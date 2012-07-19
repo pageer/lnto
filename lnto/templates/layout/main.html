@@ -1,0 +1,18 @@
+{% extends "layout/base.html" %}
+{% block body %}
+<div id="header">
+	{% block header %}
+	<h3>lnto</h3>
+	<ul>
+		<li><a href="{{url_for('show_index')}}">Links</a></li>
+		<li><a href="{{url_for('do_add_link')}}">Add Link</a></li>
+	</ul>
+	{% endblock %}
+</div>
+<div id="content">
+	{% block content %}{% endblock %}
+</div>
+<div id="sidebar">
+	{% block sidebar %}{% endblock %}
+</div>
+{% endblock %}
