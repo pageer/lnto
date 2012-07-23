@@ -2,7 +2,7 @@
 {% block title %}Add a link{% endblock %}
 {% block content %}
 <div>
-	<form action="{{ url_for('do_add_link') }}" method="post">
+	<form id="add-link-form" action="{{ url_for('do_add_link') }}" method="post">
 		<div>
 			<label for="name">Title: </label>
 			<input type="text" id="name" name="name" value="{{link.name}}" />
@@ -13,11 +13,11 @@
 		</div>
 		<div>
 			<label for="shortname">Short name :</label>
-			<input type="text" id="shortname" name="shortname" value="{{link.shortname}}" />
+			<input type="text" id="shortname" name="shortname" value="{{link.shortname|default('', true)}}" />
 		</div>
 		<div>
 			<label for="description">Description:</label>
-			<textarea type="text" id="description" name="description"/>{{link.name}}</textarea>
+			<textarea type="text" id="description" name="description"/>{{link.description}}</textarea>
 		</div>
 		{% if errors %}
 		<div class="error">
@@ -26,8 +26,8 @@
 			{% endfor %}
 		</div>
 		{% endif %}
-		<div>
-			<button>Submit</button>
+		<div class="buttons">
+			<button>{{options.button_label}}</button>
 		</div>
 	</form>
 </div>

@@ -1,11 +1,91 @@
+/* Every fuckin' thing */
+html {
+	font-family: helvetica, sans-serif;
+	font-size: 12pt;
+}
+
+/* Header */
+#header h3,
+#header ul,
+#header ul li {
+	display: inline-block;
+}
+
+#header h3 {
+	width: 50px;
+}
+
+#header ul li {
+	min-width: 25px
+}
+
+#header .link {
+	font-size: 10pt;
+	text-decoration: none;
+	margin-left: 5px;
+}
+
+#header .link:hover {
+	text-decoration: underline;
+}
+
+#header .link span {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	background-repeat: no-repeat;
+}
+
+/* link-images */
+
+#header .link.show span {
+	background-image: url(/static/images/link.png);
+}
+
+#header .link.add span {
+	background-image: url(/static/images/link_add.png);
+}
+
 /* Login page */
 
 
 /* Index page */
-.button.show {
-	
+.link-list a {
+	text-decoration: none;
 }
 
-.button.edit {
-	
+.link-list a:hover {
+	text-decoration: underline;
+}
+
+.link-list a.button:hover {
+	text-decoration: none;
+}
+
+/* Add links */
+#add-link-form {
+	width: 365px;
+	margin: 20px auto 0 auto;
+}
+
+#add-link-form > div {
+	margin-bottom: 10px;
+}
+
+#add-link-form label {
+	display: inline-block;
+	width: 100px;
+	text-align: right;
+	vertical-align: top;
+}
+
+#add-link-form input,
+#add-link-form textarea {
+	display: inline-block;
+	margin-left: 5px;
+	width: 250px;
+}
+
+#add-link-form .buttons {
+	text-align: right;
 }

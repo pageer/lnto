@@ -13,5 +13,7 @@ CREATE TABLE links (
 	description TEXT NOT NULL DEFAULT '',
 	shortname VARCHAR(255) UNIQUE,
 	url TEXT NOT NULL,
+	added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	accessed DATETIME,
 	CONSTRAINT user_url_unique UNIQUE (userid, url) ON CONFLICT FAIL
 );

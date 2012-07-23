@@ -1,6 +1,6 @@
 import time, datetime
 from lnto import app
-from flask import render_template, make_response, redirect, url_for, request, session, g
+from flask import render_template, make_response, redirect, abort, url_for, request, session, g
 from lnto.libs.db import *
 from lnto.libs.links import *
 from lnto.libs.users import *
@@ -67,6 +67,9 @@ def do_add_link():
     if not usr:
         return redirect(url_for('do_login'))
     if request.method == 'POST':
+        options = {
+            'button_label': 'Add Link'
+        }
         data = {
             'userid': usr.userid,
             'name': request.form.get('name', ''),
@@ -75,18 +78,20 @@ def do_add_link():
             'description': request.form.get('description', ''),
         }
         link = Link(data)
+        return Link.name
         
         errors = []
         if not (data.get('name') and data.get('url')):
             errors.append("Name and URL are required")
         
         if len(errors) > 0:
-            return render_template("add_link.html", link=link, errors=errors)
+            return render_template("add_link.html", link = link, options = options, errors = errors)
         else:
             link.save()
             return redirect(url_for('show_index'))
     else:
-        return render_template("add_link.html")
+        link = Link()
+        return render_template("add_link.html", link = link, options = options)
 
 @app.route('/links/edit/<linkid>', methods = ['GET', 'POST'])
 def do_edit_link(linkid):
@@ -98,6 +103,10 @@ def do_edit_link(linkid):
     if not link:
         abort(404)
     
+    options = {
+        'button_label': 'Save'
+    }
+    
     if request.method == 'POST':
         link.name = request.form.get('name')
         link.description = request.form.get('description')
@@ -108,8 +117,12 @@ def do_edit_link(linkid):
         if not (data.get('name') and data.get('url')):
             errors.append("Name and URL are required")
     else:
-        return render_template("add_link.html", link=link)
-    
+        return render_template("add_link.html", link=link, options=options)
+
+@app.route('/link/show/<linkid>')
+def show_link(linkid):
+    usr = User.get_logged_in()
+
 @app.route('/to/<linkid>')
 def show_linkurl(linkid):
     link = Link.get_by_id(linkid)

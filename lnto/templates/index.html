@@ -2,12 +2,12 @@
 {% block title %}Link index{% endblock %}
 {% block content %}
 <div>
-	<ul>
+	<ul class="link-list">
 		{% for link in links %}
 		<li>
 			<a href="{{link.url}}">{{link.name}}</a>
 			<a href="{{ url_for('show_linkurl', linkid=link.linkid) }}" class="button show">
-				<img src="{{url_for('static', filename="images/link.png")}}" alt="Show" title="Show details"/>
+				<img src="{{url_for('static', filename="images/link.png")}}" alt="Show details" title="Show details"/>
 			</a>
 			<a href="{{url_for('do_edit_link', linkid=link.linkid)}}" class="button edit">
 				<img src="{{url_for('static', filename="images/link_edit.png")}}" alt="Edit" title="Edit link"/>

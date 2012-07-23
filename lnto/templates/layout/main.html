@@ -4,8 +4,16 @@
 	{% block header %}
 	<h3>lnto</h3>
 	<ul>
-		<li><a href="{{url_for('show_index')}}">Links</a></li>
-		<li><a href="{{url_for('do_add_link')}}">Add Link</a></li>
+		<li>
+			<a href="{{url_for('show_index')}}" class="link show">
+				Show links<span></span>
+			</a>
+		</li>
+		<li>
+			<a href="{{url_for('do_add_link')}}" class="link add">
+				Add link<span></span>
+			</a>
+		</li>
 	</ul>
 	{% endblock %}
 </div>
