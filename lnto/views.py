@@ -1,6 +1,6 @@
 import time, datetime
 from lnto import app
-from flask import render_template, make_response, redirect, abort, url_for, request, session, g
+from flask import render_template, make_response, redirect, jsonify, abort, url_for, request, session, g
 from lnto.libs.db import *
 from lnto.libs.links import *
 from lnto.libs.users import *
@@ -32,7 +32,7 @@ def do_logout():
     return response
 
 @app.route('/users/new', methods = ['GET', 'POST'])
-def do_new_user():
+def do_add_user():
     if request.method == 'POST':
         errors = []
         if request.form['username'].strip() == '':
@@ -60,38 +60,48 @@ def show_index():
         return redirect(url_for('do_login'))
     links = Link.get_by_user(usr.userid)
     return render_template('index.html', links = links);
-    
+
 @app.route('/links/add', methods = ['GET', 'POST'])
 def do_add_link():
     usr = User.get_logged_in()
     if not usr:
         return redirect(url_for('do_login'))
+    
     if request.method == 'POST':
-        options = {
-            'button_label': 'Add Link'
-        }
-        data = {
-            'userid': usr.userid,
-            'name': request.form.get('name', ''),
-            'shortname': request.form.get('shortname', ''),
-            'url': request.form.get('url', ''),
-            'description': request.form.get('description', ''),
-        }
-        link = Link(data)
-        return Link.name
-        
-        errors = []
-        if not (data.get('name') and data.get('url')):
-            errors.append("Name and URL are required")
-        
-        if len(errors) > 0:
-            return render_template("add_link.html", link = link, options = options, errors = errors)
-        else:
+        req = request.form
+    else:
+        req = request.args
+    
+    data = {
+        'userid': usr.userid,
+        'name': req.get('name', ''),
+        'shortname': req.get('shortname', ''),
+        'url': req.get('url', ''),
+        'description': req.get('description', ''),
+    }
+    options = {
+        'button_label': 'Add Link'
+    }
+    
+    link = Link(data)
+    errors = []
+    
+    if data['name'] == '' or data['url'] == '':
+        errors.append("Name and URL are required")
+    
+    if request.method == 'POST':
+        if len(errors) == 0:
             link.save()
             return redirect(url_for('show_index'))
     else:
-        link = Link()
-        return render_template("add_link.html", link = link, options = options)
+        if request.args.get('submit') == '1':
+            if len(errors) == 0:
+                link.save()
+                return redirect(url_for('show_index'))
+        else:
+            errors = []
+    
+    return render_template("add_link.html", link = link, options = options, errors = errors)
 
 @app.route('/links/edit/<linkid>', methods = ['GET', 'POST'])
 def do_edit_link(linkid):
@@ -119,15 +129,36 @@ def do_edit_link(linkid):
     else:
         return render_template("add_link.html", link=link, options=options)
 
+@app.route('/links/delete/<linkid>', methods = ['POST'])
+def do_delete_link(linkid):
+    usr = User.get_logged_in()
+    if not usr:
+        return jsonify({'status': 'error', 'message': 'You must log in to delete a link.'})
+    
+    link = Link.get_by_id(linkid)
+    if not link:
+        return jsonify({'status': 'error', 'message': 'That link does not exist.'})
+    
+    link.delete()
+    return jsonify({'status': 'success'})
+
 @app.route('/link/show/<linkid>')
 def show_link(linkid):
     usr = User.get_logged_in()
+    link = Link.get_by_id(linkid)
+    if link is None:
+        abort(404)
+    return render_template('link.html', link = link, user = usr)
 
 @app.route('/to/<linkid>')
 def show_linkurl(linkid):
     link = Link.get_by_id(linkid)
     if link is None:
         abort(404);
+    usr = User.get_logged_in()
+    #if usr is not None:
+    #    link.get_count(usr).add_hit()
+    link.get_hit(usr).add_hit()
     return redirect(link.url)
 
 @app.route('/<shorturl>')
@@ -135,4 +166,8 @@ def show_shorturl(shorturl):
     link = Link.get_by_shortname(shorturl)
     if link is None:
         abort(404);
+    usr = User.get_logged_in()
+    link.get_hit(usr).add_hit()
+    #if usr is not None:
+    #    link.get_count(usr).add_hit()
     return redirect(link.url)

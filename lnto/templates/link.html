@@ -1,0 +1,15 @@
+{% extends "layout/main.html" %}
+{% block content %}
+<h3 class="title">
+	<a href="{{url_for('show_link', linkid = link.linkid)}}">{{link.name}}</a>
+</h3>
+<div class="hits">
+	You visited: {{link.get_hit(user).get_count()}}
+	Total visits: {{link.get_hit().get_count()}}
+	Your last visit: {{link.get_hit(user).get_last_hit()}}
+	
+</div>
+<div class="description">
+	{{link.description}}
+</div>
+{% endblock %}

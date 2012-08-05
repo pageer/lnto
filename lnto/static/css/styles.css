@@ -38,12 +38,16 @@ html {
 
 /* link-images */
 
-#header .link.show span {
+#header .link.showlinks span {
 	background-image: url(/static/images/link.png);
 }
 
-#header .link.add span {
+#header .link.addlink span {
 	background-image: url(/static/images/link_add.png);
+}
+
+#header .link.adduser span {
+	background-image: url(/static/images/user_add.png);
 }
 
 /* Login page */

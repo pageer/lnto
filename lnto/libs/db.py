@@ -16,7 +16,7 @@ def get_db(factory = None):
 	ret.row_factory = factory
 	return ret
 
-class ActiveRecord:
+class ActiveRecord(object):
 	"""A very simple implementation of the active record pattern.
 	
 	Currently, this handles only simple entities that are stored entirely
@@ -26,7 +26,8 @@ class ActiveRecord:
 	
 	fields = {}
 	table = ''
-	key = ''
+	key = []
+	auto_incrementing_id = True
 	
 	def __init__(self, row = None):
 		for key in self.fields.keys():
@@ -43,7 +44,7 @@ class ActiveRecord:
 		return ret
 	
 	def save(self):
-		if getattr(self, self.key) == self.fields[self.key]:
+		if len(self.key) == 1 and getattr(self, self.key) == self.fields[self.key]:
 			self.insert()
 		else:
 			self.update()
@@ -52,17 +53,20 @@ class ActiveRecord:
 		sql = "UPDATE " + self.table + " SET "
 		for field in self.fields.keys():
 			if field != self.key:
-				sql += field + " = :" + field + ", "
-		sql = sql[:-2] + " WHERE " + self.key + " = :" + self.key
+				sql += "%s = :%s, " % (field, field)
+		sql = sql[:-2] + " WHERE "
+		for k in self.key:
+			sql += "%s = :%s AND " % (k, k)
+		sql = sql[:-5]
 		get_db().execute(sql, self.getDict())
-		get_db().commit();
+		get_db().commit()
 	
 	def insert(self):
 		sql = "INSERT INTO " + self.table
 		fields = ' ('
 		values = ' ('
 		for field in self.fields.keys():
-			if field != self.key:
+			if self.auto_incrementing_id and field not in self.key:
 				values = values + ':' + field + ', '
 				fields = fields + field + ', '
 		fields = fields[:-2] + ')'
@@ -70,24 +74,49 @@ class ActiveRecord:
 		sql += fields + ' VALUES ' + values
 		curr = get_db().execute(sql, self.getDict())
 		get_db().commit();
-		setattr(self, self.key, curr.lastrowid)
+		if self.auto_incrementing_id:
+			setattr(self, self.key[0], curr.lastrowid)
+		return sql
 	
-	@staticmethod
-	def get_by(table, fields, return_class = None, return_cursor = False):
-		sql = "SELECT * FROM " + table + " WHERE "
+	def delete(self):
+		sql = "DELETE FROM %s WHERE " % (self.table)
+		keyvals = {}
+		for k in self.key:
+			sql += "%s = :%s AND " % (k, k)
+			keyvals[k] = getattr(self, k)
+		sql = sql[:-5]
+		get_db().execute(sql, keyvals)
+		get_db().commit()
+	
+	@classmethod
+	def query_select(cls, fields, where, data):
+		sql = "SELECT %s FROM %s WHERE %s" % (fields, cls.table, where)
+		curr = get_db(RowDict).execute(sql, data)
+		return curr.fetchall()
+	
+	@classmethod
+	def get_by(return_class, fields, return_cursor = False):
+		sql = "SELECT * FROM " + return_class.table + " WHERE "
 		for field in fields.keys():
 			sql += field + ' = :' + field + ' AND '
 		sql = sql[:-5]
 		curr = get_db(RowDict).execute(sql, fields)
 		if return_cursor:
 			return curr
-		elif return_class is not None:
+		else:
 			ret = []
 			for row in curr.fetchall():
 				ret.append(return_class(row))
 			return ret
-		else:
-			return curr.fetchall()
+	
+	@classmethod
+	def get_by_id(cls, keyval):
+		return cls.getone_by(cls.key[0], keyval)
+	
+	@classmethod
+	def getone_by(cls, field, value):
+		ret = cls.get_by({field:value})
+		return ret[0] if len(ret) >  0 else None
 	
 class RowDict(sqlite3.Row):
 	def get(self, key, default = None):

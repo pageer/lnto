@@ -2,16 +2,21 @@
 {% block body %}
 <div id="header">
 	{% block header %}
-	<h3>lnto</h3>
+	<h3><a href="{{url_for('show_index')}}">lnto</a></h3>
 	<ul>
 		<li>
-			<a href="{{url_for('show_index')}}" class="link show">
+			<a href="{{url_for('show_index')}}" class="link showlinks">
 				Show links<span></span>
 			</a>
 		</li>
 		<li>
-			<a href="{{url_for('do_add_link')}}" class="link add">
+			<a href="{{url_for('do_add_link')}}" class="link addlink">
 				Add link<span></span>
+			</a>
+		</li>
+		<li>
+			<a href="{{url_for('do_add_user')}}" class="link adduser">
+				Create Account<span></span>
 			</a>
 		</li>
 	</ul>

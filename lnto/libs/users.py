@@ -5,7 +5,7 @@ import werkzeug.security, hashlib
 
 class User(ActiveRecord):
 	table = 'users'
-	key = 'userid'
+	key = ['userid']
 	fields = {
 		'userid': 0,
 		'username': '',
@@ -43,12 +43,6 @@ class User(ActiveRecord):
 		else:
 			return None
 	
-	@staticmethod
-	def get_by_username(username):
-		ret = User.get_by('users', {'username': username}, return_class = User)
-		return ret[0] if len(ret) >  0 else None
-	
-	@staticmethod
-	def get_by_userid(userid):
-		ret = User.get_by('users', {'userid': userid}, return_class = User)
-		return ret[0] if len(ret) >  0 else None
+	@classmethod
+	def get_by_username(cls, username):
+		return cls.getone_by('username', username)

@@ -1,7 +1,7 @@
-{% extends "layout/base.html" %}
+{% extends "layout/main.html" %}
 {% block title %}Create a new user{% endblock %}
-{% block body %}
-<form method="post" action="{{ url_for('do_new_user') }}">
+{% block content %}
+<form method="post" action="{{ url_for('do_add_user') }}">
 	<div>
 		<label for="username">Username</label>
 		<input type="text" id="username" name="username" />
