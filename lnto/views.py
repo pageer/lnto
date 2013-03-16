@@ -61,6 +61,18 @@ def show_index():
     links = Link.get_by_user(usr.userid)
     return render_template('index.html', links = links);
 
+@app.route('/home/<username>')
+def show_user_index(username):
+    usr = User.get_by_username(username)
+    if not usr:
+        abort(404)
+    curr_user = User.get_logged_in()
+    if usr.userid == curr_user.userid:
+        links = Link.get_by_user(curr_user.userid)
+    else:
+        links = Link.get_public_by_user(usr.userid)
+    return render_template('index.html', links = links)
+
 @app.route('/links/add', methods = ['GET', 'POST'])
 def do_add_link():
     usr = User.get_logged_in()
@@ -78,9 +90,11 @@ def do_add_link():
         'shortname': req.get('shortname', ''),
         'url': req.get('url', ''),
         'description': req.get('description', ''),
+        'is_public': 1 if req.get('is_public', 1) else 0,
     }
     options = {
-        'button_label': 'Add Link'
+        'button_label': 'Add Link',
+        'post_view': url_for('do_add_link')
     }
     
     link = Link(data)
@@ -114,7 +128,8 @@ def do_edit_link(linkid):
         abort(404)
     
     options = {
-        'button_label': 'Save'
+        'button_label': 'Save',
+        'post_view': url_for('do_edit_link', linkid=linkid)
     }
     
     if request.method == 'POST':
@@ -122,12 +137,15 @@ def do_edit_link(linkid):
         link.description = request.form.get('description')
         link.shortname = request.form.get('shortname')
         link.url = request.form.get('url')
+        link.is_public = 1 if request.form.get('is_public') else 0
         
         errors = []
-        if not (data.get('name') and data.get('url')):
+        if not (request.form.get('name') and request.form.get('url')):
             errors.append("Name and URL are required")
-    else:
-        return render_template("add_link.html", link=link, options=options)
+        
+        if len(errors) == 0:
+            link.save()
+    return render_template("add_link.html", link=link, options=options)
 
 @app.route('/links/delete/<linkid>', methods = ['POST'])
 def do_delete_link(linkid):

@@ -62,7 +62,12 @@ html {
 	text-decoration: underline;
 }
 
+.link-list a.button {
+	opacity: 0.5;	
+}
+
 .link-list a.button:hover {
+	opacity: 1;
 	text-decoration: none;
 }
 
@@ -88,6 +93,10 @@ html {
 	display: inline-block;
 	margin-left: 5px;
 	width: 250px;
+}
+
+#add-link-form input[type="checkbox"] {
+	width: auto;
 }
 
 #add-link-form .buttons {

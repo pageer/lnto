@@ -12,6 +12,8 @@ class Link(db.ActiveRecord):
 		'url': '',
 		'description': '',
 		'shortname': None,
+		'added': datetime.now(),
+		'is_public': 1,
 		'userid': 0,
 		'linkid': 0
 	}
@@ -41,6 +43,10 @@ class Link(db.ActiveRecord):
 	@staticmethod
 	def get_by_user(userid):
 		return Link.get_by({'userid': userid})
+	
+	@staticmethod
+	def get_public_by_user(userid):
+		return Link.get_by({'userid': userid, 'is_public': 1})
 	
 	@classmethod
 	def get_by_shortname(cls, name):

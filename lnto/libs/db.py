@@ -44,7 +44,8 @@ class ActiveRecord(object):
 		return ret
 	
 	def save(self):
-		if len(self.key) == 1 and getattr(self, self.key) == self.fields[self.key]:
+		print (self.key), getattr(self, self.key[0]), self.fields[self.key[0]]
+		if len(self.key) == 1 and getattr(self, self.key[0]) == self.fields[self.key[0]]:
 			self.insert()
 		else:
 			self.update()
