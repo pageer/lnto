@@ -1,9 +1,10 @@
 import time, datetime
+from datetime import datetime, timedelta
 from lnto import app
 from flask import render_template, make_response, redirect, jsonify, abort, url_for, request, session, g
-from lnto.libs.db import *
-from lnto.libs.links import *
-from lnto.libs.users import *
+from lnto.libs.links import Link
+from lnto.libs.users import User
+from lnto.libs.decorators import force_login
 
 @app.route('/login', methods = ['GET', 'POST'])
 def do_login():
@@ -45,7 +46,9 @@ def do_add_user():
             usr = User()
             usr.username = request.form['username']
             usr.set_password(request.form['password'])
-            usr.signup_up = request.headers.get('Remote-Addr')
+            usr.signup_ip = request.remote_addr
+            print usr.signup_ip
+            exit
             usr.save()
             return redirect(url_for('show_index'))
         else:
@@ -54,10 +57,9 @@ def do_add_user():
         return render_template("new_user.html")
 
 @app.route('/')
+@force_login
 def show_index():
     usr = User.get_logged_in()
-    if not usr:
-        return redirect(url_for('do_login'))
     links = Link.get_by_user(usr.userid)
     return render_template('index.html', links = links);
 
@@ -74,10 +76,9 @@ def show_user_index(username):
     return render_template('index.html', links = links)
 
 @app.route('/links/add', methods = ['GET', 'POST'])
+@force_login
 def do_add_link():
     usr = User.get_logged_in()
-    if not usr:
-        return redirect(url_for('do_login'))
     
     if request.method == 'POST':
         req = request.form
@@ -118,10 +119,9 @@ def do_add_link():
     return render_template("add_link.html", link = link, options = options, errors = errors)
 
 @app.route('/links/edit/<linkid>', methods = ['GET', 'POST'])
+@force_login
 def do_edit_link(linkid):
     usr = User.get_logged_in()
-    if not usr:
-        return redirect(url_for('do_login'))
     
     link = Link.get_by_id(linkid)
     if not link:
@@ -162,10 +162,10 @@ def do_delete_link(linkid):
 
 @app.route('/link/show/<linkid>')
 def show_link(linkid):
-    usr = User.get_logged_in()
     link = Link.get_by_id(linkid)
     if link is None:
         abort(404)
+    usr = User.get_logged_in()
     return render_template('link.html', link = link, user = usr)
 
 @app.route('/to/<linkid>')

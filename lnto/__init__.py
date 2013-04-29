@@ -1,15 +1,19 @@
 import lnto.libs.db
 from flask import Flask, request, session, g
+from flask.ext.sqlalchemy import SQLAlchemy
 
 DB_PATH = 'linkto.db'
+
 DEBUG = True
 SECRET_KEY = 'super secret key zone japan'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///../linkto.db'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+appdb = SQLAlchemy(app)
 lnto.libs.db.DB_PATH = app.config['DB_PATH']
 
-import views
+import views, api
 
 #@app.before_request
 #def before_request():

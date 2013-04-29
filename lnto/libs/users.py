@@ -1,18 +1,24 @@
-from lnto.libs.db import *
+from lnto import appdb
 from flask import request
 from datetime import datetime, timedelta
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
 import werkzeug.security, hashlib
 
-class User(ActiveRecord):
-	table = 'users'
-	key = ['userid']
-	fields = {
-		'userid': 0,
-		'username': '',
-		'password': '',
-		'signup_ip': '',
-		'signup_date': datetime.now()
-	}
+class User(appdb.Model):
+	__tablename__ = 'users'
+	userid = Column(Integer, primary_key = True)
+	username = Column(String(64))
+	password = Column(String(255))
+	signup_ip = Column(String(64), default = '')
+	signup_date = Column(DateTime, default = datetime.now())
+	
+	def __init__(self, row = None):
+		if row is not None:
+			self.username = row['username'] if row.get('username') else ''
+			self.password = row['password'] if row.get('password') else ''
+			self.signup_ip = row['signup_ip'] if row.get('signup_ip') else ''
+			self.signup_date = row['signup_date'] if row.get('signup_date') else datetime.now()
+	
 	
 	def set_password(self, passwd):
 		self.password = werkzeug.security.generate_password_hash(passwd)
@@ -31,6 +37,10 @@ class User(ActiveRecord):
 		userkey += hashlib.sha512(self.password).hexdigest()
 		return self.username + '|' + hashlib.sha512(userkey).hexdigest()
 	
+	def save(self):
+		appdb.session.add(self)
+		appdb.session.commit()
+
 	@staticmethod
 	def get_logged_in():
 		if request.cookies.get('uinf'):
@@ -45,4 +55,4 @@ class User(ActiveRecord):
 	
 	@classmethod
 	def get_by_username(cls, username):
-		return cls.getone_by('username', username)
+		return appdb.session.query(User).filter_by(username = username).first()

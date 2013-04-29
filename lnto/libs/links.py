@@ -1,28 +1,39 @@
 import sqlite3
-import db
-from lnto.libs.db import get_db
+from lnto import appdb
 from datetime import datetime
 
-class Link(db.ActiveRecord):
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
 
-	table = 'links'
-	key = ['linkid']
-	fields = {
-		'name': '',
-		'url': '',
-		'description': '',
-		'shortname': None,
-		'added': datetime.now(),
-		'is_public': 1,
-		'userid': 0,
-		'linkid': 0
-	}
+class Link(appdb.Model):
+	__tablename__ = 'links'
+	
+	linkid = Column(Integer, primary_key = True)
+	userid = Column(Integer)
+	name = Column(String(256))
+	url = Column(Text)
+	description = Column(Text)
+	shortname = Column(String(256))
+	added = Column(DateTime)
+	is_public = Column(Boolean)
+	
 	count = None
+	
+	def __init__(self, row = None):
+		if row is not None:
+			self.name = row['name'] if row.get('name') else ''
+			self.url = row['url'] if row.get('url') else ''
+			self.description = row['description'] if row.get('description') else ''
+			self.shortname = row['shortname'] if row.get('shortname') else None
+			self.added = row['added'] if row.get('added') else datetime.now()
+			self.is_public = row['is_public'] if row.get('is_public') else 1
+			self.userid = row['userid'] if row.get('userid') else 0
+			self.linkid = row['linkid'] if row.get('linkid') else 0
 	
 	def save(self):
 		if self.shortname == '':
 			self.shortname = None
-		super(Link, self).save()
+		appdb.session.add(self)
+		appdb.session.commit()
 	
 	def get_count(self, user = None):
 		if self.count is None:
@@ -41,61 +52,70 @@ class Link(db.ActiveRecord):
 		return LinkHit(data)
 	
 	@staticmethod
+	def get_by_id(id):
+		return appdb.session.query(Link).filter_by(linkid = id).first()
+
+	@staticmethod
 	def get_by_user(userid):
-		return Link.get_by({'userid': userid})
+		return appdb.session.query(Link).filter_by(userid = userid).all()
 	
 	@staticmethod
 	def get_public_by_user(userid):
-		return Link.get_by({'userid': userid, 'is_public': 1})
+		return appdb.session.query(Link).filter_by(userid = userid, is_public = 1).all()
 	
 	@classmethod
 	def get_by_shortname(cls, name):
-		return cls.getone_by('shortname', name)
+		return appdb.session.query(Link).filter_by(shortname = name).first()
 
-class LinkHit(db.ActiveRecord):
-	table = "links_hits"
-	key = ['hitid']
-	fields = {
-		'hitid': 0,
-		'linkid': 0,
-		'userid': None,
-		'ts': 0
-	}
+class LinkHit(appdb.Model):
+	__tablename__ = "links_hits"
+	
+	hitid = Column(Integer, primary_key = True)
+	linkid = Column(Integer)
+	userid = Column(Integer)
+	ts = Column(DateTime)
+	
+	def __init__(self, row = None):
+		if row is not None:
+			self.hitid = row['hitid'] if row.get('hitid') else None
+			self.linkid = row['linkid'] if row.get('linkid') else 0
+			self.userid = row['userid'] if row.get('userid') else None
+			self.ts = row['ts'] if row.get('ts') else None
+	
 	
 	def add_hit(self):
 		self.ts = datetime.now()
-		self.insert()
+		appdb.session.add(self)
+		appdb.session.commit()
 	
 	def get_count(self):
-		data = {'linkid': self.linkid}
-		where = 'linkid = :linkid'
-		if self.userid is not None:
-			data['userid'] = self.userid
-			where += " AND userid = :userid"
-		results = self.query_select("COUNT(*) AS cnt", where, data)
-		return results[0]['cnt'] if len(results) > 0 else 0
+		if self.userid:
+			return appdb.session.query(LinkHit).filter_by(linkid = self.linkid, userid = self.userid).count()
+		else:
+			return appdb.session.query(LinkHit).filter_by(linkid = self.linkid).count()
 	
 	def get_last_hit(self):
-		data = {'linkid': self.linkid}
-		where = 'linkid = :linkid'
-		if self.userid is not None:
-			data['userid'] = self.userid
-			where += " AND userid = :userid"
-		results = self.query_select("MAX(ts) AS last_access", where, data)
-		return results[0]['last_access'] if len(results) > 0 else 0
+		if self.userid:
+			return appdb.session.query(appdb.func.max(LinkHit.ts)).select_from(LinkHit).filter_by(linkid = self.linkid, userid = self.userid).scalar()
+		else:
+			return appdb.session.query(appdb.func.max(LinkHit.ts)).select_from(LinkHit).filter_by(linkid = self.linkid).scalar()
 
-class LinkCount(db.ActiveRecord):
-	table = "links_counts"
-	auto_incrementing_id = False
-	key = ['linkid', 'userid']
-	fields = {
-		'linkid': 0,
-		'userid': 0,
-		'hit_count': 0,
-		'last_hit': datetime.now()
-	}
+class LinkCount(appdb.Model):
+	__tablename__ = "links_counts"
+	linkid = Column(Integer, primary_key = True)
+	userid = Column(Integer, primary_key = True)
+	hit_count = Column(Integer)
+	last_hit = Column(DateTime)
+	
+	def __init__(self, row = None):
+		if row is not None:
+			self.linkid = row['linkid'] if row.get('linkid') else None
+			self.userid = row['userid'] if row.get('userid') else None
+			self.hit_count = row['hit_count'] if row.get('hit_count') else None
+			self.last_hit = row['last_hit'] if row.get('last_hit') else None
 	
 	def add_hit(self):
 		self.hit_count += 1
 		self.last_hit = datetime.now()
-		self.update()
+		appdb.session.add(self)
+		appdb.session.commit()
