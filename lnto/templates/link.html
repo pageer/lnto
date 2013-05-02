@@ -12,4 +12,9 @@
 <div class="description">
 	{{link.description}}
 </div>
+<div class="tags">
+	{% for tag in link.get_taglist()%}
+	<a href="">{{tag}}</a> 
+	{% endfor %}
+</div>
 {% endblock %}

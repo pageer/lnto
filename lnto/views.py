@@ -4,6 +4,7 @@ from lnto import app
 from flask import render_template, make_response, redirect, jsonify, abort, url_for, request, session, g
 from lnto.libs.links import Link
 from lnto.libs.users import User
+from lnto.libs.tags import Tag
 from lnto.libs.decorators import force_login
 
 @app.route('/login', methods = ['GET', 'POST'])
@@ -91,6 +92,7 @@ def do_add_link():
         'shortname': req.get('shortname', ''),
         'url': req.get('url', ''),
         'description': req.get('description', ''),
+        'tags': req.get('tags', ''),
         'is_public': 1 if req.get('is_public', 1) else 0,
     }
     options = {
@@ -103,6 +105,15 @@ def do_add_link():
     
     if data['name'] == '' or data['url'] == '':
         errors.append("Name and URL are required")
+    
+    if (data.get('tags').strip() == ''):
+        taglist = []
+    else:
+        taglist = data.get('tags').split(',')
+
+    for name in taglist:
+        tag = Tag.get_by_name(name.strip())
+        link.tags.append(tag)
     
     if request.method == 'POST':
         if len(errors) == 0:
@@ -138,6 +149,15 @@ def do_edit_link(linkid):
         link.shortname = request.form.get('shortname')
         link.url = request.form.get('url')
         link.is_public = 1 if request.form.get('is_public') else 0
+        
+        if (request.form.get('tags').strip() == ''):
+            taglist = []
+        else:
+            taglist = request.form.get('tags').split(',')
+    
+        for name in taglist:
+            tag = Tag.get_by_name(name.strip())
+            link.tags.append(tag)
         
         errors = []
         if not (request.form.get('name') and request.form.get('url')):

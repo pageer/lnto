@@ -1,16 +1,21 @@
 from lnto import appdb
 from flask import request
 from datetime import datetime, timedelta
+
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
+
 import werkzeug.security, hashlib
 
 class User(appdb.Model):
 	__tablename__ = 'users'
 	userid = Column(Integer, primary_key = True)
-	username = Column(String(64))
+	username = Column(String(64), unique = True)
 	password = Column(String(255))
 	signup_ip = Column(String(64), default = '')
 	signup_date = Column(DateTime, default = datetime.now())
+	
+	user_links = relationship('Link', order_by = 'Link.linkid', backref = 'users', lazy = 'dynamic')
 	
 	def __init__(self, row = None):
 		if row is not None:
@@ -39,6 +44,10 @@ class User(appdb.Model):
 	
 	def save(self):
 		appdb.session.add(self)
+		appdb.session.commit()
+	
+	def delete(self):
+		appdb.session.delete(self)
 		appdb.session.commit()
 
 	@staticmethod

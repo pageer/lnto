@@ -1,20 +1,26 @@
 import sqlite3
 from lnto import appdb
+from lnto.libs.tags import link_tags, link_display_tags
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, Boolean, Text
 
 class Link(appdb.Model):
 	__tablename__ = 'links'
 	
 	linkid = Column(Integer, primary_key = True)
-	userid = Column(Integer)
+	userid = Column(Integer, ForeignKey('users.userid'))
 	name = Column(String(256))
 	url = Column(Text)
 	description = Column(Text)
 	shortname = Column(String(256))
 	added = Column(DateTime)
 	is_public = Column(Boolean)
+	
+	owner = relationship('User', backref = backref('links', order_by = linkid))
+	#display_tags = relationship('DisplayTag', secondary = link_display_tags, backref = 'links')
+	tags = relationship('Tag', secondary = link_tags, backref = 'links')
 	
 	count = None
 	
@@ -27,7 +33,13 @@ class Link(appdb.Model):
 			self.added = row['added'] if row.get('added') else datetime.now()
 			self.is_public = row['is_public'] if row.get('is_public') else 1
 			self.userid = row['userid'] if row.get('userid') else 0
-			self.linkid = row['linkid'] if row.get('linkid') else 0
+			self.linkid = row['linkid'] if row.get('linkid') else None
+	
+	def get_taglist(self):
+		ret = []
+		for tag in self.tags:
+			ret.append(str(tag))
+		return ret
 	
 	def save(self):
 		if self.shortname == '':
