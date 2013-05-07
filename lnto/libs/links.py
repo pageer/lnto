@@ -1,6 +1,6 @@
 import sqlite3
 from lnto import appdb
-from lnto.libs.tags import link_tags, link_display_tags
+from lnto.libs.tags import Tag, link_tags, link_display_tags
 from datetime import datetime
 
 from sqlalchemy.orm import relationship, backref
@@ -75,9 +75,23 @@ class Link(appdb.Model):
 	def get_public_by_user(userid):
 		return appdb.session.query(Link).filter_by(userid = userid, is_public = 1).all()
 	
-	@classmethod
-	def get_by_shortname(cls, name):
+	@staticmethod
+	def get_by_shortname(name):
 		return appdb.session.query(Link).filter_by(shortname = name).first()
+	
+	@staticmethod
+	def get_by_tag(tag, userid = None):
+		if userid is None:
+			return appdb.session.query(Link).filter(Link.tags.any(Tag.tag_name == tag)).all()
+		else:
+			return appdb.session.query(Link).filter_by(userid = userid).filter(Link.tags.any(Tag.tag_name == tag)).all()
+
+	@staticmethod
+	def get_public_by_tag(tag, userid = None):
+		if userid is None:
+			return appdb.session.query(Link).filter_by(is_public = True).filter(Link.tags.any(Tag.tag_name == tag)).all()
+		else:
+			return appdb.session.query(Link).filter_by(userid = userid, is_public = True).filter(Link.tags.any(Tag.tag_name == tag)).all()
 
 class LinkHit(appdb.Model):
 	__tablename__ = "links_hits"

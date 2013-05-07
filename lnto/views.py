@@ -64,12 +64,20 @@ def show_index():
     links = Link.get_by_user(usr.userid)
     return render_template('index.html', links = links);
 
+@app.route('/home/<username>/')
 @app.route('/home/<username>')
+@app.route('/my/', defaults = {'username': None})
+@app.route('/my',  defaults = {'username': None})
 def show_user_index(username):
-    usr = User.get_by_username(username)
+    curr_user = User.get_logged_in()
+    if username is None:
+        usr = curr_user
+    else:
+        usr = User.get_by_username(username)
+    
     if not usr:
         abort(404)
-    curr_user = User.get_logged_in()
+    
     if usr.userid == curr_user.userid:
         links = Link.get_by_user(curr_user.userid)
     else:
@@ -127,7 +135,7 @@ def do_add_link():
         else:
             errors = []
     
-    return render_template("add_link.html", link = link, options = options, errors = errors)
+    return render_template("link_add.html", link = link, options = options, errors = errors)
 
 @app.route('/links/edit/<linkid>', methods = ['GET', 'POST'])
 @force_login
@@ -165,7 +173,7 @@ def do_edit_link(linkid):
         
         if len(errors) == 0:
             link.save()
-    return render_template("add_link.html", link=link, options=options)
+    return render_template("link_add.html", link=link, options=options)
 
 @app.route('/links/delete/<linkid>', methods = ['POST'])
 def do_delete_link(linkid):
@@ -199,6 +207,41 @@ def show_linkurl(linkid):
     link.get_hit(usr).add_hit()
     return redirect(link.url)
 
+@app.route('/tags/')
+@app.route('/tags')
+def show_tag_list(name):
+    tags = Tag.get_public()
+    
+@app.route('/home/<username>/tags/')
+@app.route('/home/<username>/tags')
+@app.route('/my/tags/', defaults = {'username': None})
+@app.route('/my/tags',  defaults = {'username': None})
+def show_user_tag_list(username):
+    if username is None:
+        user = User.get_logged_in()
+    else:
+        user = User.get_by_username(username)
+    
+    if user.username == username:
+        tags = Tag.get_by_user(user.username)
+    else:
+        tags = Tag.get_public_by_user(user.username)
+    
+@app.route('/tag/<name>')
+def show_tag(name):
+    links = Link.get_public_by_tag(name)
+    title = 'Links for Tag - "%s"' % name
+    return render_template('index.html', links = links, section_title = title, page_title = title);
+    
+@app.route('/my/tag/<name>')
+@force_login
+def show_user_tag(name):
+    usr = User.get_logged_in()
+    links = Link.get_by_tag(name, usr.userid)
+    title = 'My Tagged Links - "%s"' % name
+    return render_template('index.html', links = links, section_title = title, page_title = title);
+
+# Wildcard route - THIS MUST BE PROCESSED LAST    
 @app.route('/<shorturl>')
 def show_shorturl(shorturl):
     link = Link.get_by_shortname(shorturl)

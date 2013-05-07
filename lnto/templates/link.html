@@ -14,7 +14,7 @@
 </div>
 <div class="tags">
 	{% for tag in link.get_taglist()%}
-	<a href="">{{tag}}</a> 
+	<a href="{{url_for('show_tag', name = tag)}}">{{tag}}</a> 
 	{% endfor %}
 </div>
 {% endblock %}

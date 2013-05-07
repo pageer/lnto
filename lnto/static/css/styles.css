@@ -51,7 +51,27 @@ html {
 }
 
 /* Login page */
+.login-form {
+    padding: 15px;
+    border: thin solid #c9c9c9;
+    border-radius: 5px;
+    margin: 0 auto;
+    max-width: 300px;
+}
 
+.login-form .row {
+    margin: 5px;
+}
+
+.login-form .row label {
+    display: inline-block;
+    width: 100px;
+    text-align: right;
+}
+
+.login-form .row.buttons {
+    text-align: center;
+}
 
 /* Index page */
 .link-list a {

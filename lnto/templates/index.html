@@ -1,7 +1,10 @@
 {% extends "layout/main.html" %}
-{% block title %}Link index{% endblock %}
+{% block title %}{{page_title|default('Link index')}}{% endblock %}
 {% block content %}
 <div>
+	{% block content_title %}
+	<h3>{{section_title|default('Links')}}</h3>	
+	{% endblock %}
 	<ul class="link-list">
 		{% for link in links %}
 		<li>
