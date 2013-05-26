@@ -11,7 +11,6 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///../linkto.db'
 app = Flask(__name__)
 app.config.from_object(__name__)
 appdb = SQLAlchemy(app)
-lnto.libs.db.DB_PATH = app.config['DB_PATH']
 
 import views, api
 

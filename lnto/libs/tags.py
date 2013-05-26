@@ -1,4 +1,6 @@
 import re
+import lnto.libs.links
+
 from lnto import appdb
 from datetime import datetime
 from sqlalchemy.orm import relationship
@@ -19,8 +21,6 @@ class Tag(appdb.Model):
 	tagid = Column(Integer, primary_key = True)
 	tag_name = Column(String(64), unique = True)
 	
-	#links = relationship('Link', secondary = link_tags, backref = 'tags')
-	
 	def __init__(self, name = None):
 		if name:
 			self.tag_name = name
@@ -37,15 +37,15 @@ class Tag(appdb.Model):
 	
 	@staticmethod
 	def get_public():
-		return appdb.session.query(Tag).filter(Links.is_public == True).all()
+		return appdb.session.query(Tag).filter(lnto.libs.links.Link.is_public == True).all()
 
 	@staticmethod
 	def get_by_user(userid):
-		return appdb.session.query(Tag).filter(Links.userid == userid).all()
+		return appdb.session.query(Tag).filter(lnto.libs.links.Link.userid == userid).all()
 	
 	@staticmethod
 	def get_public_by_user(userid):
-		return appdb.session.query(Tag).filter(Links.userid == userid, Links.is_public == False).all()
+		return appdb.session.query(Tag).filter(lnto.libs.links.Link.userid == userid, lnto.libs.links.Link.is_public == False).all()
 	
 class DisplayTag(appdb.Model):
 	__tablename__ = 'display_tags'

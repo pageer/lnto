@@ -1,7 +1,9 @@
-import sqlite3
+import urllib
+
 from lnto import appdb
 from lnto.libs.tags import Tag, link_tags, link_display_tags
 from datetime import datetime
+from bs4 import BeautifulSoup
 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, Boolean, Text
@@ -12,11 +14,11 @@ class Link(appdb.Model):
 	linkid = Column(Integer, primary_key = True)
 	userid = Column(Integer, ForeignKey('users.userid'))
 	name = Column(String(256))
-	url = Column(Text)
-	description = Column(Text)
+	url = Column(Text(convert_unicode = True))
+	description = Column(Text(convert_unicode = True), default = '')
 	shortname = Column(String(256))
-	added = Column(DateTime)
-	is_public = Column(Boolean)
+	added = Column(DateTime, default = datetime.now())
+	is_public = Column(Boolean, default = True)
 	
 	owner = relationship('User', backref = backref('links', order_by = linkid))
 	#display_tags = relationship('DisplayTag', secondary = link_display_tags, backref = 'links')
@@ -63,6 +65,9 @@ class Link(appdb.Model):
 			data['userid'] = user.userid
 		return LinkHit(data)
 	
+	def is_owner(self, user):
+		return self.userid == user.userid;
+	
 	@staticmethod
 	def get_by_id(id):
 		return appdb.session.query(Link).filter_by(linkid = id).first()
@@ -92,12 +97,65 @@ class Link(appdb.Model):
 			return appdb.session.query(Link).filter_by(is_public = True).filter(Link.tags.any(Tag.tag_name == tag)).all()
 		else:
 			return appdb.session.query(Link).filter_by(userid = userid, is_public = True).filter(Link.tags.any(Tag.tag_name == tag)).all()
+	
+	@staticmethod
+	def get_by_most_hits(owner = None, limit = 10):
+		query = appdb.session.query(Link, appdb.func.count(LinkHit.linkid)).join(LinkHit)
+		if owner is not None:
+			query = query.filter(Link.userid == owner)
+		data = query.group_by(LinkHit.linkid).order_by(appdb.func.count(LinkHit.linkid).desc()).limit(limit)
+		ret = []
+		for row in data:
+			row[0].hit_count = row[1]
+			ret.append(row[0])
+		return ret
+	
+	@staticmethod
+	def get_by_most_recent_hit(owner = None, limit = 10):
+		query = appdb.session.query(Link, appdb.func.max(LinkHit.ts)).join(LinkHit)
+		if owner is not None:
+			query = query.filter(Link.userid == owner)
+		data = query.group_by(LinkHit.linkid).order_by(appdb.func.max(LinkHit.ts).desc()).limit(limit)
+		ret = []
+		for row in data:
+			row[0].last_hit = row[1]
+			ret.append(row[0])
+		return ret
+		
+	
+	@staticmethod
+	def get_by_most_recent(owner = None, limit = 10):
+		query = appdb.session.query(Link)
+		if owner is not None:
+			query = query.filter(Link.userid == owner)
+		return query.order_by(Link.added.desc()).limit(limit).all()
+	
+	@staticmethod
+	def create_from_url(url):
+		# TODO: Normalize the URL first
+		opener = urllib.FancyURLopener({})
+		data = opener.open(url).read()
+		return Link.create_from_webpage(url, data)
+		
+	def create_from_webpage(url, pagedata):
+		soup = BeautifulSoup(pagedata)
+		link = Link();
+		link.url = url
+		link.title = soup.head.title.string
+		
+		for meta in soup.head.find_all('meta'):
+			desc = meta.attrs.get('description')
+			if desc:
+				link.description = desc
+		
+		return link
+		
 
 class LinkHit(appdb.Model):
 	__tablename__ = "links_hits"
 	
 	hitid = Column(Integer, primary_key = True)
-	linkid = Column(Integer)
+	linkid = Column(Integer, ForeignKey('links.linkid'))
 	userid = Column(Integer)
 	ts = Column(DateTime)
 	
@@ -125,6 +183,12 @@ class LinkHit(appdb.Model):
 			return appdb.session.query(appdb.func.max(LinkHit.ts)).select_from(LinkHit).filter_by(linkid = self.linkid, userid = self.userid).scalar()
 		else:
 			return appdb.session.query(appdb.func.max(LinkHit.ts)).select_from(LinkHit).filter_by(linkid = self.linkid).scalar()
+	
+	@staticmethod
+	def get_most_hits(owner = None, limit = 10):
+		pass
+	
+	
 
 class LinkCount(appdb.Model):
 	__tablename__ = "links_counts"

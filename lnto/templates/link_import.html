@@ -1,0 +1,22 @@
+{% extends "layout/main.html" %}
+{% block title %}Import Bookmarks{% endblock %}
+{% block content %}
+{% if results %}
+<div class="results">
+    Imported {{results.links|count}} links
+    and {{results.folders|count}} folders.
+    Found {{results.duplicates|count}} duplicate links.
+</div>
+{% endif %}
+<form method="post" action="{{url_for('show_import')}}">
+    <div>
+        Format: <label>Opera/Firefox<input type="radio" name="importtype" checked="checked" value="opera" /></label>
+    </div>
+    <div>
+        <label for="importtext">Paste file to import here:</label>
+        <br />
+        <textarea rows="20" cols="80" id="importtext" name="importtext">{{import_file}}</textarea>
+    </div>
+    <input type="submit" value="import" />
+</form>
+{% endblock %}

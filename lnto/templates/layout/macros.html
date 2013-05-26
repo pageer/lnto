@@ -1,0 +1,21 @@
+{% macro link_listing(links, curr_user, extra_field = None) %}
+	<ul class="link-list">
+		{% for link in links %}
+		<li>
+			<a href="{{ url_for('show_linkurl', linkid=link.linkid) }}" class="name">{{link.name}}</a>
+            {% if extra_field %}({{link[extra_field]}}){% endif %}
+			<a href="{{ url_for('show_link', linkid=link.linkid) }}" class="button show">
+				<img src="{{url_for('static', filename="images/link.png")}}" alt="Show details" title="Show details"/>
+			</a>
+            {% if link.is_owner(curr_user) %}
+			<a href="{{url_for('do_edit_link', linkid=link.linkid)}}" class="button edit">
+				<img src="{{url_for('static', filename="images/link_edit.png")}}" alt="Edit" title="Edit link"/>
+			</a>
+			<a href="{{url_for('do_delete_link', linkid=link.linkid)}}" class="button delete">
+				<img src="{{url_for('static', filename="images/link_delete.png")}}" alt="Edit" title="Edit link"/>
+			</a>
+            {% endif %}
+		</li>
+		{% endfor %}
+	</ul>
+{% endmacro %}
