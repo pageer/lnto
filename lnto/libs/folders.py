@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import ForeignKey, Table, Column, Integer, String, DateTime, Boolean, Text
 
-link_folders = Table('link_folders', appdb.Model.metadata,
+folder_links = Table('folder_links', appdb.Model.metadata,
 	Column('folderid', Integer, ForeignKey('folders.folderid')),
 	Column('linkid', Integer, ForeignKey('links.linkid'))
 )
@@ -18,13 +18,13 @@ class Folder(appdb.Model):
 	__tablename__ = 'folders'
 	
 	folderid = Column(Integer, primary_key = True)
-	userid = Column(Integer, )
+	userid = Column(Integer)
 	name = Column(String(255))
 	description = Column(Text, default = '')
 	added = Column(DateTime, default = datetime.now())
 	is_public = Column(Boolean, default = True)
 	
-	links = relationship('Link', secondary = link_folders)
+	links = relationship('Link', secondary = folder_links)
 	#children = relationship('Folder', secondary = folder_children, foreign_keys = 'folder_children.parentid', backref = "parents")
 	
 	#table = 'folders'

@@ -55,10 +55,10 @@ class LinkImporter(object):
             if len(a.contents) == 0:
                 data['name'] = data['url'][:250]
             else:
-                data['name'] = a.contents[0]
+                data['name'] = unicode(a.contents[0])
             desc_node = self.get_description(a)
             if desc_node:
-                data['description'] = desc_node.contents[0]
+                data['description'] = unicode(desc_node.contents[0])
             link = Link(data)
             
             if links.get(link.url):
@@ -72,8 +72,10 @@ class LinkImporter(object):
                 f = folders.get(folder.contents[0])
                 if not f:
                     f = Folder()
+                    f.userid = self.user.userid
                     f.name = folder.contents[0]
                     folders[folder.contents[0]] = f
+                    appdb.session.add(f)
                 f.links.append(link)
         appdb.session.commit()
         return {'links': links, 'folders': folders, 'duplicates': duplicates}
