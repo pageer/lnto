@@ -2,20 +2,20 @@
 {% import 'layout/macros.html' as macros %}
 {% block title %}User Homepage{% endblock %}
 {% block content %}
-<div class="all-links">
-	<h3>All Links</h3>	
+<div class="linkpanel all-links">
+	<h3 class="header">All Links</h3>	
 	{{ macros.link_listing(links, user) }}
 </div>
-<div class="popular-links">
-	<h3>Most Visits</h3>	
+<div class="linkpanel popular-links">
+	<h3 class="header">Most Visits</h3>	
 	{{ macros.link_listing(most_hits, user, 'hit_count') }}
 </div>
-<div class="last-links">
-	<h3>Recently Visited</h3>	
-	{{ macros.link_listing(recent_hits, user, 'last_hit') }}
+<div class="linkpanel last-links">
+	<h3 class="header">Recently Visited</h3>	
+	{{ macros.link_listing(recent_hits, user, 'last_hit', 'date') }}
 </div>
-<div class="recent-links">
-	<h3>Recently Added</h3>	
-	{{ macros.link_listing(recent_links, user, 'added') }}
+<div class="linkpanel recent-links">
+	<h3 class="header">Recently Added</h3>	
+	{{ macros.link_listing(recent_links, user, 'added', 'date') }}
 </div>
 {% endblock %}

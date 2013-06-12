@@ -1,0 +1,18 @@
+{% extends "layout/main.html" %}
+{% block title %}Add a link{% endblock %}
+{% block content %}
+<div>
+    <form method="post">
+        <h3>Really delete this link?</h3>
+        <div>{{link.name}} - <a href="{{url_for('show_linkurl', linkid = link.linkid)}}">{{link.url}}</a></div>
+        <div>
+            <input type="submit" name="confirm" value="Yes" />
+            <input type="submit" name="cancel" value="No" />
+        </div>
+        {% if error %}
+        <div class="error">{{error}}</div>
+        {% endif %}
+        <input type="hidden" name="referer" value="{{pageoptions.referer}}" />
+    </form>
+</div>
+{% endblock %}

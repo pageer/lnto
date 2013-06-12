@@ -1,18 +1,27 @@
-{% macro link_listing(links, curr_user, extra_field = None) %}
+{% macro link_listing(links, curr_user, extra_field = None, format = None) %}
 	<ul class="link-list">
 		{% for link in links %}
 		<li>
 			<a href="{{ url_for('show_linkurl', linkid=link.linkid) }}" class="name">{{link.name}}</a>
-            {% if extra_field %}({{link[extra_field]}}){% endif %}
+            {% if extra_field %}
+				{% if format == 'date' %}
+					<span class="extra">({{link[extra_field].strftime('%Y-%m-%d %I:%m %p')}})</span>
+				{% else %}
+					<span class="extra">({{link[extra_field]}})</span>
+				{% endif %}
+			{% endif %}
+            {% if link.is_owner(curr_user) %}
+			<span class="menulink">
+				<img src="{{url_for('static', filename="images/cog.png")}}" alt=""/>
+				<span class="menu">
+					<a href="{{ url_for('show_link', linkid=link.linkid) }}" class="button show">Show&nbsp;details</a>
+					<a href="{{url_for('do_edit_link', linkid=link.linkid)}}" class="button edit">Edit</a>
+					<a href="{{url_for('show_delete_link', linkid=link.linkid)}}" data-linkid="{{link.linkid}}" class="button delete">Delete</a>
+				</span>
+			</span>
+			{% else %}
 			<a href="{{ url_for('show_link', linkid=link.linkid) }}" class="button show">
 				<img src="{{url_for('static', filename="images/link.png")}}" alt="Show details" title="Show details"/>
-			</a>
-            {% if link.is_owner(curr_user) %}
-			<a href="{{url_for('do_edit_link', linkid=link.linkid)}}" class="button edit">
-				<img src="{{url_for('static', filename="images/link_edit.png")}}" alt="Edit" title="Edit link"/>
-			</a>
-			<a href="{{url_for('do_delete_link', linkid=link.linkid)}}" class="button delete">
-				<img src="{{url_for('static', filename="images/link_delete.png")}}" alt="Edit" title="Edit link"/>
 			</a>
             {% endif %}
 		</li>

@@ -21,6 +21,8 @@ class Tag(appdb.Model):
 	tagid = Column(Integer, primary_key = True)
 	tag_name = Column(String(64), unique = True)
 	
+	#tagged_links = relationship(lnto.libs.links.Link, secondary = link_tags)
+	
 	def __init__(self, name = None):
 		if name:
 			self.tag_name = name
@@ -46,6 +48,10 @@ class Tag(appdb.Model):
 	@staticmethod
 	def get_public_by_user(userid):
 		return appdb.session.query(Tag).filter(lnto.libs.links.Link.userid == userid, lnto.libs.links.Link.is_public == False).all()
+	
+	@staticmethod
+	def get_cloud_by_user(userid):
+		return appdb.session.query(Tag, appdb.func.count(lnto.libs.links.Link.linkid)).outerjoin(lnto.libs.links.Link).groupby(Tag).filter(lnto.libs.links.Link.userid == userid, lnto.libs.links.Link.is_public == False).all()
 	
 class DisplayTag(appdb.Model):
 	__tablename__ = 'display_tags'

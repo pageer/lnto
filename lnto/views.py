@@ -1,12 +1,25 @@
-import time, datetime
+import time, datetime, re
 from datetime import datetime, timedelta
 from lnto import app
-from flask import render_template, make_response, redirect, jsonify, abort, url_for, request, session, g
+from flask import render_template, make_response, redirect, abort, url_for, request, session, g
 from lnto.libs.links import Link
 from lnto.libs.users import User
 from lnto.libs.tags import Tag
 from lnto.libs.importer import LinkImporter
 from lnto.libs.decorators import force_login
+
+def get_base_url():
+	base = re.findall('(.+://[^/]*)', request.url)
+	if len(base) == 1:
+		return base[0]
+	return ''
+
+def get_default_data():
+	return {
+		'base_url': get_base_url(),
+		'referer': request.form.get('referer') or request.referrer or url_for('show_index')
+	}
+
 
 @app.route('/login', methods = ['GET', 'POST'])
 def do_login():
@@ -22,9 +35,9 @@ def do_login():
 			return response
 		else:
 			error = 'Either your username or password is wrong'
-			return render_template('login.html', error = error)
+			return render_template('login.html', pageoptions = get_default_data(), error = error)
 	else:
-		return render_template('login.html')
+		return render_template('login.html', pageoptions = get_default_data())
 
 @app.route('/logout', methods = ['GET', 'POST'])
 def do_logout():
@@ -54,9 +67,9 @@ def do_add_user():
 			usr.save()
 			return redirect(url_for('show_index'))
 		else:
-			return render_template("new_user.html", errors = errors)
+			return render_template("new_user.html", pageoptions = get_default_data(), errors = errors)
 	else:
-		return render_template("new_user.html")
+		return render_template("new_user.html", pageoptions = get_default_data())
 
 @app.route('/')
 @force_login
@@ -66,7 +79,7 @@ def show_index():
 	recent_links = Link.get_by_most_recent(usr.userid)
 	recent_hits = Link.get_by_most_recent_hit(usr.userid)
 	most_hits = Link.get_by_most_hits(usr.userid)
-	return render_template('homepage.html', links = links, user = usr, recent_links = recent_links, recent_hits = recent_hits, most_hits = most_hits);
+	return render_template('homepage.html', pageoptions = get_default_data(), links = links, user = usr, recent_links = recent_links, recent_hits = recent_hits, most_hits = most_hits);
 
 @app.route('/home/<username>/')
 @app.route('/home/<username>')
@@ -86,9 +99,9 @@ def show_user_index(username):
 		links = Link.get_by_user(curr_user.userid)
 	else:
 		links = Link.get_public_by_user(usr.userid)
-	return render_template('link_index.html', links = links)
+	return render_template('link_index.html', pageoptions = get_default_data(), links = links)
 
-@app.route('/links/add', methods = ['GET', 'POST'])
+@app.route('/link/add', methods = ['GET', 'POST'])
 @force_login
 def do_add_link():
 	usr = User.get_logged_in()
@@ -109,39 +122,34 @@ def do_add_link():
 	}
 	options = {
 		'button_label': 'Add Link',
-		'post_view': url_for('do_add_link')
+		'post_view': req.get('post_view') if req.get('post_view') else url_for('do_add_link')
 	}
+	
+	# if post_view is 1, just use the link URL.
+	if options['post_view'] == '1':
+		options['post_view'] = data['url']
 	
 	link = Link(data)
 	errors = []
 	
-	if data['name'] == '' or data['url'] == '':
-		errors.append("Name and URL are required")
+	if request.method == 'POST' or data.get('submit') == '1	':
+		if data['name'] == '' or data['url'] == '':
+			errors.append("Name and URL are required")
+		
+		if (data.get('tags').strip() == ''):
+			taglist = []
+		else:
+			taglist = data.get('tags').split(',')
 	
-	if (data.get('tags').strip() == ''):
-		taglist = []
-	else:
-		taglist = data.get('tags').split(',')
-
-	for name in taglist:
-		tag = Tag.get_by_name(name.strip())
-		link.tags.append(tag)
-	
-	if request.method == 'POST':
+		link.set_tags(taglist)
+		
 		if len(errors) == 0:
 			link.save()
-			return redirect(url_for('show_index'))
-	else:
-		if request.args.get('submit') == '1':
-			if len(errors) == 0:
-				link.save()
-				return redirect(url_for('show_index'))
-		else:
-			errors = []
+			return redirect(req.get('referer') or url_for('show_index'))
 	
-	return render_template("link_add.html", link = link, options = options, errors = errors)
+	return render_template("link_add.html", pageoptions = get_default_data(), link = link, options = options, errors = errors)
 
-@app.route('/links/edit/<linkid>', methods = ['GET', 'POST'])
+@app.route('/link/edit/<linkid>', methods = ['GET', 'POST'])
 @force_login
 def do_edit_link(linkid):
 	usr = User.get_logged_in()
@@ -167,9 +175,7 @@ def do_edit_link(linkid):
 		else:
 			taglist = request.form.get('tags').split(',')
 	
-		for name in taglist:
-			tag = Tag.get_by_name(name.strip())
-			link.tags.append(tag)
+		link.set_tags(taglist)
 		
 		errors = []
 		if not (request.form.get('name') and request.form.get('url')):
@@ -177,20 +183,26 @@ def do_edit_link(linkid):
 		
 		if len(errors) == 0:
 			link.save()
-	return render_template("link_add.html", link=link, options=options)
+			if request.form.get('referer'):
+				return redirect(request.form.get('referer'))
+	return render_template("link_add.html", pageoptions = get_default_data(), link=link, options=options, errors = errors)
 
-@app.route('/links/delete/<linkid>', methods = ['POST'])
-def do_delete_link(linkid):
+@app.route('/link/delete/<linkid>', methods = ['POST', 'GET'])
+@force_login
+def show_delete_link(linkid):
 	usr = User.get_logged_in()
-	if not usr:
-		return jsonify({'status': 'error', 'message': 'You must log in to delete a link.'})
+	error = ''
 	
 	link = Link.get_by_id(linkid)
-	if not link:
-		return jsonify({'status': 'error', 'message': 'That link does not exist.'})
-	
-	link.delete()
-	return jsonify({'status': 'success'})
+	if not link.is_owner(usr):
+		error = 'You do not have permission to delete this link.'
+	else:
+		if request.form.get('confirm'):
+			link.delete()
+			return redirect(url_for('show_index'))
+		elif request.form.get('cancel'):
+			return redirect(request.form.get('referer'))
+	return render_template("link_delete.html", pageoptions = get_default_data(), link=link, error = error)
 
 @app.route('/links/import', methods = ['GET', 'POST'])
 @force_login
@@ -203,7 +215,7 @@ def show_import():
 	else:
 		markup = ''
 		results = None
-	return render_template('link_import.html', import_file = markup, results = results)
+	return render_template('link_import.html', pageoptions = get_default_data(), import_file = markup, results = results)
 
 @app.route('/link/show/<linkid>')
 def show_link(linkid):
@@ -211,7 +223,7 @@ def show_link(linkid):
 	if link is None:
 		abort(404)
 	usr = User.get_logged_in()
-	return render_template('link.html', link = link, user = usr)
+	return render_template('link.html', pageoptions = get_default_data(), link = link, user = usr)
 
 @app.route('/to/<linkid>')
 def show_linkurl(linkid):
@@ -226,8 +238,10 @@ def show_linkurl(linkid):
 
 @app.route('/tags/')
 @app.route('/tags')
-def show_tag_list(name):
+def show_tag_list():
 	tags = Tag.get_public()
+	title = 'Tag listing'
+	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags, page_title = title, section_title = title)
 	
 @app.route('/home/<username>/tags/')
 @app.route('/home/<username>/tags')
@@ -247,13 +261,14 @@ def show_user_tag_list(username):
 		tags = Tag.get_public_by_user(user.userid)
 		title = 'Tags for %s' % username
 	
-	return render_template('tag_index.html', tags = tags, page_title = title, section_title = title)
+	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags, page_title = title, section_title = title)
 	
 @app.route('/tag/<name>')
 def show_tag(name):
+	usr = User.get_logged_in()
 	links = Link.get_public_by_tag(name)
 	title = 'Links for Tag - "%s"' % name
-	return render_template('link_index.html', links = links, section_title = title, page_title = title);
+	return render_template('link_index.html',pageoptions = get_default_data(),  user = usr, links = links, section_title = title, page_title = title);
 	
 @app.route('/my/tag/<name>')
 @force_login
@@ -261,7 +276,7 @@ def show_user_tag(name):
 	usr = User.get_logged_in()
 	links = Link.get_by_tag(name, usr.userid)
 	title = 'My Tagged Links - "%s"' % name
-	return render_template('link_index.html', links = links, section_title = title, page_title = title);
+	return render_template('link_index.html', pageoptions = get_default_data(), user = usr, links = links, section_title = title, page_title = title);
 
 # Wildcard route - THIS MUST BE PROCESSED LAST    
 @app.route('/<shorturl>')

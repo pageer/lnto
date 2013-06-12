@@ -53,7 +53,7 @@ CREATE TABLE display_tags (
 
 CREATE TABLE link_tags (
     linkid INTEGER NOT NULL,
-    tagid INTEGER NOT NULL UNIQUE,
+    tagid INTEGER NOT NULL,
     PRIMARY KEY (tagid, linkid)
 );
 

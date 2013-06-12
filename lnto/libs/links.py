@@ -33,9 +33,11 @@ class Link(appdb.Model):
 			self.description = row['description'] if row.get('description') else ''
 			self.shortname = row['shortname'] if row.get('shortname') else None
 			self.added = row['added'] if row.get('added') else datetime.now()
-			self.is_public = row['is_public'] if row.get('is_public') else 1
+			self.is_public = row['is_public'] if row.get('is_public') is not None else True
 			self.userid = row['userid'] if row.get('userid') else 0
 			self.linkid = row['linkid'] if row.get('linkid') else None
+			if row.get('tags'):
+				self.set_tags(row.get('tags'))
 	
 	def get_taglist(self):
 		ret = []
@@ -43,10 +45,24 @@ class Link(appdb.Model):
 			ret.append(str(tag))
 		return ret
 	
+	def set_tags(self, taglist):
+		while self.tags:
+			del self.tags[0]
+		
+		for tag in taglist:
+			t = Tag.get_by_name(tag)
+			if not t:
+				t = Tag(tag)
+			self.tags.append(t)
+	
 	def save(self):
 		if self.shortname == '':
 			self.shortname = None
 		appdb.session.add(self)
+		appdb.session.commit()
+	
+	def delete(self):
+		appdb.session.delete(self)
 		appdb.session.commit()
 	
 	def get_count(self, user = None):
@@ -66,6 +82,8 @@ class Link(appdb.Model):
 		return LinkHit(data)
 	
 	def is_owner(self, user):
+		if not user:
+			return False
 		return self.userid == user.userid;
 	
 	@staticmethod
@@ -78,7 +96,7 @@ class Link(appdb.Model):
 	
 	@staticmethod
 	def get_public_by_user(userid):
-		return appdb.session.query(Link).filter_by(userid = userid, is_public = 1).all()
+		return appdb.session.query(Link).filter_by(userid = userid, is_public = True).all()
 	
 	@staticmethod
 	def get_by_shortname(name):
@@ -94,9 +112,9 @@ class Link(appdb.Model):
 	@staticmethod
 	def get_public_by_tag(tag, userid = None):
 		if userid is None:
-			return appdb.session.query(Link).filter_by(is_public = True).filter(Link.tags.any(Tag.tag_name == tag)).all()
+			return appdb.session.query(Link).filter(Link.is_public == True, Link.tags.any(Tag.tag_name == tag)).all()
 		else:
-			return appdb.session.query(Link).filter_by(userid = userid, is_public = True).filter(Link.tags.any(Tag.tag_name == tag)).all()
+			return appdb.session.query(Link).filter(Link.userid == userid, Link.is_public == True, Link.tags.any(Tag.tag_name == tag)).all()
 	
 	@staticmethod
 	def get_by_most_hits(owner = None, limit = 10):
@@ -121,7 +139,6 @@ class Link(appdb.Model):
 			row[0].last_hit = row[1]
 			ret.append(row[0])
 		return ret
-		
 	
 	@staticmethod
 	def get_by_most_recent(owner = None, limit = 10):

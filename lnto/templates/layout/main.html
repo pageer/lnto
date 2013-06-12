@@ -3,7 +3,7 @@
 <div id="header">
 	{% block header %}
 	<h3><a href="{{url_for('show_index')}}">lnto</a></h3>
-	<ul>
+	<ul class="headerlinks">
 		<li>
 			<a href="{{url_for('show_index')}}" class="link showlinks">
 				My links<span></span>
@@ -15,6 +15,11 @@
 			</a>
 		</li>
 		<li>
+			<a href="{{url_for('show_import')}}" class="link import">
+				Import<span></span>
+			</a>
+		</li>
+		<li>
 			<a href="{{url_for('do_add_user')}}" class="link adduser">
 				Create Account<span></span>
 			</a>
@@ -22,6 +27,24 @@
 		<li>
 			<a href="{{url_for('do_logout')}}" class="link logout">
 				Log Out<span></span>
+			</a>
+		</li>
+		<li class="bookmarklet">
+			Bookmarklets: 
+			<a class="link" href="javascript:(function() {
+			var desc = '', i = 0, metas = document.getElementsByTagName('meta');
+			for (i in metas) {
+				if (metas[i].name == 'description') {
+					desc = metas[i].content
+				}
+			}
+			window.location = '{{pageoptions.base_url}}{{url_for('do_add_link')}}'
+			+ '?url=' + encodeURIComponent(window.location)
+			+ '&post_view=1'
+			+ '&name=' + encodeURIComponent(document.title)
+			+ '&decsription=' + encodeURIComponent(desc);
+			})()">
+				Add to lnto
 			</a>
 		</li>
 	</ul>
