@@ -208,4 +208,6 @@ ul.link-list {
 	padding: 6px;
 	background-color: #c5c5c5;
 	font-size: 1em;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
 }

@@ -17,7 +17,7 @@ def get_base_url():
 def get_default_data():
 	return {
 		'base_url': get_base_url(),
-		'referer': request.form.get('referer') or request.referrer or url_for('show_index')
+		'referer': request.form.get('next') or request.args.get('next') or request.form.get('referer') or request.referrer or url_for('show_index')
 	}
 
 
@@ -30,7 +30,7 @@ def do_login():
 		curr_user = User.get_by_username(request.form.get('username'))
 		userkey = curr_user.login(request.form.get('password')) if curr_user else None
 		if curr_user and userkey:
-			response = make_response(redirect(url_for('show_index')))
+			response = make_response(redirect(request.form.get('referer') or url_for('show_index')))
 			response.set_cookie('uinf', userkey, 60*60*24*7, datetime.today() + timedelta(days=20))
 			return response
 		else:
@@ -122,12 +122,9 @@ def do_add_link():
 	}
 	options = {
 		'button_label': 'Add Link',
-		'post_view': req.get('post_view') if req.get('post_view') else url_for('do_add_link')
+		'post_view': req.get('post_view') if req.get('post_view') else url_for('do_add_link'),
+		'redirect_to_target': req.get('redirect_to_target', 0)
 	}
-	
-	# if post_view is 1, just use the link URL.
-	if options['post_view'] == '1':
-		options['post_view'] = data['url']
 	
 	link = Link(data)
 	errors = []
@@ -145,7 +142,8 @@ def do_add_link():
 		
 		if len(errors) == 0:
 			link.save()
-			return redirect(req.get('referer') or url_for('show_index'))
+			redir_target = link.url if req.get('redirect_to_target') else (req.get('next') or req.get('referer') or url_for('show_index'))
+			return redirect(redir_target)
 	
 	return render_template("link_add.html", pageoptions = get_default_data(), link = link, options = options, errors = errors)
 

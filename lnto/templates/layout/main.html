@@ -15,7 +15,7 @@
 			</a>
 		</li>
 		<li>
-			<a href="{{url_for('show_import')}}" class="link import">
+			<a href="{{url_for('show_import')}}" class="link import" title="Import bookmarks from file">
 				Import<span></span>
 			</a>
 		</li>
@@ -40,9 +40,9 @@
 			}
 			window.location = '{{pageoptions.base_url}}{{url_for('do_add_link')}}'
 			+ '?url=' + encodeURIComponent(window.location)
-			+ '&post_view=1'
+			+ '&redirect_to_target=1'
 			+ '&name=' + encodeURIComponent(document.title)
-			+ '&decsription=' + encodeURIComponent(desc);
+			+ '&description=' + encodeURIComponent(desc);
 			})()">
 				Add to lnto
 			</a>
