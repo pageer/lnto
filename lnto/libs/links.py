@@ -22,7 +22,7 @@ class Link(appdb.Model):
 	
 	owner = relationship('User', backref = backref('links', order_by = linkid))
 	#display_tags = relationship('DisplayTag', secondary = link_display_tags, backref = 'links')
-	tags = relationship('Tag', secondary = link_tags, backref = 'links')
+	tags = relationship('Tag', secondary = link_tags)
 	
 	count = None
 	

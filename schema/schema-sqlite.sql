@@ -14,7 +14,8 @@ CREATE TABLE links (
 	shortname VARCHAR(255) UNIQUE,
 	url TEXT NOT NULL,
 	added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	is_public TINYINT NOT NULL DEFAULT 1
+	is_public TINYINT NOT NULL DEFAULT 1,
+    UNIQUE (userid, url)
 );
 
 CREATE TABLE links_counts (

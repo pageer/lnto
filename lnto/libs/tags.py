@@ -21,7 +21,7 @@ class Tag(appdb.Model):
 	tagid = Column(Integer, primary_key = True)
 	tag_name = Column(String(64), unique = True)
 	
-	#tagged_links = relationship(lnto.libs.links.Link, secondary = link_tags)
+	links = relationship('Link', secondary = link_tags)
 	
 	def __init__(self, name = None):
 		if name:
@@ -51,7 +51,13 @@ class Tag(appdb.Model):
 	
 	@staticmethod
 	def get_cloud_by_user(userid):
-		return appdb.session.query(Tag, appdb.func.count(lnto.libs.links.Link.linkid)).outerjoin(lnto.libs.links.Link).groupby(Tag).filter(lnto.libs.links.Link.userid == userid, lnto.libs.links.Link.is_public == False).all()
+		tags = appdb.session.query(Tag, appdb.func.count('*').label('num_links')).join(link_tags, lnto.libs.links.Link).group_by(Tag).order_by('num_links DESC').all()
+		ret = []
+		for tag in tags:
+			t = tag[0]
+			t.link_count = tag[1]
+			ret.append(t)
+		return ret
 	
 class DisplayTag(appdb.Model):
 	__tablename__ = 'display_tags'

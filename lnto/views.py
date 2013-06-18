@@ -14,10 +14,15 @@ def get_base_url():
 		return base[0]
 	return ''
 
+def user_is_logged_in():
+	u = User.get_logged_in()
+	return u is not None
+
 def get_default_data():
 	return {
 		'base_url': get_base_url(),
-		'referer': request.form.get('next') or request.args.get('next') or request.form.get('referer') or request.referrer or url_for('show_index')
+		'referer': request.form.get('next') or request.args.get('next') or request.form.get('referer') or request.referrer or url_for('show_index'),
+		'user_logged_in': user_is_logged_in()
 	}
 
 
@@ -79,12 +84,10 @@ def show_index():
 	recent_links = Link.get_by_most_recent(usr.userid)
 	recent_hits = Link.get_by_most_recent_hit(usr.userid)
 	most_hits = Link.get_by_most_hits(usr.userid)
-	return render_template('homepage.html', pageoptions = get_default_data(), links = links, user = usr, recent_links = recent_links, recent_hits = recent_hits, most_hits = most_hits);
+	tag_cloud = Tag.get_cloud_by_user(usr.userid)
+	return render_template('homepage.html', pageoptions = get_default_data(), links = links, user = usr, recent_links = recent_links, recent_hits = recent_hits, most_hits = most_hits, tag_cloud = tag_cloud);
 
-@app.route('/home/<username>/')
-@app.route('/home/<username>')
-@app.route('/my/', defaults = {'username': None})
-@app.route('/my',  defaults = {'username': None})
+@app.route('/links',  defaults = {'username': None})
 def show_user_index(username):
 	curr_user = User.get_logged_in()
 	if username is None:
@@ -95,11 +98,11 @@ def show_user_index(username):
 	if not usr:
 		abort(404)
 	
-	if usr.userid == curr_user.userid:
+	if usr is curr_user:
 		links = Link.get_by_user(curr_user.userid)
 	else:
 		links = Link.get_public_by_user(usr.userid)
-	return render_template('link_index.html', pageoptions = get_default_data(), links = links)
+	return render_template('link_index.html', pageoptions = get_default_data(), links = links, user = curr_user)
 
 @app.route('/link/add', methods = ['GET', 'POST'])
 @force_login
@@ -234,17 +237,7 @@ def show_linkurl(linkid):
 	link.get_hit(usr).add_hit()
 	return redirect(link.url)
 
-@app.route('/tags/')
-@app.route('/tags')
-def show_tag_list():
-	tags = Tag.get_public()
-	title = 'Tag listing'
-	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags, page_title = title, section_title = title)
-	
-@app.route('/home/<username>/tags/')
-@app.route('/home/<username>/tags')
-@app.route('/my/tags/', defaults = {'username': None})
-@app.route('/my/tags',  defaults = {'username': None})
+@app.route('/tags',  defaults = {'username': None})
 def show_user_tag_list(username):
 	if username is None:
 		user = User.get_logged_in()
@@ -253,7 +246,7 @@ def show_user_tag_list(username):
 		user = User.get_by_username(username)
 	
 	if user.username == username:
-		tags = Tag.get_by_user(user.userid)
+		tags = Tag.get_cloud_by_user(user.userid)
 		title = "My Tags"
 	else:
 		tags = Tag.get_public_by_user(user.userid)

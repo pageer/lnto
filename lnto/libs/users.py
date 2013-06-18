@@ -8,6 +8,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
 import werkzeug.security, hashlib
 
 class User(appdb.Model):
+	
 	__tablename__ = 'users'
 	userid = Column(Integer, primary_key = True)
 	username = Column(String(64), unique = True)
@@ -52,13 +53,14 @@ class User(appdb.Model):
 
 	@staticmethod
 	def get_logged_in():
-		if request.cookies.get('uinf'):
-			username = request.cookies['uinf'].split('|')[0]
+		if not request.cookies.get('uinf'):
+			return None
+		
+		username = request.cookies['uinf'].split('|')[0]
+		
+		if username:
 			curr_user = User.get_by_username(username)
-			if curr_user.check_login():
-				return curr_user
-			else:
-				return None
+			return curr_user if curr_user.check_login() else None
 		else:
 			return None
 	

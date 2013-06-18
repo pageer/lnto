@@ -4,9 +4,15 @@
 	{% block header %}
 	<h3><a href="{{url_for('show_index')}}">lnto</a></h3>
 	<ul class="headerlinks">
+		{% if pageoptions['user_logged_in'] %}
 		<li>
 			<a href="{{url_for('show_index')}}" class="link showlinks">
-				My links<span></span>
+				Dashboard<span></span>
+			</a>
+		</li>
+		<li>
+			<a href="{{url_for('show_user_index')}}" class="link showlinks">
+				Links<span></span>
 			</a>
 		</li>
 		<li>
@@ -24,10 +30,17 @@
 				Create Account<span></span>
 			</a>
 		</li>
+		{% endif %}
 		<li>
+			{% if pageoptions['user_logged_in'] %}
 			<a href="{{url_for('do_logout')}}" class="link logout">
 				Log Out<span></span>
 			</a>
+			{% else %}
+			<a href="{{url_for('do_login')}}" class="link login">
+				Login<span></span>
+			</a>
+			{% endif %}	
 		</li>
 		<li class="bookmarklet">
 			Bookmarklets: 

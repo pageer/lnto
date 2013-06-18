@@ -13,6 +13,8 @@ class LinkImporter(object):
     soup = None
     user = None
     
+    tag_folders = True  # Since folders don't really work yet, tag each entry with the folder name.
+    
     def __init__(self, markup, import_type = None, user = None):
         self.data = markup
         self.import_type = import_type
@@ -47,6 +49,7 @@ class LinkImporter(object):
         anchors = self.soup.find_all('a')
         links = {}
         duplicates = []
+        errors = []
         folders = {}
         for a in anchors:
             data = {'userid': self.user.userid}
@@ -59,26 +62,33 @@ class LinkImporter(object):
             desc_node = self.get_description(a)
             if desc_node:
                 data['description'] = unicode(desc_node.contents[0])
-            link = Link(data)
-            
-            if links.get(link.url):
-                duplicates.append(link)
-            else:
-                links[link.url] = link
-                appdb.session.add(link)
+            try:
+                link = Link(data)
                 
-            folder = self.get_folder(a)
-            if folder:
-                f = folders.get(folder.contents[0])
-                if not f:
-                    f = Folder()
-                    f.userid = self.user.userid
-                    f.name = folder.contents[0]
-                    folders[folder.contents[0]] = f
-                    appdb.session.add(f)
-                f.links.append(link)
-        appdb.session.commit()
-        return {'links': links, 'folders': folders, 'duplicates': duplicates}
+                if links.get(link.url):
+                    duplicates.append(link)
+                else:
+                    links[link.url] = link
+                    appdb.session.add(link)
+                    
+                folder = self.get_folder(a)
+                if folder:
+                    f = folders.get(folder.contents[0])
+                    if not f:
+                        f = Folder()
+                        f.userid = self.user.userid
+                        f.name = folder.contents[0]
+                        folders[folder.contents[0]] = f
+                        appdb.session.add(f)
+                    f.links.append(link)
+                    
+                    if self.tag_folders:
+                        link.set_tags([folder.contents[0]])
+                appdb.session.commit()
+            except Exception:
+                errors.append(link)
+                appdb.session.rollback()
+        return {'links': links, 'folders': folders, 'duplicates': duplicates, 'errors': errors}
         
     def get_description(self, item):
         next_sib = item.parent.next_sibling

@@ -2,7 +2,7 @@
 	<ul class="link-list">
 		{% for link in links %}
 		<li>
-			<a href="{{ url_for('show_linkurl', linkid=link.linkid) }}" class="name">{{link.name}}</a>
+			<a href="{{ url_for('show_linkurl', linkid=link.linkid) }}" title="{{link.url}}" data-linkid="{{link.linkid}}" class="name">{{link.name}}</a>
             {% if extra_field %}
 				{% if format == 'date' %}
 					<span class="extra">({{link[extra_field].strftime('%Y-%m-%d %I:%m %p')}})</span>
@@ -24,6 +24,19 @@
 				<img src="{{url_for('static', filename="images/link.png")}}" alt="Show details" title="Show details"/>
 			</a>
             {% endif %}
+		</li>
+		{% endfor %}
+	</ul>
+{% endmacro %}
+
+{% macro tag_listing(tags, show_counts = None) %}
+	<ul class="link-list">
+		{% for tag in tags %}
+		<li>
+			<a href="{{ url_for('show_tag', name = tag.tag_name) }}" class="name">{{tag.tag_name}}</a>
+            {% if tag.link_count %}
+				<span class="extra">({{tag.link_count}})</span>
+			{% endif %}
 		</li>
 		{% endfor %}
 	</ul>

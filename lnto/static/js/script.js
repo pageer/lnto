@@ -9,7 +9,7 @@ LinkEditor = {
 			}
 			//var posturl = $self.attr('href');
 			var posturl = '/api/links/delete';
-			$.post(posturl, {}, function (data, textStatus, jzXHR) {
+			$.post(posturl, {linkid: linkid}, function (data, textStatus, jzXHR) {
 				if (data.status == 'success') {
 					$self.parents('li').remove();
 				} else {

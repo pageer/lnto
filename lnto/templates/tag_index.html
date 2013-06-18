@@ -1,16 +1,11 @@
 {% extends "layout/main.html" %}
+{% import 'layout/macros.html' as macros %}
 {% block title %}{{page_title|default('Tag Listing')}}{% endblock %}
 {% block content %}
 <div>
 	{% block content_title %}
 	<h3>{{section_title|default('Tag Listing')}}</h3>	
 	{% endblock %}
-	<ul class="link-list">
-		{% for tag in tags %}
-		<li>
-			<a href="{{ url_for('show_user_tag', name = tag.tag_name) }}" class="name">{{tag.tag_name}}</a>
-		</li>
-		{% endfor %}
-	</ul>
+	{{ macros.tag_listing(tags, True) }}
 </div>
 {% endblock %}

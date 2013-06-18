@@ -6,6 +6,16 @@
     Imported {{results.links|count}} links
     and {{results.folders|count}} folders.
     Found {{results.duplicates|count}} duplicate links.
+    {% if results.errors %}
+    <div class="errors">
+        Found {{results.errors|count}} errors:
+        <ul>
+        {% for err in results.errors %}
+            <li>{{err.name}} - {{err.url}}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 </div>
 {% endif %}
 <form method="post" action="{{url_for('show_import')}}">

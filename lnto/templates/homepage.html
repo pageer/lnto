@@ -14,6 +14,10 @@
 	<h3 class="header">Recently Visited</h3>	
 	{{ macros.link_listing(recent_hits, user, 'last_hit', 'date') }}
 </div>
+<div class="linkpanel tag-cloud">
+	<h3 class="header">Tag Cloud</h3>	
+	{{ macros.tag_listing(tag_cloud) }}
+</div>
 <div class="linkpanel recent-links">
 	<h3 class="header">Recently Added</h3>	
 	{{ macros.link_listing(recent_links, user, 'added', 'date') }}
