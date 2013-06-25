@@ -88,6 +88,7 @@ def show_index():
 	return render_template('homepage.html', pageoptions = get_default_data(), links = links, user = usr, recent_links = recent_links, recent_hits = recent_hits, most_hits = most_hits, tag_cloud = tag_cloud);
 
 @app.route('/links',  defaults = {'username': None})
+@app.route('/public/links/<username>')
 def show_user_index(username):
 	curr_user = User.get_logged_in()
 	if username is None:
@@ -121,12 +122,12 @@ def do_add_link():
 		'url': req.get('url', ''),
 		'description': req.get('description', ''),
 		'tags': req.get('tags', ''),
-		'is_public': 1 if req.get('is_public', 1) else 0,
+		'is_public': True if req.get('is_public', 1) == '1' else False,
 	}
 	options = {
 		'button_label': 'Add Link',
 		'post_view': req.get('post_view') if req.get('post_view') else url_for('do_add_link'),
-		'redirect_to_target': req.get('redirect_to_target', 0)
+		'redirect_to_target': True if req.get('redirect_to_target', 0) == '1' else False
 	}
 	
 	link = Link(data)
@@ -153,6 +154,7 @@ def do_add_link():
 @app.route('/link/edit/<linkid>', methods = ['GET', 'POST'])
 @force_login
 def do_edit_link(linkid):
+	errors = []
 	usr = User.get_logged_in()
 	
 	link = Link.get_by_id(linkid)
@@ -169,7 +171,7 @@ def do_edit_link(linkid):
 		link.description = request.form.get('description')
 		link.shortname = request.form.get('shortname')
 		link.url = request.form.get('url')
-		link.is_public = 1 if request.form.get('is_public') else 0
+		link.is_public = True if request.form.get('is_public') == '1' else False
 		
 		if (request.form.get('tags').strip() == ''):
 			taglist = []
@@ -178,7 +180,6 @@ def do_edit_link(linkid):
 	
 		link.set_tags(taglist)
 		
-		errors = []
 		if not (request.form.get('name') and request.form.get('url')):
 			errors.append("Name and URL are required")
 		
@@ -187,6 +188,40 @@ def do_edit_link(linkid):
 			if request.form.get('referer'):
 				return redirect(request.form.get('referer'))
 	return render_template("link_add.html", pageoptions = get_default_data(), link=link, options=options, errors = errors)
+
+@app.route('/links/bulk-edit/<tags>', methods = ['POST', 'GET'])
+@app.route('/links/bulk-edit', methods = ['POST', 'GET'], defaults = {'tags': None})
+@force_login
+def do_bulk_edit(tags):
+	errors = []
+	updated = 0
+	user = User.get_logged_in()
+	
+	if tags:
+		taglist = tags.split(',')
+		links = Link.get_by_tag(taglist[0], user.userid)
+	else:
+		links = Link.get_by_user(user.userid)
+	
+	if request.method == 'POST':
+		
+		linkids = request.form.getlist('linkids')
+		edit_links = Link.get_by_id(linkids)
+		
+		if request.form.get('tag_text') and request.form.get('tag_submit'):
+			for l in edit_links:
+				l.add_tag(request.form.get('tag_text'))
+				l.save()
+		
+		if request.form.get('set_privacy') and request.form.get('privacy_submit'):
+			for l in edit_links:
+				l.is_public = True if request.form.get('set_privacy') == 'public' else False
+				l.save()
+		
+		updated += 1
+	
+	return render_template("link_edit_bulk.html", pageoptions = get_default_data(), url_tags = tags, links=links, errors = errors)
+
 
 @app.route('/link/delete/<linkid>', methods = ['POST', 'GET'])
 @force_login
@@ -254,14 +289,14 @@ def show_user_tag_list(username):
 	
 	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags, page_title = title, section_title = title)
 	
-@app.route('/tag/<name>')
+@app.route('/public/tag/<name>')
 def show_tag(name):
 	usr = User.get_logged_in()
 	links = Link.get_public_by_tag(name)
 	title = 'Links for Tag - "%s"' % name
 	return render_template('link_index.html',pageoptions = get_default_data(),  user = usr, links = links, section_title = title, page_title = title);
 	
-@app.route('/my/tag/<name>')
+@app.route('/tag/<name>')
 @force_login
 def show_user_tag(name):
 	usr = User.get_logged_in()

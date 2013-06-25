@@ -33,11 +33,17 @@
 	<ul class="link-list">
 		{% for tag in tags %}
 		<li>
-			<a href="{{ url_for('show_tag', name = tag.tag_name) }}" class="name">{{tag.tag_name}}</a>
+			<a href="{{ url_for('show_user_tag', name = tag.tag_name) }}" class="name">{{tag.tag_name}}</a>
             {% if tag.link_count %}
 				<span class="extra">({{tag.link_count}})</span>
 			{% endif %}
 		</li>
 		{% endfor %}
 	</ul>
+{% endmacro %}
+
+{% macro link_taglist(link) %}
+	{% for tag in link.get_taglist() %}
+		<a class="link-tag" href="{{url_for('show_tag', name = tag)}}">{{tag}}</a>
+	{% endfor %}
 {% endmacro %}

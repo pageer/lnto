@@ -1,0 +1,48 @@
+{% extends "layout/main.html" %}
+{% import 'layout/macros.html' as macros %}
+{% block title %}{{page_title|default('Bulk link editor')}}{% endblock %}
+{% block content %}
+<div class="bulk-editor">
+	{% block content_title %}
+	<h3>{{section_title|default('Bulk edit links')}}</h3>	
+	{% endblock %}
+    <form method="post" action="{{url_for('do_bulk_edit', tags = url_tags)}}">
+		<div class="controls">
+			<div>
+				<label>Add tag: <input name="tag_text" type="text"/></label>
+				<input type="submit" name="tag_submit" value="Add"/>
+			</div>
+			<div>
+				<label>Privacy: 
+					<select name="set_privacy">
+						<option value="private">Private</option>
+						<option value="public">Public</option>
+					</select>
+				</label>
+				<input type="submit" name="privacy_submit" value="Set"/>
+			</div>
+		</div>
+		<div>
+			<label><input type="checkbox" id="toggle-check"/>Toggle all</label>
+		</div>
+		<ul>
+			{% for l in links %}
+			<li class="link-list">
+				<input type="checkbox" class="bulk-select" name="linkids" id="linkid-{{l.linkid}}" value="{{l.linkid}}"/>
+				<a href="{{url_for('show_link', linkid = l.linkid)}}">{{l.name}}</a>
+				<span class="menulink">
+					<img src="{{url_for('static', filename="images/cog.png")}}" alt=""/>
+					<span class="menu">
+						<a href="{{ url_for('show_link', linkid=l.linkid) }}" class="button show">Show&nbsp;details</a>
+						<a href="{{url_for('do_edit_link', linkid=l.linkid)}}" class="button edit">Edit</a>
+						<a href="{{url_for('show_delete_link', linkid=l.linkid)}}" data-linkid="{{l.linkid}}" class="button delete">Delete</a>
+					</span>
+				</span>
+				<span class="privacy">{% if l.is_public %}Public{% else %}Private{% endif %}</span>
+				{{macros.link_taglist(l)}}
+			</li>
+			{% endfor %}
+		</ul>
+	</form>
+</div>
+{% endblock %}

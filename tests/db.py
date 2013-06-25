@@ -45,6 +45,14 @@ def create_test_data():
             'url': 'http://www.example.com/test4',
             'description': 'This is a test again',
             'tags': ['test1'],
+        },
+        {
+            'name': 'User2Foo2',
+            'userid': 2,
+            'url': 'http://www.example.com/test5',
+            'description': 'This is a test again',
+            'tags': ['privatetag'],
+            'is_public': False
         }
     ]
     user_data = [

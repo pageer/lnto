@@ -33,11 +33,12 @@ class Link(appdb.Model):
 			self.description = row['description'] if row.get('description') else ''
 			self.shortname = row['shortname'] if row.get('shortname') else None
 			self.added = row['added'] if row.get('added') else datetime.now()
-			self.is_public = row['is_public'] if row.get('is_public') is not None else True
+			self.is_public = bool(row['is_public']) if row.get('is_public') is not None else True
 			self.userid = row['userid'] if row.get('userid') else 0
 			self.linkid = row['linkid'] if row.get('linkid') else None
 			if row.get('tags'):
 				self.set_tags(row.get('tags'))
+	
 	
 	def get_taglist(self):
 		ret = []
@@ -45,15 +46,25 @@ class Link(appdb.Model):
 			ret.append(str(tag))
 		return ret
 	
+
 	def set_tags(self, taglist):
 		while self.tags:
 			del self.tags[0]
 		
 		for tag in taglist:
-			t = Tag.get_by_name(tag)
-			if not t:
-				t = Tag(tag)
-			self.tags.append(t)
+			self.add_tag(tag)
+	
+	
+	def add_tag(self, tagname):
+		for tag in self.tags:
+			if str(tag) == tagname:
+				return
+		
+		t = Tag.get_by_name(tagname)
+		if not t:
+			t = Tag(tagname)
+		self.tags.append(t)
+	
 	
 	def save(self):
 		if self.shortname == '':
@@ -61,9 +72,11 @@ class Link(appdb.Model):
 		appdb.session.add(self)
 		appdb.session.commit()
 	
+	
 	def delete(self):
 		appdb.session.delete(self)
 		appdb.session.commit()
+	
 	
 	def get_count(self, user = None):
 		if self.count is None:
@@ -75,20 +88,26 @@ class Link(appdb.Model):
 				self.count.insert()
 		return self.count
 	
+
 	def get_hit(self, user=None):
 		data = {'linkid': self.linkid}
 		if user is not None:
 			data['userid'] = user.userid
 		return LinkHit(data)
 	
+
 	def is_owner(self, user):
 		if not user:
 			return False
 		return self.userid == user.userid;
 	
+
 	@staticmethod
 	def get_by_id(id):
-		return appdb.session.query(Link).filter_by(linkid = id).first()
+		if type(id) is list:
+			return appdb.session.query(Link).filter(Link.linkid.in_(id)).all()
+		else:
+			return appdb.session.query(Link).filter_by(linkid = id).first()
 
 	@staticmethod
 	def get_by_user(userid):

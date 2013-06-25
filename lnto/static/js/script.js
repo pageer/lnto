@@ -34,6 +34,33 @@ LinkEditor = {
 	}
 };
 
+BulkEditor = {
+	handlers: {
+		toggle_all: function () {
+			console.log('Toggle that shit');
+			var $boxes = $('.bulk-select'),
+				num_selected = $boxes.filter(':checked').length,
+				total_boxes = $boxes.length;
+			if (num_selected == total_boxes) {
+				$boxes.prop('checked', false);
+			} else {
+				$boxes.prop('checked', true);
+			}
+		}
+	},
+	init: function() {
+		$('.bulk-editor #toggle-check').on('change.bulkeditor', this.handlers.toggle_all);
+		$('.bulk-editor li').on('click.bulkeditor', function() {
+			var $box = $(this).find('input.bulk-select');
+			$box.prop('checked', !$box.is(':checked'));
+		});
+		$('.bulk-editor li input.bulk-select').on('click.bulkeditor', function(e) {
+			e.stopPropagation();
+		});
+	}
+};
+
 $(document).ready(function () {
 	LinkEditor.init();
+	BulkEditor.init();
 });

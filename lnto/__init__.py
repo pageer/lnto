@@ -1,4 +1,3 @@
-import lnto.libs.db
 from flask import Flask, request, session, g
 from flask.ext.sqlalchemy import SQLAlchemy
 

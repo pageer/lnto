@@ -50,6 +50,15 @@ class TestLinks(unittest.TestCase):
         self.assertTrue('test3' in self.link.get_taglist())
         self.assertTrue('test4' in self.link.get_taglist())
     
+    def test_add_tag_and_get(self):
+        self.link.add_tag('test5')
+        self.assertTrue('test5' in self.link.get_taglist())
+    
+    def test_add_tag_duplicate(self):
+        taglist = self.link.get_taglist()
+        self.link.add_tag('test1')
+        self.assertTrue(taglist == self.link.get_taglist())
+    
     def test_get_by_id_exists(self):
         result = Link.get_by_id(1)
         self.assertTrue(result.__class__ is Link)
@@ -57,6 +66,18 @@ class TestLinks(unittest.TestCase):
     def test_get_by_id_nonexistent(self):
         result = Link.get_by_id(123)
         self.assertEqual(result, None)
+    
+    def test_get_by_id_array_all_exist(self):
+        result = Link.get_by_id([1, 2])
+        self.assertEqual(len(result), 2)
+    
+    def test_get_by_id_array_one_exists(self):
+        result = Link.get_by_id([1, 123])
+        self.assertEqual(len(result), 1)
+    
+    def test_get_by_id_array_none_exist(self):
+        result = Link.get_by_id([234, 123])
+        self.assertEqual(len(result), 0)
     
     def test_get_by_user_exists(self):
         result = Link.get_by_user(1)

@@ -39,25 +39,30 @@ class Tag(appdb.Model):
 	
 	@staticmethod
 	def get_public():
-		return appdb.session.query(Tag).filter(lnto.libs.links.Link.is_public == True).all()
+		return appdb.session.query(Tag).filter(Tag.links.any(is_public = True)).all()
 
 	@staticmethod
 	def get_by_user(userid):
-		return appdb.session.query(Tag).filter(lnto.libs.links.Link.userid == userid).all()
+		return appdb.session.query(Tag).filter(Tag.links.any(userid = userid)).all()
 	
 	@staticmethod
 	def get_public_by_user(userid):
-		return appdb.session.query(Tag).filter(lnto.libs.links.Link.userid == userid, lnto.libs.links.Link.is_public == False).all()
+		return appdb.session.query(Tag).join(link_tags).join(lnto.libs.links.Link).filter(lnto.libs.links.Link.userid == userid, lnto.libs.links.Link.is_public == True).all()
 	
 	@staticmethod
 	def get_cloud_by_user(userid):
-		tags = appdb.session.query(Tag, appdb.func.count('*').label('num_links')).join(link_tags, lnto.libs.links.Link).group_by(Tag).order_by('num_links DESC').all()
+		tags = appdb.session.query(Tag, appdb.func.count('*').label('num_links')).join(link_tags, lnto.libs.links.Link).filter_by(userid = userid).group_by(Tag).order_by('num_links DESC').all()
 		ret = []
 		for tag in tags:
 			t = tag[0]
 			t.link_count = tag[1]
 			ret.append(t)
 		return ret
+	
+	#@staticmethod
+	#def get_untagged_by_user(userid):
+	#	tags = appdb.session.query(lnto.libs.links.Link)
+	
 	
 class DisplayTag(appdb.Model):
 	__tablename__ = 'display_tags'

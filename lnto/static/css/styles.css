@@ -67,6 +67,10 @@ body {
 	vertical-align: bottom;
 }
 
+#header .link.dashboard span {
+	background-image: url(/static/images/house.png);
+}
+
 #header .link.showlinks span {
 	background-image: url(/static/images/link.png);
 }
@@ -171,6 +175,15 @@ ul.link-list {
 .link-list .menulink.showit .menu {
 	display: block;
 }
+
+.privacy {
+	font-size:0.8em;
+	color: #555;
+}
+
+.link-tag {
+	font-size:0.8em;
+}
 	
 /* Add links */
 #add-link-form {
@@ -229,4 +242,9 @@ ul.link-list {
 	font-size: 1em;
 	border-top-right-radius: 5px;
 	border-top-left-radius: 5px;
+}
+
+/* Bulk editor */
+.bulk-editor ul li {
+	list-style-type: none;
 }
