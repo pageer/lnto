@@ -13,6 +13,20 @@ def json_error(message = None):
 def json_success(data = None):
 	return jsonify({'status': 'success', 'data': data})
 
+
+def validate_link(link, user = None):
+	if not user:
+		user = User.get_logged_in()
+	
+	if not link:
+		return json_error('That link does not exist.')
+	
+	if not link.is_owner(user):
+		return json_error('You do not have permission to delete this link.')
+	
+	return None
+
+
 # Routes
 
 @app.route('/api/links/delete', methods = ['POST'])
@@ -21,12 +35,9 @@ def do_delete_link():
 		return json_error('No linkid specified')
 	
 	link = Link.get_by_id(request.form.get('linkid'))
-	if not link:
-		return json_error('That link does not exist.')
-	
-	usr = User.get_logged_in()
-	if not link.is_owner(usr):
-		return json_error('You do not have permission to delete this link.')
+	error = validate_link(link)
+	if error:
+		return error
 	
 	try:
 		link.delete()
@@ -34,10 +45,38 @@ def do_delete_link():
 	except Exception:
 		return json_error('Error deleting link')
 
+
+@app.route('/api/link/tag', methods = ['POST'])
+def do_add_tag():
+	if not request.form.get('linkid') or not request.form.get('tags'):
+		return json_error('Missing linkid or tags parameters')
+	
+	link = Link.get_by_id(request.form.get('linkid'))
+	tags = request.form.get('tags').split(',')
+	
+	error = validate_link(link)
+	if error:
+		return error
+	
+	try:
+		for tag in tags:
+			link.add_tag(tag.strip())
+		link.save()
+		return json_success()
+	except Exception:
+		return json_error('Error adding tags')
+
+
 @app.route('/api/link/<linkid>')
 @check_api_login
 def get_link_metadata(linkid):
-	pass
+	link = Link.get_by_id(linkid)
+	error = validate_link(link)
+	if error:
+		return error
+	else:
+		return json_success(link.serializable())
+
 
 @app.route('/api/folder/<path>')
 @check_api_login

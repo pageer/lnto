@@ -102,6 +102,20 @@ class Link(appdb.Model):
 		return self.userid == user.userid;
 	
 
+	def serializable(self):
+		return {
+			'linkid': self.linkid,
+			'userid': self.userid,
+			'name': self.name,
+			'url': self.url,
+			'description': self.description,
+			'shortname': self.shortname,
+			'added': self.added.strftime('%Y-%m-%d %I:%m %p'),
+			'is_public': self.is_public,
+			'tags': self.get_taglist()
+		}
+	
+
 	@staticmethod
 	def get_by_id(id):
 		if type(id) is list:

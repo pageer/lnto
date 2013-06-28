@@ -3,7 +3,7 @@ CREATE TABLE users (
 	username VARCHAR(64) UNIQUE NOT NULL,
 	password VARCHAR(255) NOT NULL,
 	signup_ip VARCHAR(64) NOT NULL DEFAULT '',
-	signup_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	signup_date DATETIME NOT NULL
 ) Engine=InnoDB;
 
 CREATE TABLE links (
@@ -13,35 +13,35 @@ CREATE TABLE links (
 	description TEXT NOT NULL DEFAULT '',
 	shortname VARCHAR(255) UNIQUE,
 	url TEXT NOT NULL,
-	added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	added DATETIME NOT NULL,
 	is_public TINYINT NOT NULL DEFAULT 1,
-    FOREIGN KEY userid REFERENCES users(userid)
+    FOREIGN KEY (userid) REFERENCES users(userid)
 ) Engine=InnoDB;
 
 CREATE TABLE links_counts (
 	linkid INTEGER NOT NULL,
 	userid INTEGER NOT NULL,
 	hit_count INTEGER NOT NULL DEFAULT 0,
-	last_hit DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	last_hit TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (linkid, userid),
-    FOREIGN KEY linkid REFERENCES links(linkid),
-    FOREIGN KEY userid REFERENCES users(userid)
+    FOREIGN KEY (linkid) REFERENCES links(linkid),
+    FOREIGN KEY (userid) REFERENCES users(userid)
 ) Engine=InnoDB;
 
 CREATE TABLE links_anonymous_count (
 	linkid INTEGER NOT NULL PRIMARY KEY,
 	hit_count INTEGER NOT NULL DEFAULT 0,
-	last_hit DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY linkid REFERENCES links(linkid)
+	last_hit TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (linkid) REFERENCES links(linkid)
 ) Engine=InnoDB;
 
 CREATE TABLE links_hits (
 	hitid INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	linkid INTEGER NOT NULL,
 	userid INTEGER,
-	ts DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY linkid REFERENCES links(linkid),
-    FOREIGN KEY userid REFERENCES users(userid)
+	ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (linkid) REFERENCES links(linkid),
+    FOREIGN KEY (userid) REFERENCES users(userid)
 ) Engine=InnoDB;
 
 CREATE TABLE tags (
@@ -61,16 +61,16 @@ CREATE TABLE link_tags (
     linkid INTEGER NOT NULL,
     tagid INTEGER NOT NULL,
     PRIMARY KEY (tagid, linkid),
-    FOREIGN KEY linkid REFERENCES links(linkid),
-    FOREIGN KEY tagid REFERENCES tags(tagid)
+    FOREIGN KEY (linkid) REFERENCES links(linkid),
+    FOREIGN KEY (tagid) REFERENCES tags(tagid)
 ) Engine=InnoDB;
 
 CREATE TABLE link_display_tags (
     linkid INTEGER NOT NULL,
     displayid INTEGER NOT NULL,
     PRIMARY KEY (linkid, displayid),
-    FOREIGN KEY linkid REFERENCES links(linkid),
-    FOREIGN KEY displayid REFERENCES display_tags(displayid)
+    FOREIGN KEY (linkid) REFERENCES links(linkid),
+    FOREIGN KEY (displayid) REFERENCES display_tags(displayid)
 ) Engine=InnoDB;
 
 -- Folder structure
@@ -79,8 +79,8 @@ CREATE TABLE folders (
     userid INTEGER NOT NULL,
     name TEXT NOT NULL,
     description TEXT NOT NULL DEFAULT '',
-    added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    is_public TIYINT NOT NULL DEFAULT 1,
+    added DATETIME NOT NULL,
+    is_public TINYINT NOT NULL DEFAULT 1,
     FOREIGN KEY (userid) REFERENCES users(userid)
 ) Engine=InnoDB;
 

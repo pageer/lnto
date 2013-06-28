@@ -1,1 +1,0 @@
-DB_DSN = 'sqlite:///linkto.db'
