@@ -60,9 +60,9 @@ class User(appdb.Model):
 		
 		if username:
 			curr_user = User.get_by_username(username)
-			return curr_user if curr_user.check_login() else None
-		else:
-			return None
+			if curr_user:
+				return curr_user if curr_user.check_login() else None
+		return None
 	
 	@classmethod
 	def get_by_username(cls, username):
