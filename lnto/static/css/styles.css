@@ -75,6 +75,10 @@ body {
 	background-image: url(/static/images/link.png);
 }
 
+#header .link.showtags span {
+	background-image: url(/static/images/tag_blue.png);
+}
+
 #header .link.addlink span {
 	background-image: url(/static/images/link_add.png);
 }

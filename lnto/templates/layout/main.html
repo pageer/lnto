@@ -15,6 +15,11 @@
 				Links<span></span>
 			</a>
 		</li>
+				<li>
+			<a href="{{url_for('show_user_tag_list')}}" class="link showtags">
+				Tags<span></span>
+			</a>
+		</li>
 		<li>
 			<a href="{{url_for('do_add_link')}}" class="link addlink">
 				Add link<span></span>
@@ -25,11 +30,13 @@
 				Import<span></span>
 			</a>
 		</li>
+		{% if pageoptions['allow_registration'] %}
 		<li>
 			<a href="{{url_for('do_add_user')}}" class="link adduser">
 				Create Account<span></span>
 			</a>
 		</li>
+		{% endif %}
 		{% endif %}
 		<li>
 			{% if pageoptions['user_logged_in'] %}

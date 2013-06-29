@@ -1,8 +1,16 @@
 from flask import Flask, request, session, g
 from flask.ext.sqlalchemy import SQLAlchemy
 
+#### Default configuration settings ####
+
+# User for securing passwords and such.
 SECRET_KEY = 'super secret key zone japan'
+# Database connection URL
 SQLALCHEMY_DATABASE_URI = 'sqlite:///../linkto.db'
+# Set to true to allow new user accounts to be registerd.
+ALLOW_REGISTRATION = True
+
+#### End config settings ####
 
 app = Flask(__name__)
 app.config.from_object(__name__)

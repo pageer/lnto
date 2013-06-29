@@ -22,7 +22,8 @@ def get_default_data():
 	return {
 		'base_url': get_base_url(),
 		'referer': request.form.get('next') or request.args.get('next') or request.form.get('referer') or request.referrer or url_for('show_index'),
-		'user_logged_in': user_is_logged_in()
+		'user_logged_in': user_is_logged_in(),
+		'allow_registration': app.config['ALLOW_REGISTRATION']
 	}
 
 
@@ -54,6 +55,9 @@ def do_logout():
 
 @app.route('/users/new', methods = ['GET', 'POST'])
 def do_add_user():
+	if not app.config['ALLOW_REGISTRATION']:
+		abort(403)
+		
 	if request.method == 'POST':
 		errors = []
 		if request.form['username'].strip() == '':
