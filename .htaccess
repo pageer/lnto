@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ runcgi.py/$1 [L]
+
+<Files "config.cfg">
+	Deny from all
+</Files>
