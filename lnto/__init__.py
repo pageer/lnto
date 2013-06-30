@@ -15,6 +15,13 @@ ALLOW_REGISTRATION = True
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_pyfile('../config.cfg', True)
+
+#import logging
+#from logging import FileHandler
+#file_handler = FileHandler('error.log')
+#file_handler.setLevel(logging.ERROR)
+#app.logger.addHandler(file_handler)
+
 appdb = SQLAlchemy(app)
 
 import views, api

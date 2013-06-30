@@ -68,35 +68,39 @@ body {
 }
 
 #header .link.dashboard span {
-	background-image: url(/static/images/house.png);
+	background-image: url(../images/house.png);
 }
 
 #header .link.showlinks span {
-	background-image: url(/static/images/link.png);
+	background-image: url(../images/link.png);
+}
+
+#header .link.bulkedit span {
+	background-image: url(../images/page_edit.png);
 }
 
 #header .link.showtags span {
-	background-image: url(/static/images/tag_blue.png);
+	background-image: url(../images/tag_blue.png);
 }
 
 #header .link.addlink span {
-	background-image: url(/static/images/link_add.png);
+	background-image: url(../images/link_add.png);
 }
 
 #header .link.adduser span {
-	background-image: url(/static/images/user_add.png);
+	background-image: url(../images/user_add.png);
 }
 
 #header .link.import span {
-	background-image: url(/static/images/book_add.png);
+	background-image: url(../images/book_add.png);
 }
 
 #header .link.logout span {
-	background-image: url(/static/images/door_out.png);
+	background-image: url(../images/door_out.png);
 }
 
 #header .link.login span {
-	background-image: url(/static/images/door_in.png);
+	background-image: url(../images/door_in.png);
 }
 
 /* Login page */
