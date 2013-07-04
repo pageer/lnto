@@ -1,3 +1,14 @@
+{% macro link_menu(link) %}
+	<span class="menulink">
+		<img src="{{url_for('static', filename="images/cog.png")}}" alt=""/>
+		<span class="menu">
+			<a href="{{ url_for('show_link', linkid=link.linkid) }}" class="button show">Show&nbsp;details</a>
+			<a href="{{url_for('do_edit_link', linkid=link.linkid)}}" class="button edit">Edit</a>
+			<a href="{{url_for('show_delete_link', linkid=link.linkid)}}" data-linkid="{{link.linkid}}" class="button delete">Delete</a>
+		</span>
+	</span>
+{% endmacro %}
+
 {% macro link_listing(links, curr_user, extra_field = None, format = None) %}
 	<ul class="link-list">
 		{% for link in links %}
@@ -11,14 +22,7 @@
 				{% endif %}
 			{% endif %}
             {% if link.is_owner(curr_user) %}
-			<span class="menulink">
-				<img src="{{url_for('static', filename="images/cog.png")}}" alt=""/>
-				<span class="menu">
-					<a href="{{ url_for('show_link', linkid=link.linkid) }}" class="button show">Show&nbsp;details</a>
-					<a href="{{url_for('do_edit_link', linkid=link.linkid)}}" class="button edit">Edit</a>
-					<a href="{{url_for('show_delete_link', linkid=link.linkid)}}" data-linkid="{{link.linkid}}" class="button delete">Delete</a>
-				</span>
-			</span>
+			{{link_menu(link)}}
 			{% else %}
 			<a href="{{ url_for('show_link', linkid=link.linkid) }}" class="button show">
 				<img src="{{url_for('static', filename="images/link.png")}}" alt="Show details" title="Show details"/>

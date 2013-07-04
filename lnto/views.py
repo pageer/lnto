@@ -193,18 +193,26 @@ def do_edit_link(linkid):
 				return redirect(request.form.get('referer'))
 	return render_template("link_add.html", pageoptions = get_default_data(), link=link, options=options, errors = errors)
 
-@app.route('/links/bulk-edit/<tags>', methods = ['POST', 'GET'])
-@app.route('/links/bulk-edit', methods = ['POST', 'GET'], defaults = {'tags': None})
+@app.route('/links/manage/<tags>', methods = ['POST', 'GET'])
+@app.route('/links/manage/', methods = ['POST', 'GET'], defaults = {'tags': None})
 @force_login
 def do_bulk_edit(tags):
 	errors = []
 	updated = 0
 	user = User.get_logged_in()
 	
+	# Redirect filters immediately
+	if request.args.get('tag_select'):
+		return redirect(url_for('do_bulk_edit', tags = request.args.get('tag_select')))
+	
+	available_tags = Tag.get_by_user(user.userid)
+	
 	if tags:
 		taglist = tags.split(',')
+		title = 'Manage Links in ' + tags
 		links = Link.get_by_tag(taglist[0], user.userid)
 	else:
+		title = "Manage Links"
 		links = Link.get_by_user(user.userid)
 	
 	if request.method == 'POST':
@@ -224,7 +232,7 @@ def do_bulk_edit(tags):
 		
 		updated += 1
 	
-	return render_template("link_edit_bulk.html", pageoptions = get_default_data(), url_tags = tags, links=links, errors = errors)
+	return render_template("link_edit_bulk.html", pageoptions = get_default_data(), url_tags = tags, links=links, section_title = title, tags = available_tags, errors = errors)
 
 
 @app.route('/link/delete/<linkid>', methods = ['POST', 'GET'])

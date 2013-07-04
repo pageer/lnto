@@ -135,3 +135,79 @@ class TestLinks(unittest.TestCase):
         result = Link.get_public_by_tag('this does not exist', 1)
         self.assertEqual(len(result), 0)
     
+    def test_get_by_most_hits(self):
+        result = Link.get_by_most_hits()
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0].linkid, 1)
+    
+    def test_get_by_most_hits_with_owner(self):
+        result = Link.get_by_most_hits(1)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].linkid, 1)
+        self.assertEqual(result[1].linkid, 2)
+    
+    def test_get_by_most_hits_with_limit(self):
+        result = Link.get_by_most_hits(1, 1)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].linkid, 1)
+    
+    def test_get_by_most_recent_hit(self):
+        result = Link.get_by_most_hits()
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0].linkid, 1)
+    
+    def test_get_by_most_recent_hit_with_owner(self):
+        result = Link.get_by_most_hits(1)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].linkid, 1)
+        self.assertEqual(result[1].linkid, 2)
+    
+    def test_get_by_most_recent_hit_with_limit(self):
+        result = Link.get_by_most_hits(1, 1)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].linkid, 1)
+    
+    def test_get_by_most_recent(self):
+        result = Link.get_by_most_recent()
+        self.assertEqual(len(result), 5)
+        self.assertEqual(result[0].linkid, 4)
+    
+    def test_get_by_most_recent_with_owner(self):
+        result = Link.get_by_most_recent(1)
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0].linkid, 3)
+    
+    def test_get_by_most_recent_with_limit(self):
+        result = Link.get_by_most_recent(1, 2)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].linkid, 3)
+    
+    def test_create_from_webpage(self):
+        url = 'http://www.example.com'
+        html = """
+        <html>
+        <head>
+            <title>This is a test</title>
+        </head>
+        <body>Test</body>
+        </html>
+        """
+        link = Link.create_from_webpage(url, html)
+        self.assertEqual(link.url, url)
+        self.assertEqual(link.name, 'This is a test')
+    
+    def test_create_from_webpage_with_description(self):
+        url = 'http://www.example.com'
+        html = """
+        <html>
+        <head>
+            <title>This is a test</title>
+            <meta name="description" content="Describe this page" />
+        </head>
+        <body>Test</body>
+        </html>
+        """
+        link = Link.create_from_webpage(url, html)
+        self.assertEqual(link.url, url)
+        self.assertEqual(link.name, 'This is a test')
+        self.assertEqual(link.description, "Describe this page")

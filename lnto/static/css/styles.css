@@ -1,4 +1,4 @@
-/* Every fuckin' thing */
+/* Everything */
 html {
 	font-family: helvetica, sans-serif;
 	font-size: 12pt;
@@ -157,6 +157,11 @@ ul.link-list {
 .link-list .menulink {
 	text-decoration: none;
 	position: relative;
+	opacity: 0.7;
+}
+
+.link-list .menulink:hover {
+	opacity: 1;
 }
 
 .link-list .menulink .menu {
@@ -182,6 +187,14 @@ ul.link-list {
 
 .link-list .menulink.showit .menu {
 	display: block;
+}
+
+.fullpage-list li {
+	border-radius: 4px;
+}
+
+.fullpage-list li:hover {
+	background-color: #fff;
 }
 
 .privacy {
@@ -256,3 +269,10 @@ ul.link-list {
 .bulk-editor ul li {
 	list-style-type: none;
 }
+
+.controls .edit-panel,
+.filters .filter-panel {
+	display: inline-block;
+	margin-right: 3em;
+}
+

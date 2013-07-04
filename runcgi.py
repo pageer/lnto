@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 
 activate_this = '/home/skepticats/www/www/lnto/venv/bin/activate_this.py'
 execfile(activate_this, dict(__file__=activate_this))

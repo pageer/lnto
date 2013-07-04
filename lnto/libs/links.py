@@ -186,17 +186,18 @@ class Link(appdb.Model):
 		opener = urllib.FancyURLopener({})
 		data = opener.open(url).read()
 		return Link.create_from_webpage(url, data)
-		
+	
+	@staticmethod
 	def create_from_webpage(url, pagedata):
 		soup = BeautifulSoup(pagedata)
 		link = Link();
 		link.url = url
-		link.title = soup.head.title.string
+		link.name = soup.head.title.string
 		
 		for meta in soup.head.find_all('meta'):
-			desc = meta.attrs.get('description')
-			if desc:
-				link.description = desc
+			name = meta.attrs.get('name')
+			if name == 'description' and meta.attrs.get('content'):
+				link.description = meta.attrs.get('content')
 		
 		return link
 		
@@ -233,11 +234,6 @@ class LinkHit(appdb.Model):
 			return appdb.session.query(appdb.func.max(LinkHit.ts)).select_from(LinkHit).filter_by(linkid = self.linkid, userid = self.userid).scalar()
 		else:
 			return appdb.session.query(appdb.func.max(LinkHit.ts)).select_from(LinkHit).filter_by(linkid = self.linkid).scalar()
-	
-	@staticmethod
-	def get_most_hits(owner = None, limit = 10):
-		pass
-	
 	
 
 class LinkCount(appdb.Model):
