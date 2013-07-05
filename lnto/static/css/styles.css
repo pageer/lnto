@@ -270,6 +270,15 @@ ul.link-list {
 	list-style-type: none;
 }
 
+#toggle-controls {
+	font-size: 80%;
+	text-decoration: none;
+}
+
+#toggle-controls:hover {
+	text-decoration: underline;
+}
+
 .controls .edit-panel,
 .filters .filter-panel {
 	display: inline-block;

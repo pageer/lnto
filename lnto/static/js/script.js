@@ -8,8 +8,7 @@ LinkEditor = {
 			if (!confirm('Delete "'+link_name+'"?')) {
 				return false;
 			}
-			//var posturl = $self.attr('href');
-			var posturl = '../../api/links/delete';
+			var posturl = BASE_URL + 'api/links/delete';
 			$.post(posturl, {linkid: linkid}, function (data, textStatus, jzXHR) {
 				if (data.status == 'success') {
 					$self.parents('li').remove();

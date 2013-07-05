@@ -9,10 +9,7 @@ from lnto.libs.importer import LinkImporter
 from lnto.libs.decorators import force_login
 
 def get_base_url():
-	base = re.findall('(.+://[^/]*)', request.url)
-	if len(base) == 1:
-		return base[0]
-	return ''
+	return request.url_root
 
 def user_is_logged_in():
 	u = User.get_logged_in()
