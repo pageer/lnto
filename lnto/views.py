@@ -147,7 +147,7 @@ def do_add_link():
 		
 		if len(errors) == 0:
 			link.save()
-			redir_target = link.url if req.get('redirect_to_target') else (req.get('next') or req.get('referer') or url_for('show_index'))
+			redir_target = link.url if options.redirect_to_target else (req.get('next') or req.get('referer') or url_for('show_index'))
 			return redirect(redir_target)
 	
 	return render_template("link_add.html", pageoptions = get_default_data(), link = link, options = options, errors = errors)
