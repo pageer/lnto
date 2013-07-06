@@ -128,7 +128,7 @@ def do_add_link():
 	options = {
 		'button_label': 'Add Link',
 		'post_view': req.get('post_view') if req.get('post_view') else url_for('do_add_link'),
-		'redirect_to_target': True if req.get('redirect_to_target', 0) == '1' else False
+		'redirect_to_target': 1 if req.get('redirect_to_target', 0) == '1' else 0
 	}
 	
 	link = Link(data)

@@ -24,15 +24,15 @@ CREATE TABLE links_counts (
 	hit_count INTEGER NOT NULL DEFAULT 0,
 	last_hit TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (linkid, userid),
-    FOREIGN KEY (linkid) REFERENCES links(linkid),
-    FOREIGN KEY (userid) REFERENCES users(userid)
+    FOREIGN KEY (linkid) REFERENCES links(linkid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (userid) REFERENCES users(userid) ON DELETE CASCADE ON UPDATE CASCADE
 ) Engine=InnoDB;
 
 CREATE TABLE links_anonymous_count (
 	linkid INTEGER NOT NULL PRIMARY KEY,
 	hit_count INTEGER NOT NULL DEFAULT 0,
 	last_hit TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (linkid) REFERENCES links(linkid)
+    FOREIGN KEY (linkid) REFERENCES links(linkid) ON DELETE CASCADE ON UPDATE CASCADE
 ) Engine=InnoDB;
 
 CREATE TABLE links_hits (
@@ -40,8 +40,8 @@ CREATE TABLE links_hits (
 	linkid INTEGER NOT NULL,
 	userid INTEGER,
 	ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (linkid) REFERENCES links(linkid),
-    FOREIGN KEY (userid) REFERENCES users(userid)
+    FOREIGN KEY (linkid) REFERENCES links(linkid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (userid) REFERENCES users(userid) ON DELETE CASCADE ON UPDATE CASCADE
 ) Engine=InnoDB;
 
 CREATE TABLE tags (
@@ -61,16 +61,16 @@ CREATE TABLE link_tags (
     linkid INTEGER NOT NULL,
     tagid INTEGER NOT NULL,
     PRIMARY KEY (tagid, linkid),
-    FOREIGN KEY (linkid) REFERENCES links(linkid),
-    FOREIGN KEY (tagid) REFERENCES tags(tagid)
+    FOREIGN KEY (linkid) REFERENCES links(linkid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (tagid) REFERENCES tags(tagid) ON DELETE CASCADE ON UPDATE CASCADE
 ) Engine=InnoDB;
 
 CREATE TABLE link_display_tags (
     linkid INTEGER NOT NULL,
     displayid INTEGER NOT NULL,
     PRIMARY KEY (linkid, displayid),
-    FOREIGN KEY (linkid) REFERENCES links(linkid),
-    FOREIGN KEY (displayid) REFERENCES display_tags(displayid)
+    FOREIGN KEY (linkid) REFERENCES links(linkid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (displayid) REFERENCES display_tags(displayid) ON DELETE CASCADE ON UPDATE CASCADE
 ) Engine=InnoDB;
 
 -- Folder structure
