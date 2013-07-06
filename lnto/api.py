@@ -42,8 +42,8 @@ def do_delete_link():
 	try:
 		link.delete()
 		return json_success()
-	except Exception:
-		return json_error('Error deleting link')
+	except Exception as e:
+		return json_error('Error deleting link - ' + str(e))
 
 
 @app.route('/api/link/tag', methods = ['POST'])
@@ -63,8 +63,8 @@ def do_add_tag():
 			link.add_tag(tag.strip())
 		link.save()
 		return json_success()
-	except Exception:
-		return json_error('Error adding tags')
+	except Exception as e:
+		return json_error('Error adding tags - ' + str(e))
 
 
 @app.route('/api/link/<linkid>')
