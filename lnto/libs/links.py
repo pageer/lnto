@@ -150,6 +150,20 @@ class Link(appdb.Model):
 			return appdb.session.query(Link).filter(Link.userid == userid, Link.is_public == True, Link.tags.any(Tag.tag_name == tag)).all()
 	
 	@staticmethod
+	def get_untagged(userid = None):
+		if userid is None:
+			return appdb.session.query(Link).filter(~Link.tags.any()).all()
+		else:
+			return appdb.session.query(Link).filter(~Link.tags.any(), Link.userid == userid).all()
+	
+	@staticmethod
+	def get_public_untagged(userid = None):
+		if userid is None:
+			return appdb.session.query(Link).filter(~Link.tags.any(), Link.is_public == True).all()
+		else:
+			return appdb.session.query(Link).filter(~Link.tags.any(), Link.userid == userid, Link.is_public == True).all()
+	
+	@staticmethod
 	def get_by_most_hits(owner = None, limit = 10):
 		query = appdb.session.query(Link, appdb.func.count(LinkHit.linkid)).join(LinkHit)
 		if owner is not None:

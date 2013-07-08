@@ -169,7 +169,7 @@ class TestLinks(unittest.TestCase):
     
     def test_get_by_most_recent(self):
         result = Link.get_by_most_recent()
-        self.assertEqual(len(result), 5)
+        self.assertEqual(len(result), 9)
         self.assertEqual(result[0].linkid, 4)
     
     def test_get_by_most_recent_with_owner(self):
@@ -181,6 +181,29 @@ class TestLinks(unittest.TestCase):
         result = Link.get_by_most_recent(1, 2)
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].linkid, 3)
+    
+    def test_get_untagged(self):
+        result = Link.get_untagged()
+        self.assertEqual(len(result), 2)
+    
+    def test_get_untagged_with_owner(self):
+        result = Link.get_untagged(3)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].linkid, 6)
+        
+    def test_get_public_untagged(self):
+        result = Link.get_public_untagged()
+        for r in result:
+            print str(r.linkid) + ' ' + str(r.is_public)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].linkid, 7)
+    
+    def test_get_public_untagged_with_owner(self):
+        result = Link.get_public_untagged(4)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].linkid, 7)
+        result = Link.get_public_untagged(3)
+        self.assertEqual(len(result), 0)
     
     def test_create_from_webpage(self):
         url = 'http://www.example.com'

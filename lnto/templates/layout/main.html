@@ -50,20 +50,20 @@
 			{% endif %}	
 		</li>
 		<li class="bookmarklet">
-			Bookmarklets: 
-			<a class="link" href="javascript:(function() {
-			var desc = '', i = 0, metas = document.getElementsByTagName('meta');
-			for (i in metas) {
-				if (metas[i].name == 'description') {
-					desc = metas[i].content
-				}
-			}
-			window.location = '{{pageoptions.base_url}}{{url_for('do_add_link')}}'
-			+ '?url=' + encodeURIComponent(window.location)
-			+ '&redirect_to_target=1'
-			+ '&name=' + encodeURIComponent(document.title)
-			+ '&description=' + encodeURIComponent(desc);
-			})()">
+			<span>Bookmarklets:</span>
+			<a class="link" href="{{["javascript:(function() {",
+			"var desc = '', i = 0, metas = document.getElementsByTagName('meta');",
+			"for (i in metas) {",
+			"if (metas[i].name == 'description') {",
+					"desc = metas[i].content",
+				"}",
+			"}",
+			"window.location = '", pageoptions.base_url, url_for('do_add_link'), "'",
+			"+ '?url=' + encodeURIComponent(window.location)",
+			"+ '&redirect_to_target=1'",
+			"+ '&name=' + encodeURIComponent(document.title)",
+			"+ '&description=' + encodeURIComponent(desc);",
+			"})()"]|join}}">
 				Add to lnto
 			</a>
 		</li>

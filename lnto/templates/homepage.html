@@ -2,24 +2,7 @@
 {% import 'layout/macros.html' as macros %}
 {% block title %}User Homepage{% endblock %}
 {% block content %}
-<div class="linkpanel all-links">
-	<h3 class="header">All Links</h3>	
-	{{ macros.link_listing(links, user) }}
-</div>
-<div class="linkpanel popular-links">
-	<h3 class="header">Most Visits</h3>	
-	{{ macros.link_listing(most_hits, user, 'hit_count') }}
-</div>
-<div class="linkpanel last-links">
-	<h3 class="header">Recently Visited</h3>	
-	{{ macros.link_listing(recent_hits, user, 'last_hit', 'date') }}
-</div>
-<div class="linkpanel tag-cloud">
-	<h3 class="header">Tag Cloud</h3>	
-	{{ macros.tag_listing(tag_cloud) }}
-</div>
-<div class="linkpanel recent-links">
-	<h3 class="header">Recently Added</h3>	
-	{{ macros.link_listing(recent_links, user, 'added', 'date') }}
-</div>
+{% for item in dashboard %}
+	{% include item.template %}
+{% endfor %}
 {% endblock %}

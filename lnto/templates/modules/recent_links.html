@@ -1,0 +1,5 @@
+{% import 'layout/macros.html' as macros %}
+<div class="linkpanel recent-links">
+	<h3 class="header">Recently Added</h3>	
+	{{ macros.link_listing(item.data, user, 'added', 'date') }}
+</div>

@@ -61,7 +61,43 @@ def create_test_data():
             'added': datetime(2013, 1, 2, 12, 13, 14),
             'tags': ['privatetag'],
             'is_public': False
-        }
+        },
+        {
+            'name': 'User3Foo3',
+            'userid': 3,
+            'url': 'http://www.example.com/test6',
+            'description': 'This is a test again',
+            'added': datetime(2013, 1, 2, 12, 13, 14),
+            'tags': [],
+            'is_public': False
+        },
+        {
+            'name': 'User4Foo4',
+            'userid': 4,
+            'url': 'http://www.example.com/test7',
+            'description': 'This is a test again',
+            'added': datetime(2013, 1, 2, 12, 13, 14),
+            'tags': [],
+            'is_public': True
+        },
+        {
+            'name': 'User3Foo3',
+            'userid': 3,
+            'url': 'http://www.example.com/test6',
+            'description': 'This is a test again',
+            'added': datetime(2013, 1, 2, 12, 13, 14),
+            'tags': ['userid3'],
+            'is_public': False
+        },
+        {
+            'name': 'User4Foo4',
+            'userid': 4,
+            'url': 'http://www.example.com/test7',
+            'description': 'This is a test again',
+            'added': datetime(2013, 1, 2, 12, 13, 14),
+            'tags': ['userid4'],
+            'is_public': True
+        },
     ]
     user_data = [
         {
@@ -71,6 +107,14 @@ def create_test_data():
         {
             'username': 'testuser2',
             'password': 'test2'
+        },
+        {
+            'username': 'testuser3',
+            'password': 'test3'
+        },
+        {
+            'username': 'testuser4',
+            'password': 'test4'
         }
     ]
     hit_data = [

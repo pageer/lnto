@@ -1,3 +1,28 @@
+PageHeader = {
+	handlers: {
+		bookmarklet_expand: function () {
+			var $this = $(this);
+			if ($this.hasClass('expanded')) {
+				$this.text('(+)');
+				$this.removeClass('expanded');
+				$this.next().remove();
+			} else {
+				$this.addClass('expanded');
+				$this.text('(-)');
+				var $input = $('<input type="text" class="bookmarklet-text" />');
+				$input.val($this.closest('.bookmarklet').find('.link').attr('href'));
+				$this.after($input);
+				$input.select();
+			}
+		}
+	},
+	init: function () {
+		var $bookmarklets = $('#header .bookmarklet'),
+		    $node = $('<a href="javascript:void(0)" class="expand" title="Show bookmarklet code">(+)</a>').on('click.pageheader', this.handlers.bookmarklet_expand);
+		$bookmarklets.find('.link').after($node);
+	}
+};
+
 LinkEditor = {
 	handlers: {
 		delete_link: function (e) {
@@ -96,6 +121,7 @@ BulkEditor = {
 };
 
 $(document).ready(function () {
+	PageHeader.init();
 	LinkEditor.init();
 	BulkEditor.init();
 });

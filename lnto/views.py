@@ -5,6 +5,7 @@ from flask import render_template, make_response, redirect, abort, url_for, requ
 from lnto.libs.links import Link
 from lnto.libs.users import User
 from lnto.libs.tags import Tag
+from lnto.libs.dashboard import Dashboard
 from lnto.libs.importer import LinkImporter
 from lnto.libs.decorators import force_login
 
@@ -81,12 +82,14 @@ def do_add_user():
 @force_login
 def show_index():
 	usr = User.get_logged_in()
-	links = Link.get_by_user(usr.userid)
-	recent_links = Link.get_by_most_recent(usr.userid)
-	recent_hits = Link.get_by_most_recent_hit(usr.userid)
-	most_hits = Link.get_by_most_hits(usr.userid)
-	tag_cloud = Tag.get_cloud_by_user(usr.userid)
-	return render_template('homepage.html', pageoptions = get_default_data(), links = links, user = usr, recent_links = recent_links, recent_hits = recent_hits, most_hits = most_hits, tag_cloud = tag_cloud);
+	#links = Link.get_by_user(usr.userid)
+	#recent_links = Link.get_by_most_recent(usr.userid)
+	#recent_hits = Link.get_by_most_recent_hit(usr.userid)
+	#most_hits = Link.get_by_most_hits(usr.userid)
+	#tag_cloud = Tag.get_cloud_by_user(usr.userid)
+	dashboard = Dashboard(usr.userid)
+	data = dashboard.render()
+	return render_template('homepage.html', pageoptions = get_default_data(), user = usr, dashboard = data);#links = links, user = usr, recent_links = recent_links, recent_hits = recent_hits, most_hits = most_hits, tag_cloud = tag_cloud);
 
 @app.route('/links',  defaults = {'username': None})
 @app.route('/public/links/<username>')

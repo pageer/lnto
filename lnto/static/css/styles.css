@@ -60,6 +60,11 @@ body {
 	margin-left: 3em;
 }
 
+.bookmarklet-text {
+	display: inline-block;
+	position: relative;
+}
+
 /* link-images */
 
 #header .link span {
