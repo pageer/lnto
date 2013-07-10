@@ -4,15 +4,17 @@ from lnto.libs.tags import Tag
 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql import select
-from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, Boolean, Text
+from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, Boolean, Text, func
 
 class AbstractModule(object):
     
     typeid = 0
     classes = ''
     caption = ''
+    shortdesc = ''
     template_type = ''
     configuration = None
+    config_required = False
     userid = 0
     
     def __init__(self, userid):
@@ -26,6 +28,9 @@ class AbstractModule(object):
     
     def get_template(self):
         return 'modules/' + self.template_type + '.html'
+    
+    def get_config_template(self):
+        return 'modules/' + self.template_type + '_config.html'
     
     def get_configuration(self, moduleid):
         return {}
@@ -45,6 +50,7 @@ class AbstractModule(object):
 class AllLinksModule(AbstractModule):
     typeid = 1
     classes = 'all-links'
+    shortdesc = 'All links'
     caption = 'All Links'
     template_type = 'all_links'
     
@@ -55,6 +61,7 @@ class AllLinksModule(AbstractModule):
 class PopularLinksModule(AbstractModule):
     typeid = 2
     classes = 'popular-links'
+    shortdesc = 'Most visited links'
     caption = 'Most Visits'
     template_type = 'most_visits'
     
@@ -65,6 +72,7 @@ class PopularLinksModule(AbstractModule):
 class RecentlyVisitedLinksModule(AbstractModule):
     typeid = 3
     classes = 'last-links'
+    shortdesc = 'Most recently visited links'
     caption = 'Recently Visited'
     template_type = 'recent_visits'
     
@@ -75,6 +83,7 @@ class RecentlyVisitedLinksModule(AbstractModule):
 class AllTagsModule(AbstractModule):
     typeid = 4
     classes = 'tag-cloud'
+    shortdesc = 'All tags'
     caption = 'Tag Cloud'
     template_type = 'tag_cloud'
     
@@ -85,6 +94,7 @@ class AllTagsModule(AbstractModule):
 class RecentlyAddedLinksModule(AbstractModule):
     typeid = 5
     classes = 'recent-links'
+    shortdesc = 'Recently added links'
     caption = 'Recently Added'
     template_type = 'recent_links'
     
@@ -101,9 +111,24 @@ class TagModuleConfig(appdb.Model):
 class TagModule(AbstractModule):
     typeid = 6
     classes = 'show-tag'
+    shortdesc = 'Links from a tag'
+    config_required = True
     
     def get_configuration(self, moduleid):
         self.configuration = appdb.session.query(TagModuleConfig).filter_by(moduleid = moduleid).first()
+    
+    def save_configuration(self, config):
+        if not config.get('moduleid'):
+            raise Error('No moduleid found.');
+        if not config.get('tag_name'):
+            raise Error('No tag name found.');
+        item = appdb.session.auery(TagModuleConfig).filter_by(moduleid = int(config.get('moduleid'))).first()
+        if not item:
+            item = TagModuleConfig()
+            item.moduleid = config.get('moduleid')
+        item.tag_name = config.get('tag_name')
+        appdb.session.add(item)
+        appdb.session.commit()
     
     def get_caption(self):
         return self.configuration.tag_name
@@ -129,8 +154,7 @@ class Dashboard(object):
         self.userid = userid
     
     def get_modules(self):
-        modules = []
-        #modules = appdb.session.query(DashboardModule).filter_by(userid = self.userid).order_by(DashboardModule.position).all()
+        modules = appdb.session.query(DashboardModule).filter_by(userid = self.userid).order_by(DashboardModule.position).all()
         # Let's add some defaults
         if len(modules) == 0:
             modules.append(DashboardModule(1, self.userid, 1, 1))
@@ -149,6 +173,18 @@ class Dashboard(object):
             ret.append(mod.render())
         return ret
     
+    def get_next_position(self):
+        pos = appdb.session.query(func.max(DashboardModule.position)).filter_by(userid = self.userid).first()[0]
+        return 0 if pos is None else pos
+    
+    def add_module(self, module_type, position, config_data = None):
+        mod = DashboardModule(userid = self.userid, module_type = module_type, position = position)
+        appdb.session.add(mod)
+        if config_data:
+            mod.get_module()
+            mod.module.save_configuration(config_data)
+        appdb.session.commit()
+    
 
 class DashboardModule(appdb.Model):
     __tablename__ = 'dashboard_modules'
@@ -160,7 +196,7 @@ class DashboardModule(appdb.Model):
     
     module = None
     
-    def __init__(self, moduleid = 0, userid = 0, module_type = 1, position = 0):
+    def __init__(self, moduleid = None, userid = 0, module_type = 1, position = 0):
         self.moduleid = moduleid
         self.userid = userid
         self.module_type = module_type

@@ -1,11 +1,11 @@
 import time, datetime, re
 from datetime import datetime, timedelta
 from lnto import app
-from flask import render_template, make_response, redirect, abort, url_for, request, session, g
+from flask import render_template, make_response, redirect, abort, url_for, flash, request, session, g
 from lnto.libs.links import Link
 from lnto.libs.users import User
 from lnto.libs.tags import Tag
-from lnto.libs.dashboard import Dashboard
+from lnto.libs.dashboard import Dashboard, module_type_map
 from lnto.libs.importer import LinkImporter
 from lnto.libs.decorators import force_login
 
@@ -82,14 +82,52 @@ def do_add_user():
 @force_login
 def show_index():
 	usr = User.get_logged_in()
-	#links = Link.get_by_user(usr.userid)
-	#recent_links = Link.get_by_most_recent(usr.userid)
-	#recent_hits = Link.get_by_most_recent_hit(usr.userid)
-	#most_hits = Link.get_by_most_hits(usr.userid)
-	#tag_cloud = Tag.get_cloud_by_user(usr.userid)
 	dashboard = Dashboard(usr.userid)
 	data = dashboard.render()
-	return render_template('homepage.html', pageoptions = get_default_data(), user = usr, dashboard = data);#links = links, user = usr, recent_links = recent_links, recent_hits = recent_hits, most_hits = most_hits, tag_cloud = tag_cloud);
+	return render_template('homepage.html', pageoptions = get_default_data(), user = usr, dashboard = data)
+
+@app.route('/modules/add', methods = ['GET', 'POST'])
+@force_login
+def show_add_module():
+	modtype = request.form.get('mod_type')
+	if request.method == 'POST' and modtype and module_type_map.get(int(modtype)):
+		mod = module_type_map[int(modtype)]
+		if mod.config_required:
+			return redirect(url_for('do_add_module', modtype = request.form.get('mod_type')))
+		else:
+			usr = User.get_logged_in()
+			dash = Dashboard(usr.userid)
+			pos = dash.get_next_position()
+			try:
+				dash.add_module(int(modtype), int(pos))
+				flash('Module added!', 'success')
+				return redirect(url_for('show_index'))
+			except Exception as e:
+				flash(str(e), 'error')
+			
+	return render_template('module_available.html', pageoptions = get_default_data(), module_types = module_type_map);
+
+@app.route('/modules/add/<modtype>', methods = ['GET', 'POST'])
+@force_login
+def do_add_module(modtype):
+	usr = User.get_logged_in()
+	dash = Dashboard(usr.userid)
+	mod = module_type_map[modtype]
+	
+	if request.method == 'POST':
+		mod_type = request.form.get('module_type')
+		pos = request.form.get('position') or dash.get_next_position()
+		if mod_type:
+			try:
+				dash.add_module(int(mod_type), int(pos), request.form)
+				flash('Module added!', 'success')
+				return redirect(url_for('show_index'))
+			except Exception as e:
+				flash(str(e), 'error')
+		else:
+			flash('You must supply a module type.', 'error')
+	
+	return render_template('module_add.html', pageoptions = get_default_data(), user = usr, dashboard = dash, module = mod)
 
 @app.route('/links',  defaults = {'username': None})
 @app.route('/public/links/<username>')
@@ -207,7 +245,11 @@ def do_bulk_edit(tags):
 	
 	available_tags = Tag.get_by_user(user.userid)
 	
-	if tags:
+	if tags == 'untagged':
+		taglist = tags.split(',')
+		title = 'Manage Untagged Links'
+		links = Link.get_untagged(user.userid)
+	elif tags:
 		taglist = tags.split(',')
 		title = 'Manage Links in ' + tags
 		links = Link.get_by_tag(taglist[0], user.userid)

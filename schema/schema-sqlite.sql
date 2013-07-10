@@ -92,3 +92,17 @@ CREATE TABLE folder_tree (
     FOREIGN KEY (descendant) REFERENCES folders(folderid)
 );
 
+-- Dashboard modules
+CREATE TABLE dashboard_modules (
+    moduleid INTEGER NOT NULL PRIMARY KEY,
+    userid INTEGER NOT NULL,
+    module_type INTEGER NOT NULL DEFAULT 1,
+    position INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (userid) REFERENCES users(userid) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE dashboard_modules_config_tag (
+    moduleid INTEGER NOT NULL PRIMARY KEY,
+    tag_name VARCHAR(64) NOT NULL,
+    FOREIGN KEY (moduleid) REFERENCES dashboard_modules(moduleid) ON DELETE CASCADE ON UPDATE CASCADE
+);

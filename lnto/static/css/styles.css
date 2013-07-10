@@ -20,6 +20,7 @@ body {
 	background-color: #e5e5e5;
 	border-bottom: 1px solid #a5a5a5;
 	box-shadow: 3px 3px 3px #d3d3d3;
+	position: relative;
 }
 
 #header h3,
@@ -288,5 +289,13 @@ ul.link-list {
 .filters .filter-panel {
 	display: inline-block;
 	margin-right: 3em;
+}
+
+/* Header extensions */
+
+#header li.modules {
+	position: absolute;
+	top: 30%;
+	right: 0;
 }
 

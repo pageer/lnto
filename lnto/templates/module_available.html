@@ -1,0 +1,13 @@
+{% extends "layout/main.html" %}
+{% block title %}Add dashboard module{% endblock %}
+{% block content %}
+<h3>Available Modules</h3>
+<form method="post" action="{{url_for('show_add_module')}}">
+    <select name="mod_type">
+    {% for mod in module_types.keys() %}
+        <option value="{{module_types[mod].typeid}}">{{module_types[mod].shortdesc}}</option>
+    {% endfor %}
+    </select>
+    <input type="submit" value="Add Module"/>
+</form>
+{% endblock %}

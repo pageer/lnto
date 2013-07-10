@@ -1,6 +1,11 @@
 {% extends "layout/main.html" %}
 {% import 'layout/macros.html' as macros %}
 {% block title %}User Homepage{% endblock %}
+{% block page_extension %}
+<li class="modules">
+	<a href="{{url_for('show_add_module')}}">Add Module</a>
+</li>
+{% endblock %}
 {% block content %}
 {% for item in dashboard %}
 	{% include item.template %}

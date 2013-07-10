@@ -11,6 +11,7 @@
 			<label>Filter by tag:
 				<select id="tag-select" name="tag_select">
 					<option value="">All</option>
+					<option value="untagged">Untagged</option>
 					{% for t in tags %}
 					<option value="{{t.tag_name}}"{% if (t.tag_name == url_tags) %}selected="selected"{% endif %}>{{t.tag_name}}</option>
 					{% endfor %}
