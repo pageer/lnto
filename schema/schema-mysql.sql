@@ -94,7 +94,7 @@ CREATE TABLE folder_links (
 
 -- Dashboard modules
 CREATE TABLE dashboard_modules (
-    moduleid INTEGER NOT NULL PRIMARY KEY,
+    moduleid INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
     userid INTEGER NOT NULL,
     module_type INTEGER NOT NULL DEFAULT 1,
     position INTEGER NOT NULL DEFAULT 0,

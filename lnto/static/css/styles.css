@@ -246,13 +246,14 @@ ul.link-list {
 
 /* User dashboard */
 .linkpanel {
+	display: inline-block;
+	vertical-align: top;
 	padding: 10px;
 	min-width: 250px;
 	width: 29%;
 	margin: 1%;
 	border: 1px solid #000;
 	border-radius: 5px;
-	float: left;
 	min-height: 150px;
 	background-color: #fff;
 	box-shadow: 4px 4px 4px #d5d5d5;
