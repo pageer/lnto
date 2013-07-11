@@ -14,6 +14,7 @@ class AbstractModule(object):
     shortdesc = ''
     template_type = ''
     configuration = None
+    has_config = False
     config_required = False
     userid = 0
     
@@ -35,7 +36,7 @@ class AbstractModule(object):
     def get_configuration(self, moduleid):
         return {}
     
-    def save_configuration(self, config):
+    def save_configuration(self, moduleid, config):
         pass
     
     def render_module(self):
@@ -104,7 +105,7 @@ class RecentlyAddedLinksModule(AbstractModule):
 
 class TagModuleConfig(appdb.Model):
     __tablename__ = 'dashboard_modules_config_tag'
-    moduleid = Column(Integer, ForeignKey('dashboard_modules.moduleid'), primary_key = True)
+    moduleid = Column(Integer, ForeignKey('dashboard_modules.moduleid'), primary_key = True, autoincrement = False)
     tag_name = Column(String(64))
 
 
@@ -112,20 +113,20 @@ class TagModule(AbstractModule):
     typeid = 6
     classes = 'show-tag'
     shortdesc = 'Links from a tag'
+    has_config = True
     config_required = True
+    template_type = 'tag_links'
     
     def get_configuration(self, moduleid):
         self.configuration = appdb.session.query(TagModuleConfig).filter_by(moduleid = moduleid).first()
     
-    def save_configuration(self, config):
-        if not config.get('moduleid'):
-            raise Error('No moduleid found.');
+    def save_configuration(self, moduleid, config):
         if not config.get('tag_name'):
-            raise Error('No tag name found.');
-        item = appdb.session.auery(TagModuleConfig).filter_by(moduleid = int(config.get('moduleid'))).first()
+            raise Exception('No tag name found.');
+        item = appdb.session.query(TagModuleConfig).filter_by(moduleid = moduleid).first()
         if not item:
             item = TagModuleConfig()
-            item.moduleid = config.get('moduleid')
+            item.moduleid = moduleid
         item.tag_name = config.get('tag_name')
         appdb.session.add(item)
         appdb.session.commit()
@@ -143,6 +144,7 @@ module_type_map = {
     3: RecentlyVisitedLinksModule,
     4: AllTagsModule,
     5: RecentlyAddedLinksModule,
+    6: TagModule,
 }
 
 
@@ -180,10 +182,10 @@ class Dashboard(object):
     def add_module(self, module_type, position, config_data = None):
         mod = DashboardModule(userid = self.userid, module_type = module_type, position = position)
         appdb.session.add(mod)
+        appdb.session.commit()
         if config_data:
             mod.get_module()
-            mod.module.save_configuration(config_data)
-        appdb.session.commit()
+            mod.module.save_configuration(mod.moduleid, config_data)
     
 
 class DashboardModule(appdb.Model):
@@ -204,7 +206,7 @@ class DashboardModule(appdb.Model):
     
     def get_module(self):
         self.module = module_type_map[self.module_type](self.userid)
-        self.configuration = self.module.get_configuration(self.moduleid);
+        self.module.get_configuration(self.moduleid);
     
     def render(self):
         return self.module.render_module()

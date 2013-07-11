@@ -112,7 +112,7 @@ def show_add_module():
 def do_add_module(modtype):
 	usr = User.get_logged_in()
 	dash = Dashboard(usr.userid)
-	mod = module_type_map[modtype]
+	mod = module_type_map[int(modtype)](usr.userid)
 	
 	if request.method == 'POST':
 		mod_type = request.form.get('module_type')
@@ -128,6 +128,12 @@ def do_add_module(modtype):
 			flash('You must supply a module type.', 'error')
 	
 	return render_template('module_add.html', pageoptions = get_default_data(), user = usr, dashboard = dash, module = mod)
+
+@app.route('/modules/remove/<moduleid>')
+@force_login
+def do_remove_module():
+	pass
+
 
 @app.route('/links',  defaults = {'username': None})
 @app.route('/public/links/<username>')
