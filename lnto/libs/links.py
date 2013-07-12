@@ -56,6 +56,7 @@ class Link(appdb.Model):
 	
 	
 	def add_tag(self, tagname):
+		tagname = tagname.strip()
 		for tag in self.tags:
 			if str(tag) == tagname:
 				return
