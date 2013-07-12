@@ -14,12 +14,49 @@ PageHeader = {
 				$this.after($input);
 				$input.select();
 			}
+		},
+		notification_flash: function() {
+			var $notes = $('.notifications');
+			var hider = function () {
+				$notes.animate({'opacity': 0}, 500, function () { $notes.hide(); });
+			};
+			$notes.css('opacity', 0);
+			$notes.animate({'opacity': 1}, 500, function () {
+				setTimeout(hider, 10000);
+			});
 		}
 	},
 	init: function () {
 		var $bookmarklets = $('#header .bookmarklet'),
 		    $node = $('<a href="javascript:void(0)" class="expand" title="Show bookmarklet code">(+)</a>').on('click.pageheader', this.handlers.bookmarklet_expand);
 		$bookmarklets.find('.link').after($node);
+	
+		this.handlers.notification_flash();	
+	}
+};
+
+Dashboard = {
+	handlers: {
+		remove_module: function () {
+			var $self = $(this),
+				link_name = $self.parents('li').find('.name').text(),
+				linkid = $self.data('linkid');
+			if (!confirm('Delete this module?')) {
+				return false;
+			}
+			var posturl = BASE_URL + 'api/modules/delete';
+			$.post(posturl, {moduleid: linkid}, function (data, textStatus, jzXHR) {
+				if (data.status == 'success') {
+					$self.parents('li').remove();
+				} else {
+					alert(data.message);
+				}
+			});
+		}
+	},
+	init: function () {
+		//var rem_link = $('<a href="javascript:void(0)">-</a>').on('click.module', this.handlers.remove_module);
+		//$('.linkpanel .header').append(rem_link);
 	}
 };
 
@@ -122,6 +159,7 @@ BulkEditor = {
 
 $(document).ready(function () {
 	PageHeader.init();
+	Dashboard.init();
 	LinkEditor.init();
 	BulkEditor.init();
 });

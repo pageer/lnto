@@ -3,6 +3,7 @@ from lnto import app
 from flask import render_template, make_response, redirect, jsonify, abort, url_for, request, session, g
 from lnto.libs.links import Link
 from lnto.libs.users import User
+from lnto.libs.dashboard import Dashboard
 from lnto.libs.decorators import check_api_login
 
 # Utility functions
@@ -30,7 +31,8 @@ def validate_link(link, user = None):
 # Routes
 
 @app.route('/api/links/delete', methods = ['POST'])
-def do_delete_link():
+@check_api_login
+def api_delete_link():
 	if not request.form.get('linkid'):
 		return json_error('No linkid specified')
 	
@@ -45,9 +47,24 @@ def do_delete_link():
 	except Exception as e:
 		return json_error('Error deleting link - ' + str(e))
 
+@app.route('/api/modules/delete', methods = ['POST'])
+@check_api_login
+def api_remove_module():
+	usr = User.get_logged_in()
+	dash = Dashboard(usr.userid)
+	modid = request.form.get('moduleid')
+	
+	if not modid:
+		return json_error('No moduleid given')
+	
+	if dash.remove_module(modid):
+		return json_success()
+	else:
+		return json_error('Failed to remove module')
 
 @app.route('/api/link/tag', methods = ['POST'])
-def do_add_tag():
+@check_api_login
+def api_add_tag():
 	if not request.form.get('linkid') or not request.form.get('tags'):
 		return json_error('Missing linkid or tags parameters')
 	

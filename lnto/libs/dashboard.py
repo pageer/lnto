@@ -187,6 +187,15 @@ class Dashboard(object):
             mod.get_module()
             mod.module.save_configuration(mod.moduleid, config_data)
     
+    def remove_module(self, moduleid):
+        mod = appdb.session.query(DashboardModule).filter_by(moduleid = moduleid, userid = self.userid).first()
+        if mod:
+            appdb.session.delete(mod)
+            appdb.session.commit()
+            return True
+        else:
+            return False
+    
 
 class DashboardModule(appdb.Model):
     __tablename__ = 'dashboard_modules'
@@ -209,5 +218,7 @@ class DashboardModule(appdb.Model):
         self.module.get_configuration(self.moduleid);
     
     def render(self):
-        return self.module.render_module()
+        ret = self.module.render_module()
+        ret['moduleid'] = self.moduleid
+        return ret
     

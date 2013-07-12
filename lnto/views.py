@@ -100,12 +100,12 @@ def show_add_module():
 			pos = dash.get_next_position()
 			try:
 				dash.add_module(int(modtype), int(pos))
-				flash('Module added!', 'success')
+				flash('Module added.', 'success')
 				return redirect(url_for('show_index'))
 			except Exception as e:
 				flash(str(e), 'error')
 			
-	return render_template('module_available.html', pageoptions = get_default_data(), module_types = module_type_map);
+	return render_template('module_available.html', pageoptions = get_default_data(), module_types = module_type_map)
 
 @app.route('/modules/add/<modtype>', methods = ['GET', 'POST'])
 @force_login
@@ -120,7 +120,7 @@ def do_add_module(modtype):
 		if mod_type:
 			try:
 				dash.add_module(int(mod_type), int(pos), request.form)
-				flash('Module added!', 'success')
+				flash('Module added.', 'success')
 				return redirect(url_for('show_index'))
 			except Exception as e:
 				flash(str(e), 'error')
@@ -131,9 +131,14 @@ def do_add_module(modtype):
 
 @app.route('/modules/remove/<moduleid>')
 @force_login
-def do_remove_module():
-	pass
-
+def do_remove_module(moduleid):
+	usr = User.get_logged_in()
+	dash = Dashboard(usr.userid)
+	if dash.remove_module(moduleid):
+		flash('Module deleted', 'success')
+	else:
+		flash('Could not delete module', 'error')
+	return redirect(url_for('show_index'))
 
 @app.route('/links',  defaults = {'username': None})
 @app.route('/public/links/<username>')
@@ -241,8 +246,6 @@ def do_edit_link(linkid):
 @app.route('/links/manage/', methods = ['POST', 'GET'], defaults = {'tags': None})
 @force_login
 def do_bulk_edit(tags):
-	errors = []
-	updated = 0
 	user = User.get_logged_in()
 	
 	# Redirect filters immediately
@@ -272,15 +275,15 @@ def do_bulk_edit(tags):
 			for l in edit_links:
 				l.add_tag(request.form.get('tag_text'))
 				l.save()
+			flash('Tagged %d links as "%s"' % (len(edit_links), request.form.get('tag_text')), 'success')
 		
 		if request.form.get('set_privacy') and request.form.get('privacy_submit'):
 			for l in edit_links:
 				l.is_public = True if request.form.get('set_privacy') == 'public' else False
 				l.save()
-		
-		updated += 1
+			flash('Marked %d links %s' % (len(edit_links), 'public' if request.form.get('set_privacy') == 'public' else 'private'), 'success')
 	
-	return render_template("link_edit_bulk.html", pageoptions = get_default_data(), url_tags = tags, links=links, section_title = title, tags = available_tags, errors = errors)
+	return render_template("link_edit_bulk.html", pageoptions = get_default_data(), url_tags = tags, links=links, section_title = title, tags = available_tags)
 
 
 @app.route('/link/delete/<linkid>', methods = ['POST', 'GET'])
@@ -295,6 +298,7 @@ def show_delete_link(linkid):
 	else:
 		if request.form.get('confirm'):
 			link.delete()
+			flash('Deleted link', 'success')
 			return redirect(url_for('show_index'))
 		elif request.form.get('cancel'):
 			return redirect(request.form.get('referer'))
@@ -325,7 +329,7 @@ def show_link(linkid):
 def show_linkurl(linkid):
 	link = Link.get_by_id(linkid)
 	if link is None:
-		abort(404);
+		abort(404)
 	usr = User.get_logged_in()
 	#if usr is not None:
 	#    link.get_count(usr).add_hit()
@@ -354,7 +358,7 @@ def show_tag(name):
 	usr = User.get_logged_in()
 	links = Link.get_public_by_tag(name)
 	title = 'Links for Tag - "%s"' % name
-	return render_template('link_index.html',pageoptions = get_default_data(),  user = usr, links = links, section_title = title, page_title = title);
+	return render_template('link_index.html',pageoptions = get_default_data(),  user = usr, links = links, section_title = title, page_title = title)
 	
 @app.route('/tag/<name>')
 @force_login
@@ -362,14 +366,14 @@ def show_user_tag(name):
 	usr = User.get_logged_in()
 	links = Link.get_by_tag(name, usr.userid)
 	title = 'My Tagged Links - "%s"' % name
-	return render_template('link_index.html', pageoptions = get_default_data(), user = usr, links = links, section_title = title, page_title = title);
+	return render_template('link_index.html', pageoptions = get_default_data(), user = usr, links = links, section_title = title, page_title = title)
 
 # Wildcard route - THIS MUST BE PROCESSED LAST    
 @app.route('/<shorturl>')
 def show_shorturl(shorturl):
 	link = Link.get_by_shortname(shorturl)
 	if link is None:
-		abort(404);
+		abort(404)
 	usr = User.get_logged_in()
 	link.get_hit(usr).add_hit()
 	#if usr is not None:

@@ -88,8 +88,8 @@ CREATE TABLE folder_links (
     folderid INTEGER NOT NULL,
     linkid INTEGER NOT NULL,
     PRIMARY KEY (folderid, linkid),
-    FOREIGN KEY (folderid) REFERENCES folders(folderid),
-    FOREIGN KEY (linkid) REFERENCES links(linkid)
+    FOREIGN KEY (folderid) REFERENCES folders(folderid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (linkid) REFERENCES links(linkid) ON DELETE CASCADE ON UPDATE CASCADE
 ) Engine=InnoDB;
 
 -- Dashboard modules

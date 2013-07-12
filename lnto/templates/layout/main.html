@@ -58,7 +58,7 @@
 					"desc = metas[i].content",
 				"}",
 			"}",
-			"window.location = '", pageoptions.base_url, url_for('do_add_link'), "'",
+			"window.location = '", url_for('do_add_link', _external = True), "'",
 			"+ '?url=' + encodeURIComponent(window.location)",
 			"+ '&redirect_to_target=1'",
 			"+ '&name=' + encodeURIComponent(document.title)",
