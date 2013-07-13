@@ -1,10 +1,11 @@
 {% macro link_menu(link) %}
 	<span class="menulink">
 		<img src="{{url_for('static', filename="images/cog.png")}}" alt=""/>
-		<span class="menu">
+		<span class="menu" data-linkid="{{link.linkid}}">
 			<a href="{{ url_for('show_link', linkid=link.linkid) }}" class="button show">Show&nbsp;details</a>
 			<a href="{{url_for('do_edit_link', linkid=link.linkid)}}" class="button edit">Edit</a>
-			<a href="{{url_for('show_delete_link', linkid=link.linkid)}}" data-linkid="{{link.linkid}}" class="button delete">Delete</a>
+			<a href="{{url_for('show_delete_link', linkid=link.linkid)}}" class="button delete">Delete</a>
+			<input class="box tag" placeholder="Add tag..." />
 		</span>
 	</span>
 {% endmacro %}

@@ -62,7 +62,7 @@ def api_remove_module():
 	else:
 		return json_error('Failed to remove module')
 
-@app.route('/api/link/tag', methods = ['POST'])
+@app.route('/api/links/tag', methods = ['POST'])
 @check_api_login
 def api_add_tag():
 	if not request.form.get('linkid') or not request.form.get('tags'):
@@ -84,7 +84,7 @@ def api_add_tag():
 		return json_error('Error adding tags - ' + str(e))
 
 
-@app.route('/api/link/<linkid>')
+@app.route('/api/links/<linkid>')
 @check_api_login
 def get_link_metadata(linkid):
 	link = Link.get_by_id(linkid)

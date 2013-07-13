@@ -45,7 +45,7 @@ Dashboard = {
 				return false;
 			}
 			var posturl = BASE_URL + 'api/modules/delete';
-			$.post(posturl, {moduleid: linkid}, function (data, textStatus, jzXHR) {
+			$.post(posturl, {moduleid: linkid}, function (data, textStatus) {
 				if (data.status == 'success') {
 					$self.parents('li').remove();
 				} else {
@@ -66,23 +66,40 @@ LinkEditor = {
 			$('.link-list .menulink').removeClass('showit');
 			var $self = $(this),
 				link_name = $self.parents('li').find('.name').text(),
-				linkid = $self.data('linkid');
+				linkid = $self.closest('.menu').data('linkid');
 			if (!confirm('Delete "'+link_name+'"?')) {
 				return false;
 			}
 			var posturl = BASE_URL + 'api/links/delete';
-			$.post(posturl, {linkid: linkid}, function (data, textStatus, jzXHR) {
+			$.post(posturl, {linkid: linkid}, function (data, textStatus) {
 				if (data.status == 'success') {
 					$self.parents('li').remove();
 				} else {
 					alert(data.message);
 				}
 			});
-			$('.link-list .menulink').removeClass('showit')
+			LinkEditor.handlers.menu_off();
 			return false;
 		},
+		add_tag: function (e) {
+			if (e.keyCode == 13) { //Enter key
+				var $self = $(this),
+				    linkid = $self.closest('.menu').data('linkid'),
+				    tags = $self.val(),
+				    posturl = BASE_URL + 'api/links/tag';
+				$.post(posturl, {linkid: linkid, tags: tags}, function (data, textStatus) {
+					if (data.status == 'success') {
+						// And this is where we need an MV* framework....
+						$self.val('');
+						LinkEditor.handlers.menu_off();
+					} else {
+						alert(data.message);
+					}
+				});
+			}
+		},
 		menu_on: function (e) {
-			$('.link-list .menulink').removeClass('showit');
+			LinkEditor.handlers.menu_off();
 			$(this).toggleClass('showit');
 			e.stopPropagation();
 		},
@@ -92,6 +109,7 @@ LinkEditor = {
 	},
 	init: function() {
 		$('.link-list .button.delete').on('click.linkeditor', this.handlers.delete_link);
+		$('.link-list .box.tag').on('keypress.linkeditor', this.handlers.add_tag);
 		$('.link-list .menulink').on('click.linkeditor', this.handlers.menu_on);
 		$(document).on('click.linkeditor', this.handlers.menu_off)
 	}

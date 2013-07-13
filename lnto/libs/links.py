@@ -37,7 +37,7 @@ class Link(appdb.Model):
 			self.userid = row['userid'] if row.get('userid') else 0
 			self.linkid = row['linkid'] if row.get('linkid') else None
 			if row.get('tags'):
-				self.set_tags(row.get('tags'))
+				self.set_tags(row.get('tags').split(','))
 	
 	
 	def get_taglist(self):
