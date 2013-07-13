@@ -158,32 +158,6 @@ def show_user_index(username):
 		links = Link.get_public_by_user(usr.userid)
 	return render_template('link_index.html', pageoptions = get_default_data(), links = links, user = curr_user)
 
-@app.route('/bookmark/referer')
-def redirect_bookmark():
-	url = request.referrer
-	if not url:
-		abort(500)
-	page = urllib2.urlopen(url)
-	html = page.read()
-
-	# Since we only need two things and BeautifulSoup crashed on my test page....
-	def get_tag_pos(text, tag):
-		pos = text.find(tag)
-		if pos == -1:
-			tag.swapcase()
-			pos = text.find(tag)
-		return pos
-	
-	start_tag = '<title>'
-	end_tag = '</title>'
-	start = get_tag_pos(html, start_tag)
-	end = get_tag_pos(html, end_tag)
-	title = ''
-	if start > -1 and end > start:
-		title = html[start+len(start_tag) : end]
-	
-	return redirect(url_for('do_add_link', url=url, redirect_to_target=1, name=title))
-	
 
 @app.route('/link/add', methods = ['GET', 'POST'])
 @force_login
