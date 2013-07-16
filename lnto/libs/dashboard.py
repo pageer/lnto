@@ -168,6 +168,15 @@ class Dashboard(object):
             mod.get_module()
         return modules
     
+    def get_modules_by_id(self):
+        modules = appdb.session.query(DashboardModule).filter_by(userid = self.userid).order_by(DashboardModule.position).all()
+        modmap = {}
+        for mod in modules:
+            mod.get_module()
+            modmap[mod.moduleid] = mod
+        return modmap
+    
+    
     def render(self):
         modules = self.get_modules()
         ret = []

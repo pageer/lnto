@@ -16,13 +16,14 @@ PageHeader = {
 			}
 		},
 		notification_flash: function() {
-			var $notes = $('.notifications');
+			var $notes = $('.notifications'),
+			    timerid = 0;
 			var hider = function () {
 				$notes.animate({'opacity': 0}, 500, function () { $notes.hide(); });
 			};
 			$notes.css('opacity', 0);
 			$notes.animate({'opacity': 1}, 500, function () {
-				setTimeout(hider, 10000);
+				timerid = setTimeout(hider, 5000);
 			});
 		}
 	},
@@ -37,26 +38,63 @@ PageHeader = {
 
 Dashboard = {
 	handlers: {
+		create_menu: function () {
+			var $menu_link = $('<a class="mod-config-link" href="javascript:void(0)"></a>'),
+				$menu = $('<div class="menu"></div>'),
+				$remove_link = $('<a hrev="javascript:void(0)">Remove</a>');
+			$menu_link.on('click.modconfig', this.show_menu);
+			$remove_link.on('click.modconfig', this.remove_module);
+			$menu.append($remove_link);
+			$menu_link.append($menu);
+			return $menu_link;
+		},
+		show_menu: function (e) {
+			LinkEditor.handlers.menu_off();
+			$(this).toggleClass('showit');
+			e.stopPropagation();
+		},
+		create_arrow: function (direction) {
+			var $arrow = $('<a href="javascript:void(0)" class="move-'+direction+'"></a>');
+			$arrow.on('click.movemod', direction == 'up' ? this.move_up : this.move_down);
+			return $arrow;
+		},
+		move_up: function () {
+			$mod = $(this).closest('.module');
+			$mod.prev().before($mod);
+			$('#sort-form').submit();
+		},
+		move_down: function () {
+			$mod = $(this).closest('.module');
+			$mod.next().after($mod);
+			$('#sort-form').submit();
+		},
+		save_order: function () {
+			
+		},
 		remove_module: function () {
 			var $self = $(this),
-				link_name = $self.parents('li').find('.name').text(),
-				linkid = $self.data('linkid');
+			    modid = $self.closest('.linkpanel').data('moduleid');
 			if (!confirm('Delete this module?')) {
 				return false;
 			}
 			var posturl = BASE_URL + 'api/modules/delete';
-			$.post(posturl, {moduleid: linkid}, function (data, textStatus) {
+			$.post(posturl, {moduleid: modid}, function (data, textStatus) {
 				if (data.status == 'success') {
-					$self.parents('li').remove();
+					$self.closest('.linkpanel').remove();
+					LinkEditor.handlers.menu_off();
 				} else {
 					alert(data.message);
 				}
 			});
+			return true;
 		}
 	},
 	init: function () {
-		//var rem_link = $('<a href="javascript:void(0)">-</a>').on('click.module', this.handlers.remove_module);
-		//$('.linkpanel .header').append(rem_link);
+		var $mods = $('.module-config-sort .module');
+		$mods.prepend(this.handlers.create_arrow('down'));
+		$mods.prepend(this.handlers.create_arrow('up'));
+		$('#sort-form').ajaxForm();
+		$('.linkpanel .header').append(this.handlers.create_menu());
 	}
 };
 
@@ -104,7 +142,7 @@ LinkEditor = {
 			e.stopPropagation();
 		},
 		menu_off: function () {
-			$('.link-list .menulink').removeClass('showit');
+			$('.showit').removeClass('showit');
 		}
 	},
 	init: function() {

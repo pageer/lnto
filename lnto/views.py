@@ -89,14 +89,15 @@ def show_index():
 @app.route('/modules/add', methods = ['GET', 'POST'])
 @force_login
 def show_add_module():
+	usr = User.get_logged_in()
+	dash = Dashboard(usr.userid)
+	mods = dash.get_modules()
 	modtype = request.form.get('mod_type')
 	if request.method == 'POST' and modtype and module_type_map.get(int(modtype)):
 		mod = module_type_map[int(modtype)]
 		if mod.config_required:
 			return redirect(url_for('do_add_module', modtype = request.form.get('mod_type')))
 		else:
-			usr = User.get_logged_in()
-			dash = Dashboard(usr.userid)
 			pos = dash.get_next_position()
 			try:
 				dash.add_module(int(modtype), int(pos))
@@ -105,7 +106,7 @@ def show_add_module():
 			except Exception as e:
 				flash(str(e), 'error')
 			
-	return render_template('module_available.html', pageoptions = get_default_data(), module_types = module_type_map)
+	return render_template('module_available.html', pageoptions = get_default_data(), module_types = module_type_map, modules = mods)
 
 @app.route('/modules/add/<modtype>', methods = ['GET', 'POST'])
 @force_login

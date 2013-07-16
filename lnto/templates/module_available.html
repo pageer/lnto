@@ -1,6 +1,14 @@
 {% extends "layout/main.html" %}
 {% block title %}Add dashboard module{% endblock %}
 {% block content %}
+<h3>Installed Modules</h3>
+<form id="sort-form" method="post" action="{{url_for('api_save_positions')}}">
+    <ol class="module-config-sort">
+        {% for mod in modules %}
+        <li class="module"><input type="hidden" name="moduleid" value="{{mod.moduleid}}"/>{{mod.module.get_caption()}}</li>
+        {% endfor %}
+    </ol>
+</form>
 <h3>Available Modules</h3>
 <form method="post" action="{{url_for('show_add_module')}}">
     <select name="mod_type">

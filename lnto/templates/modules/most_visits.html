@@ -1,5 +1,5 @@
 {% import 'layout/macros.html' as macros %}
-<div class="linkpanel popular-links">
+<div class="linkpanel popular-links" data-moduleid="{{item.moduleid}}">
 	<h3 class="header">Most Visits</h3>	
 	{{ macros.link_listing(item.data, user, 'hit_count') }}
 </div>

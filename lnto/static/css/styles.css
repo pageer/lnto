@@ -66,6 +66,15 @@ body {
 	position: relative;
 }
 
+/* Footer */
+
+#footer {
+	font-size: 70%;
+	text-align: center;
+	margin-top: 2em;
+	margin-bottom: 1em;
+}
+
 /* link-images */
 
 #header .link span {
@@ -140,11 +149,7 @@ body {
 .link-list a:hover {
 	text-decoration: underline;
 }
-/*
-.link-list a.button {
-	opacity: 0.5;	
-}
-*/
+
 .link-list a.button:hover {
 	opacity: 1;
 	text-decoration: none;
@@ -170,7 +175,7 @@ ul.link-list {
 	opacity: 1;
 }
 
-.link-list .menulink .menu {
+.menu {
 	display: none;
 	position: absolute;
 	z-index: 1;
@@ -183,15 +188,20 @@ ul.link-list {
 	left: 0;
 }
 
-.link-list .menulink .menu .button {
+.menu .button {
 	display: block;
 }
 
-.link-list .menulink .menu .button:hover {
+.menu .button:hover {
 	color: #f00;
 }
 
-.link-list .menulink.showit .menu {
+/* TODO: Not that important. */
+.showit {
+	opacity: 1 !important;
+}
+
+.showit .menu {
 	display: block;
 }
 
@@ -264,12 +274,27 @@ ul.link-list {
 }
 
 .linkpanel .header {
+	position: relative;
 	margin: -10px -10px 0 -10px;
 	padding: 6px;
 	background-color: #c5c5c5;
 	font-size: 1em;
 	border-top-right-radius: 5px;
 	border-top-left-radius: 5px;
+}
+
+.linkpanel .header .mod-config-link {
+	position: absolute;
+	right: 0.5em;
+	top: 0.5em;
+	background-image: url(../images/wrench.png);
+	height: 16px;
+	width: 16px;
+	opacity: 0.5;
+}
+
+.linkpanel .header .mod-config-link:hover {
+	opacity: 1;
 }
 
 /* Bulk editor */
@@ -298,6 +323,21 @@ ul.link-list {
 	position: absolute;
 	top: 30%;
 	right: 1em;
+}
+
+.move-up,
+.move-down {
+	height: 16px;
+	width: 16px;
+	display: inline-block;
+}
+
+.move-up {
+	background-image: url(../images/arrow_up.png);
+}
+
+.move-down {
+	background-image: url(../images/arrow_down.png);
 }
 
 /* Notifications */

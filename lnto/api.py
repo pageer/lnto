@@ -1,5 +1,5 @@
 import time, datetime
-from lnto import app
+from lnto import app, appdb
 from flask import render_template, make_response, redirect, jsonify, abort, url_for, request, session, g
 from lnto.libs.links import Link
 from lnto.libs.users import User
@@ -61,6 +61,29 @@ def api_remove_module():
 		return json_success()
 	else:
 		return json_error('Failed to remove module')
+	
+@app.route('/api/modules/save_position', methods = ['POST'])
+@check_api_login
+def api_save_positions():
+	usr = User.get_logged_in()
+	dash = Dashboard(usr.userid)
+	modids = request.form.getlist('moduleid')
+	saved_mods = dash.get_modules_by_id()
+	
+	i = 0
+	
+	for mod in modids:
+		saved_mods[int(mod)].position = i
+		appdb.session.add(saved_mods[int(mod)])
+		i += 1;
+	
+	try:
+		appdb.session.commit()
+		return json_success()
+	except Exception as e:
+		return json_error(str(e))
+	
+
 
 @app.route('/api/links/tag', methods = ['POST'])
 @check_api_login

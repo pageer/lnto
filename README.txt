@@ -42,6 +42,13 @@ SETUP
    line to your config.cfg file:
    ALLOW_REGISTRATION = False
 
+CREDITS
+=======
+Icons taken from Fam Fam Silk 1.3 by Mark James
+http://www.famfamfam.com/lab/icons/silk/
+Fam Fam Silk is licensed under a Creative Commons Attribution 2.5 License.
+http://creativecommons.org/licenses/by/2.5/
+
 LICENSE INFORMATION
 ===================
 lnto: An anti-social web-based bookmarking system.
