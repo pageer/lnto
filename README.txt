@@ -3,12 +3,14 @@ Copyright (C) 2013 Peter A. Geer <pageer@skepticats.com>
 This program is licensed under the GNU General Public License.
 See the license information section for details.
 
+
 ABOUT
 =====
 Lnto is an anti-social bookmarking app.  It allows you to store your links,
 tag them, tracks usage, and lets you create a customized link dashboard
 suitable for use as your browser homepage.  Oh, and you can also use it to
 share your links with others if you want.
+
 
 REQUIREMENTS
 ============
@@ -17,6 +19,7 @@ Flask (>= 0.9)
 SQLAlchemy (>= 0.8)
 Flask-SQLAlchemy
 beautifulsoup4
+
 
 SETUP
 =====
@@ -42,12 +45,14 @@ SETUP
    line to your config.cfg file:
    ALLOW_REGISTRATION = False
 
+
 CREDITS
 =======
 Icons taken from Fam Fam Silk 1.3 by Mark James
 http://www.famfamfam.com/lab/icons/silk/
 Fam Fam Silk is licensed under a Creative Commons Attribution 2.5 License.
 http://creativecommons.org/licenses/by/2.5/
+
 
 LICENSE INFORMATION
 ===================

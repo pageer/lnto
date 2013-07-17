@@ -108,6 +108,7 @@ def show_add_module():
 			
 	return render_template('module_available.html', pageoptions = get_default_data(), module_types = module_type_map, modules = mods)
 
+
 @app.route('/modules/add/<modtype>', methods = ['GET', 'POST'])
 @force_login
 def do_add_module(modtype):
@@ -128,7 +129,34 @@ def do_add_module(modtype):
 		else:
 			flash('You must supply a module type.', 'error')
 	
-	return render_template('module_add.html', pageoptions = get_default_data(), user = usr, dashboard = dash, module = mod)
+	return render_template('module_add.html', pageoptions = get_default_data(),
+						   user = usr, dashboard = dash, module = mod,
+						   post_view = url_for('do_add_module', modtype = mod.typeid))
+
+
+@app.route('/modules/config/<moduleid>', methods = ['GET', 'POST'])
+@force_login
+def do_module_config(moduleid):
+	usr = User.get_logged_in()
+	dash = Dashboard(usr.userid)
+	mod = dash.get_single_module(moduleid)
+	
+	if not mod:
+		abort(404)
+	
+	if request.method == 'POST':
+		try:
+			mod.save_config(request.form)
+			flash('Module config saved.', 'success')
+			return redirect(url_for('show_index'))
+		except Exception as e:
+			flash(str(e), 'error')
+	
+	return render_template('module_add.html', pageoptions = get_default_data(),
+						   user = usr, dashboard = dash, module = mod.module,
+						   post_view = url_for('do_module_config', moduleid = moduleid),
+						   title = 'Configure Module')
+
 
 @app.route('/modules/remove/<moduleid>')
 @force_login

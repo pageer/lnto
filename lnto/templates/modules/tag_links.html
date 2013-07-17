@@ -1,5 +1,5 @@
 {% import 'layout/macros.html' as macros %}
-<div class="linkpanel {{item.classes}}" data-moduleid="{{item.moduleid}}">
+<div class="linkpanel {{item.classes}} has-config" data-moduleid="{{item.moduleid}}">
 	<h3 class="header">{{item.caption}}</h3>	
 	{{ macros.link_listing(item.data, user) }}
 </div>

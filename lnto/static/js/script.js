@@ -41,10 +41,13 @@ Dashboard = {
 		create_menu: function () {
 			var $menu_link = $('<a class="mod-config-link" href="javascript:void(0)"></a>'),
 				$menu = $('<div class="menu"></div>'),
-				$remove_link = $('<a hrev="javascript:void(0)">Remove</a>');
+				$remove_link = $('<a class="button" href="javascript:void(0)">Remove</a>'),
+				$config_link = $('<a class="button config" href="javascript:void(0)">Configure</a>');
 			$menu_link.on('click.modconfig', this.show_menu);
 			$remove_link.on('click.modconfig', this.remove_module);
+			$config_link.on('click.modconfig', this.configure_module);
 			$menu.append($remove_link);
+			$menu.append($config_link);
 			$menu_link.append($menu);
 			return $menu_link;
 		},
@@ -68,9 +71,6 @@ Dashboard = {
 			$mod.next().after($mod);
 			$('#sort-form').submit();
 		},
-		save_order: function () {
-			
-		},
 		remove_module: function () {
 			var $self = $(this),
 			    modid = $self.closest('.linkpanel').data('moduleid');
@@ -87,6 +87,10 @@ Dashboard = {
 				}
 			});
 			return true;
+		},
+		configure_module: function () {
+			var $mod = $(this).closest('.linkpanel');
+			window.location = BASE_URL + 'modules/config/' + $mod.data('moduleid');
 		}
 	},
 	init: function () {

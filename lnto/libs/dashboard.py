@@ -176,6 +176,10 @@ class Dashboard(object):
             modmap[mod.moduleid] = mod
         return modmap
     
+    def get_single_module(self, modid):
+        mod = appdb.session.query(DashboardModule).filter_by(userid = self.userid, moduleid = modid).order_by(DashboardModule.position).first()
+        mod.get_module()
+        return mod
     
     def render(self):
         modules = self.get_modules()
@@ -230,4 +234,8 @@ class DashboardModule(appdb.Model):
         ret = self.module.render_module()
         ret['moduleid'] = self.moduleid
         return ret
+    
+    def save_config(self, config):
+        return self.module.save_configuration(self.moduleid, config)
+    
     

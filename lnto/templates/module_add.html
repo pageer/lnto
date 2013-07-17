@@ -1,8 +1,8 @@
 {% extends "layout/main.html" %}
-{% block title %}Add dashboard module{% endblock %}
+{% block title %}{{title|default('Add dashboard module')}}{% endblock %}
 {% block content %}
 <h3>Module Settings</h3>
-<form method="post" action="{{url_for('do_add_module', modtype = module.typeid)}}">
+<form method="post" action="{{post_view}}">
     {% if module.has_config %}
         <input type="hidden" name="module_type" value="{{module.typeid}}"
         {% include module.get_config_template() %}

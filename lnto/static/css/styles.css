@@ -186,10 +186,13 @@ ul.link-list {
 	padding: 8px;
 	top: 0;
 	left: 0;
+	font-size: 1em;
+	font-weight: normal;
 }
 
 .menu .button {
 	display: block;
+	text-decoration: none;
 }
 
 .menu .button:hover {
@@ -261,12 +264,24 @@ ul.link-list {
 	padding: 10px;
 	min-width: 250px;
 	width: 29%;
-	margin: 1%;
+	margin: 10px;
 	border: 1px solid #000;
 	border-radius: 5px;
 	min-height: 150px;
 	background-color: #fff;
 	box-shadow: 4px 4px 4px #d5d5d5;
+}
+
+@media (min-width: 640px) and (max-width: 1100px) {
+	.linkpanel {
+		width: 42%;
+	}
+}
+
+@media (max-width: 639px) {
+	.linkpanel {
+		width: 90%;
+	}
 }
 
 .linkpanel .link-list {
@@ -295,6 +310,14 @@ ul.link-list {
 
 .linkpanel .header .mod-config-link:hover {
 	opacity: 1;
+}
+
+.header .menu .config {
+	display: none;
+}
+
+.has-config .header .menu .config {
+	display: block;
 }
 
 /* Bulk editor */
