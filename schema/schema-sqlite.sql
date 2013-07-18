@@ -106,3 +106,9 @@ CREATE TABLE dashboard_modules_config_tag (
     tag_name VARCHAR(64) NOT NULL,
     FOREIGN KEY (moduleid) REFERENCES dashboard_modules(moduleid) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE dashboard_modules_config_recent (
+    moduleid INTEGER NOT NULL PRIMARY KEY,
+    link_limit INTEGER NOT NULL DEFAULT 10,
+    FOREIGN KEY (moduleid) REFERENCES dashboard_modules(moduleid) ON DELETE CASCADE ON UPDATE CASCADE
+);

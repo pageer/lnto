@@ -1,5 +1,3 @@
+{% extends 'modules/wrapper.html' %}
 {% import 'layout/macros.html' as macros %}
-<div class="linkpanel recent-links" data-moduleid="{{item.moduleid}}">
-	<h3 class="header">Recently Added</h3>	
-	{{ macros.link_listing(item.data, user, 'added', 'date') }}
-</div>
+{% block panel %}{{ macros.link_listing(item.data, user, 'added', 'date') }}{% endblock %}

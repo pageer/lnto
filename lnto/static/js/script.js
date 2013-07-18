@@ -28,9 +28,9 @@ PageHeader = {
 		}
 	},
 	init: function () {
-		var $bookmarklets = $('#header .bookmarklet'),
-		    $node = $('<a href="javascript:void(0)" class="expand" title="Show bookmarklet code">(+)</a>').on('click.pageheader', this.handlers.bookmarklet_expand);
-		$bookmarklets.find('.link').after($node);
+		//var $bookmarklets = $('#header .bookmarklet'),
+		//    $node = $('<a href="javascript:void(0)" class="expand" title="Show bookmarklet code">(+)</a>').on('click.pageheader', this.handlers.bookmarklet_expand);
+		//$bookmarklets.find('.link').after($node);
 	
 		this.handlers.notification_flash();	
 	}

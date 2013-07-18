@@ -41,12 +41,14 @@ class AbstractModule(object):
     
     def render_module(self):
         return {
+            'has_config': self.has_config,
             'classes': self.classes,
             'caption': self.get_caption(),
             'template': self.get_template(),
             'data': self.get_module_data(),
         }
 
+# Module types
 
 class AllLinksModule(AbstractModule):
     typeid = 1
@@ -59,7 +61,35 @@ class AllLinksModule(AbstractModule):
         return Link.get_by_user(self.userid)
 
 
-class PopularLinksModule(AbstractModule):
+class AbstractRecentActionModule(AbstractModule):
+    
+    has_config = True
+    config_template = 'base_recent_action'
+    default_link_limit = 10
+    
+    def get_config_template(self):
+        return 'modules/' + self.config_template + '_config.html'
+    
+    def get_configuration(self, moduleid):
+        self.configuration = appdb.session.query(RecentActionModuleConfig).filter_by(moduleid = moduleid).first()
+        if not self.configuration:
+            self.configuration = RecentActionModuleConfig()
+            self.configuration.moduleid = moduleid
+            self.configuration.link_limit = 10
+    
+    def save_configuration(self, moduleid, config):
+        if not config.get('link_limit'):
+            raise Exception('No limit specified.');
+        item = appdb.session.query(RecentActionModuleConfig).filter_by(moduleid = moduleid).first()
+        if not item:
+            item = RecentActionModuleConfig()
+            item.moduleid = moduleid
+        item.link_limit = config.get('link_limit')
+        appdb.session.add(item)
+        appdb.session.commit()
+
+
+class PopularLinksModule(AbstractRecentActionModule):
     typeid = 2
     classes = 'popular-links'
     shortdesc = 'Most visited links'
@@ -67,10 +97,10 @@ class PopularLinksModule(AbstractModule):
     template_type = 'most_visits'
     
     def get_module_data(self):
-        return Link.get_by_most_hits(self.userid)
+        return Link.get_by_most_hits(self.userid, self.configuration.link_limit)
     
     
-class RecentlyVisitedLinksModule(AbstractModule):
+class RecentlyVisitedLinksModule(AbstractRecentActionModule):
     typeid = 3
     classes = 'last-links'
     shortdesc = 'Most recently visited links'
@@ -78,7 +108,7 @@ class RecentlyVisitedLinksModule(AbstractModule):
     template_type = 'recent_visits'
     
     def get_module_data(self):
-        return Link.get_by_most_recent_hit(self.userid)
+        return Link.get_by_most_recent_hit(self.userid, self.configuration.link_limit)
     
     
 class AllTagsModule(AbstractModule):
@@ -92,7 +122,7 @@ class AllTagsModule(AbstractModule):
         return Tag.get_cloud_by_user(self.userid)
     
     
-class RecentlyAddedLinksModule(AbstractModule):
+class RecentlyAddedLinksModule(AbstractRecentActionModule):
     typeid = 5
     classes = 'recent-links'
     shortdesc = 'Recently added links'
@@ -100,14 +130,8 @@ class RecentlyAddedLinksModule(AbstractModule):
     template_type = 'recent_links'
     
     def get_module_data(self):
-        return Link.get_by_most_recent(self.userid)
+        return Link.get_by_most_recent(self.userid, self.configuration.link_limit)
     
-
-class TagModuleConfig(appdb.Model):
-    __tablename__ = 'dashboard_modules_config_tag'
-    moduleid = Column(Integer, ForeignKey('dashboard_modules.moduleid'), primary_key = True, autoincrement = False)
-    tag_name = Column(String(64))
-
 
 class TagModule(AbstractModule):
     typeid = 6
@@ -136,6 +160,20 @@ class TagModule(AbstractModule):
     
     def get_module_data(self):
         return Link.get_by_tag(self.configuration.tag_name, self.userid)
+    
+
+# Module config types
+
+class TagModuleConfig(appdb.Model):
+    __tablename__ = 'dashboard_modules_config_tag'
+    moduleid = Column(Integer, ForeignKey('dashboard_modules.moduleid'), primary_key = True, autoincrement = False)
+    tag_name = Column(String(64))
+
+
+class RecentActionModuleConfig(appdb.Model):
+    __tablename__ = 'dashboard_modules_config_recent'
+    moduleid = Column(Integer, ForeignKey('dashboard_modules.moduleid'), primary_key = True, autoincrement = False)
+    link_limit = Column(Integer)
     
 
 module_type_map = {

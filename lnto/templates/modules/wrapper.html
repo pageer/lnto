@@ -1,0 +1,4 @@
+<div class="linkpanel {{item.classes}} {%if item.has_config%}has-config{% endif %}" data-moduleid="{{item.moduleid}}">
+	<h3 class="header">{{item.caption}}</h3>
+    {% block panel %}{% endblock %}
+</div>

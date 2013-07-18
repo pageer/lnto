@@ -1,5 +1,3 @@
+{% extends 'modules/wrapper.html' %}
 {% import 'layout/macros.html' as macros %}
-<div class="linkpanel tag-cloud" data-moduleid="{{item.moduleid}}">
-	<h3 class="header">Tag Cloud</h3>	
-	{{ macros.tag_listing(item.data) }}
-</div>
+{% block panel %}{{ macros.tag_listing(item.data) }}{% endblock %}
