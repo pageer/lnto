@@ -272,6 +272,7 @@ def do_edit_link(linkid):
 				return redirect(request.form.get('referer'))
 	return render_template("link_add.html", pageoptions = get_default_data(), link=link, options=options, errors = errors)
 
+
 @app.route('/links/manage/<tags>', methods = ['POST', 'GET'])
 @app.route('/links/manage/', methods = ['POST', 'GET'], defaults = {'tags': None})
 @force_login
@@ -301,17 +302,28 @@ def do_bulk_edit(tags):
 		linkids = request.form.getlist('linkids')
 		edit_links = Link.get_by_id(linkids)
 		
-		if request.form.get('tag_text') and request.form.get('tag_submit'):
+		valid = True
+		for l in edit_links:
+			if not l.is_owner(user):
+				valid = False
+		
+		if valid and request.form.get('tag_text') and request.form.get('tag_submit'):
 			for l in edit_links:
 				l.add_tag(request.form.get('tag_text'))
 				l.save()
 			flash('Tagged %d links as "%s"' % (len(edit_links), request.form.get('tag_text')), 'success')
 		
-		if request.form.get('set_privacy') and request.form.get('privacy_submit'):
+		if valid and request.form.get('set_privacy') and request.form.get('privacy_submit'):
 			for l in edit_links:
 				l.is_public = True if request.form.get('set_privacy') == 'public' else False
 				l.save()
 			flash('Marked %d links %s' % (len(edit_links), 'public' if request.form.get('set_privacy') == 'public' else 'private'), 'success')
+		
+		if valid and request.form.get('delete_selected_submit'):
+			for l in edit_links:
+				l.delete()
+				links.remove(l)
+			flash('Deleted %s links' % len(edit_links), 'success')
 	
 	return render_template("link_edit_bulk.html", pageoptions = get_default_data(), url_tags = tags, links=links, section_title = title, tags = available_tags)
 

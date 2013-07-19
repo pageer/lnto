@@ -183,6 +183,13 @@ BulkEditor = {
 			} catch (e) {
 				console.log("Error writing to local storage");
 			}
+		},
+		delete_click: function (e) {
+			if (!confirm('Really delete all selected links?')) {
+				e.preventDefault();
+				return false;
+			}
+			return true;
 		}
 	},
 	init: function() {
@@ -198,6 +205,12 @@ BulkEditor = {
 		$('.bulk-editor li input.bulk-select').on('click.bulkeditor', function(e) {
 			e.stopPropagation();
 		});
+		
+		var $delete_selected = $('<input type="submit" name="delete_selected_submit" value="Delete Selected"/>'),
+			$delete_panel = $('<div class="edit-panel delete-links"></div>');
+		$delete_selected.on('click.bulkeditor', this.handlers.delete_click);
+		$delete_panel.append($delete_selected);
+		$('.bulk-editor .controls').append($delete_panel);
 		
 		$('#tag-select').on('change.bulkeditor', this.handlers.change_tag);
 		$('.bulk-editor .filter-tag input[type=submit]').hide();
