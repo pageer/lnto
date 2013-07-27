@@ -25,7 +25,7 @@ def create_test_data():
             'shortname': 'foo',
             'added': datetime(2013, 2, 1, 12, 13, 14),
             'description': 'This is a test',
-            'tags': ['test1', 'test2']
+            'tags': 'test1, test2'
         },
         {
             'name': 'Foo2',
@@ -34,7 +34,7 @@ def create_test_data():
             'shortname': 'foo2',
             'added': datetime(2013, 2, 2, 12, 13, 14),
             'description': 'This is a test again',
-            'tags': ['test1', 'blah']
+            'tags': 'test1, blah'
         },
         {
             'name': 'Foo3',
@@ -42,7 +42,7 @@ def create_test_data():
             'url': 'http://www.example.com/test3',
             'description': 'This is a test again',
             'added': datetime(2013, 2, 3, 12, 13, 14),
-            'tags': ['test1', 'blah'],
+            'tags': 'test1, blah',
             'is_public': False
         },
         {
@@ -51,7 +51,7 @@ def create_test_data():
             'url': 'http://www.example.com/test4',
             'description': 'This is a test again',
             'added': datetime(2013, 2, 3, 15, 16, 17),
-            'tags': ['test1'],
+            'tags': 'test1',
         },
         {
             'name': 'User2Foo2',
@@ -59,7 +59,7 @@ def create_test_data():
             'url': 'http://www.example.com/test5',
             'description': 'This is a test again',
             'added': datetime(2013, 1, 2, 12, 13, 14),
-            'tags': ['privatetag'],
+            'tags': 'privatetag',
             'is_public': False
         },
         {
@@ -68,7 +68,7 @@ def create_test_data():
             'url': 'http://www.example.com/test6',
             'description': 'This is a test again',
             'added': datetime(2013, 1, 2, 12, 13, 14),
-            'tags': [],
+            'tags': '',
             'is_public': False
         },
         {
@@ -77,7 +77,7 @@ def create_test_data():
             'url': 'http://www.example.com/test7',
             'description': 'This is a test again',
             'added': datetime(2013, 1, 2, 12, 13, 14),
-            'tags': [],
+            'tags': '',
             'is_public': True
         },
         {
@@ -86,7 +86,7 @@ def create_test_data():
             'url': 'http://www.example.com/test6',
             'description': 'This is a test again',
             'added': datetime(2013, 1, 2, 12, 13, 14),
-            'tags': ['userid3'],
+            'tags': 'userid3',
             'is_public': False
         },
         {
@@ -95,7 +95,7 @@ def create_test_data():
             'url': 'http://www.example.com/test7',
             'description': 'This is a test again',
             'added': datetime(2013, 1, 2, 12, 13, 14),
-            'tags': ['userid4'],
+            'tags': 'userid4',
             'is_public': True
         },
     ]

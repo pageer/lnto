@@ -285,18 +285,6 @@ def do_bulk_edit(tags):
 	
 	available_tags = Tag.get_by_user(user.userid)
 	
-	if tags == 'untagged':
-		taglist = tags.split(',')
-		title = 'Manage Untagged Links'
-		links = Link.get_untagged(user.userid)
-	elif tags:
-		taglist = tags.split(',')
-		title = 'Manage Links in ' + tags
-		links = Link.get_by_tag(taglist[0], user.userid)
-	else:
-		title = "Manage Links"
-		links = Link.get_by_user(user.userid)
-	
 	if request.method == 'POST':
 		
 		linkids = request.form.getlist('linkids')
@@ -306,6 +294,7 @@ def do_bulk_edit(tags):
 		for l in edit_links:
 			if not l.is_owner(user):
 				valid = False
+				flash("You do not have permission to edit all of the selected links.", 'error')
 		
 		if valid and request.form.get('tag_text') and request.form.get('tag_submit'):
 			for l in edit_links:
@@ -322,21 +311,38 @@ def do_bulk_edit(tags):
 		if valid and request.form.get('delete_selected_submit'):
 			for l in edit_links:
 				l.delete()
-				links.remove(l)
 			flash('Deleted %s links' % len(edit_links), 'success')
 	
+	if tags == 'untagged':
+		taglist = tags.split(',')
+		title = 'Manage Untagged Links'
+		links = Link.get_untagged(user.userid)
+	elif tags:
+		taglist = tags.split(',')
+		title = 'Manage Links in ' + tags
+		links = Link.get_by_tag(taglist[0], user.userid)
+	else:
+		title = "Manage Links"
+		links = Link.get_by_user(user.userid)
+	
 	return render_template("link_edit_bulk.html", pageoptions = get_default_data(), url_tags = tags, links=links, section_title = title, tags = available_tags)
+
+
+@app.route('/link/search', methods = ['POST'])
+def do_link_search():
+	usr = User.get_logged_in()
+	terms = response.form.get('search')
+	
 
 
 @app.route('/link/delete/<linkid>', methods = ['POST', 'GET'])
 @force_login
 def show_delete_link(linkid):
 	usr = User.get_logged_in()
-	error = ''
-	
 	link = Link.get_by_id(linkid)
+	
 	if not link.is_owner(usr):
-		error = 'You do not have permission to delete this link.'
+		flash('You do not have permission to delete this link.', 'error')
 	else:
 		if request.form.get('confirm'):
 			link.delete()
@@ -344,7 +350,7 @@ def show_delete_link(linkid):
 			return redirect(url_for('show_index'))
 		elif request.form.get('cancel'):
 			return redirect(request.form.get('referer'))
-	return render_template("link_delete.html", pageoptions = get_default_data(), link=link, error = error)
+	return render_template("link_delete.html", pageoptions = get_default_data(), link=link)
 
 @app.route('/links/import', methods = ['GET', 'POST'])
 @force_login

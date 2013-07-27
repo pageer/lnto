@@ -23,7 +23,7 @@ class TestLinks(unittest.TestCase):
     
     def test_get_public(self):
         tags = Tag.get_public()
-        self.assertEqual(len(tags), 3)
+        self.assertEqual(len(tags), 4)
     
     def test_get_by_user(self):
         tags = Tag.get_by_user(2)

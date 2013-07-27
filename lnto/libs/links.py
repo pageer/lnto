@@ -6,7 +6,12 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.sql.expression import or_
 from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, Boolean, Text
+
+def search(terms):
+	results = appdb.session.query(Link).filter(or_(Link.name.like(terms), Link.url.like(terms))).all()
+	return results
 
 class Link(appdb.Model):
 	__tablename__ = 'links'
@@ -115,7 +120,7 @@ class Link(appdb.Model):
 			'is_public': self.is_public,
 			'tags': self.get_taglist()
 		}
-	
+
 
 	@staticmethod
 	def get_by_id(id):
