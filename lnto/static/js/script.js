@@ -185,7 +185,8 @@ BulkEditor = {
 			}
 		},
 		delete_click: function (e) {
-			if (!confirm('Really delete all selected links?')) {
+			var num_selected = $('input.bulk-select:checked').length;
+			if (num_selected == 0 || !confirm('Really delete all selected links?')) {
 				e.preventDefault();
 				return false;
 			}

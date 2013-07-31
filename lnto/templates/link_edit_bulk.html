@@ -40,7 +40,7 @@
 			{% for l in links %}
 			<li class="link-list">
 				<input type="checkbox" class="bulk-select" name="linkids" id="linkid-{{l.linkid}}" value="{{l.linkid}}"/>
-				<a href="{{ url_for('show_linkurl', linkid = l.linkid) }}" title="{{l.url}}" data-linkid="{{l.linkid}}" class="name">{{l.name}}</a>
+				<a href="{{ url_for('show_linkurl', linkid = l.linkid) }}" title="{{l.url}}" data-linkid="{{l.linkid}}" class="name" target="_blank">{{l.name}}</a>
 				{{macros.link_menu(l)}}
 				<span class="privacy">{% if l.is_public %}Public{% else %}Private{% endif %}</span>
 				{{macros.link_taglist(l)}}

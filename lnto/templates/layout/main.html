@@ -58,11 +58,11 @@
 					"desc = metas[i].content",
 				"}",
 			"}",
-			"window.location = '", url_for('do_add_link', _external = True), "'",
-			"+ '?url=' + encodeURIComponent(window.location)",
-			"+ '&redirect_to_target=1'",
-			"+ '&name=' + encodeURIComponent(document.title)",
-			"+ '&description=' + encodeURIComponent(desc);",
+			"window.location='", url_for('do_add_link', _external = True), "'",
+			"+'?url='+encodeURIComponent(window.location)",
+			"+'&redirect_to_target=1'",
+			"+'&name='+encodeURIComponent(document.title)",
+			"+'&description='+encodeURIComponent(desc);",
 			"})()"]|join}}">
 				Add to lnto
 			</a>

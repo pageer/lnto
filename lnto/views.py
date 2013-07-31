@@ -392,14 +392,15 @@ def show_user_tag_list(username):
 	else:
 		user = User.get_by_username(username)
 	
-	if user.username == username:
+	user_owned = user.username == username
+	if user_owned:
 		tags = Tag.get_cloud_by_user(user.userid)
 		title = "My Tags"
 	else:
 		tags = Tag.get_public_by_user(user.userid)
 		title = 'Tags for %s' % username
 	
-	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags, page_title = title, section_title = title)
+	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags, page_title = title, section_title = title, user_owned = user_owned)
 	
 @app.route('/public/tag/<name>')
 def show_tag(name):
