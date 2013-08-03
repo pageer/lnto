@@ -62,8 +62,21 @@ body {
 }
 
 .bookmarklet-text {
-	display: inline-block;
+	display: block;
 	position: relative;
+	width: 98%;
+	height: 90%;
+}
+
+.bookmarklet-panel {
+	position: absolute;
+	border: 1px solid #000;
+	border-radius: 5px;
+	padding: 5px;
+	background-color: #fff;
+	z-index: 1;
+	width: 35%;
+	height: 9em;
 }
 
 /* Footer */
