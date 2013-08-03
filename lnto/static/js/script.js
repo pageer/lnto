@@ -3,12 +3,12 @@ PageHeader = {
 		bookmarklet_expand: function () {
 			var $this = $(this);
 			if ($this.hasClass('expanded')) {
-				$this.text('(+)');
+				$this.text('[+]');
 				$this.removeClass('expanded');
 				$this.next().remove();
 			} else {
 				$this.addClass('expanded');
-				$this.text('(-)');
+				$this.text('[-]');
 				var $input = $('<textarea class="bookmarklet-text"></textarea>'),
 				    $panel = $('<div class="bookmarklet-panel"></div>').append($input);
 				$input.val($this.closest('.bookmarklet').find('.link').attr('href'));
@@ -30,7 +30,7 @@ PageHeader = {
 	},
 	init: function () {
 		var $bookmarklets = $('#header .bookmarklet'),
-		    $node = $('<a href="javascript:void(0)" class="expand" title="Show bookmarklet code">(+)</a>').on('click.pageheader', this.handlers.bookmarklet_expand);
+		    $node = $('<a href="javascript:void(0)" class="link expand" title="Show bookmarklet code">[+]</a>').on('click.pageheader', this.handlers.bookmarklet_expand);
 		$bookmarklets.find('.link').after($node);
 	
 		this.handlers.notification_flash();	
