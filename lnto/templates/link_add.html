@@ -22,9 +22,15 @@
 		<div>
 			<label for="tags">Tags:</label>
 			<input type="text" id="tags" name="tags" value="{{link.get_taglist()|join(', ')}}" />
+			<select class="tag-picker">
+				<option>Add tag:</option>
+				{% for tag in tags %}
+				<option value="{{tag.tag_name}}">{{tag.tag_name}}</option>
+				{% endfor %}
+			</select>
 		</div>
 		<div>
-			<label for="public">Is public: </label>
+			<label for="is_public">Is public: </label>
 			<input type="checkbox" id="is_public" name="is_public" value="1" {% if link.is_public %}checked="checked"{% endif %} />
 		</div>
 		{% if errors %}

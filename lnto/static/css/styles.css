@@ -246,6 +246,7 @@ ul.link-list {
 
 #add-link-form > div {
 	margin-bottom: 10px;
+	position: relative;
 }
 
 #add-link-form label {
@@ -260,6 +261,12 @@ ul.link-list {
 	display: inline-block;
 	margin-left: 5px;
 	width: 250px;
+}
+
+#add-link-form .tag-picker {
+	position: absolute;
+	right: 0;
+	z-index: 10;
 }
 
 #add-link-form input[type="checkbox"] {
@@ -396,4 +403,10 @@ ul.link-list {
 	background-color: #D68787;
 	color: #8A0000;
 	border-color: #8A0000;
+}
+
+/* Fetch by URL page */
+.fetch-by-url {
+	width: 80%;
+	max-width: 600px;
 }

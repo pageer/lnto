@@ -158,6 +158,29 @@ LinkEditor = {
 	}
 };
 
+IndividualEditor = {
+	handlers: {
+		pick_tag: function () {
+			var val = $(this).val(),
+				$tags = $('#tags'),
+			    curr_tags = $tags.val().split(','),
+				prefix = ', ';
+			for (var i in curr_tags) {
+				if ($.trim(curr_tags[i]) == val) {
+					return;
+				}
+			}
+			if ($.trim($tags.val()) == '') {
+				prefix = '';
+			}
+			$tags.val($tags.val() + prefix + val);
+		}
+	},
+	init: function () {
+		$('#add-link-form .tag-picker').on('change.editform', this.handlers.pick_tag);
+	}
+};
+
 BulkEditor = {
 	handlers: {
 		toggle_all: function () {
@@ -236,5 +259,6 @@ $(document).ready(function () {
 	PageHeader.init();
 	Dashboard.init();
 	LinkEditor.init();
+	IndividualEditor.init();
 	BulkEditor.init();
 });

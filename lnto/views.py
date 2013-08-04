@@ -214,12 +214,8 @@ def do_add_link():
 	}
 	
 	link = Link(data)
-	errors = []
 	
 	if request.method == 'POST' or data.get('submit') == '1	':
-		if data['name'] == '' or data['url'] == '':
-			errors.append("Name and URL are required")
-		
 		if (data.get('tags').strip() == ''):
 			taglist = []
 		else:
@@ -227,12 +223,31 @@ def do_add_link():
 	
 		link.set_tags(taglist)
 		
-		if len(errors) == 0:
+		if data['name'] == '' or data['url'] == '':
+			flash("Name and URL are required", 'error')
+		else:
 			link.save()
 			redir_target = link.url if options['redirect_to_target'] else (req.get('next') or req.get('referer') or url_for('show_index'))
 			return redirect(redir_target)
 	
-	return render_template("link_add.html", pageoptions = get_default_data(), link = link, options = options, errors = errors)
+	tags = Tag.get_by_user(usr.userid)
+	
+	return render_template("link_add.html", pageoptions = get_default_data(), link = link, tags = tags, options = options)
+
+@app.route('/link/add/fetch', defaults = {'url': None}, methods = ['GET', 'POST'])
+@app.route('/link/add/fetch/<url>', methods = ['GET', 'POST'])
+@force_login
+def do_add_from_url(url):
+	fetch_url = url or request.form.get('fetch_url')
+	if (fetch_url):
+		try:
+			link = Link.create_from_url(fetch_url)
+			redir_url = url_for('do_add_link', name = link.name, url = link.url, description = link.description, redirect_to_target = 1)
+			return redirect(redir_url)
+		except Exception as e:
+			flash('Error getting link - ' + str(e), 'error')
+	return render_template('link_add_url.html', pageoptions = get_default_data(), url = fetch_url or '')
+
 
 @app.route('/link/edit/<linkid>', methods = ['GET', 'POST'])
 @force_login
