@@ -25,49 +25,56 @@
 				Add link<span></span>
 			</a>
 		</li>
-		<li>
-			<a href="{{url_for('show_import')}}" class="link import" title="Import bookmarks from file">
-				Import<span></span>
-			</a>
-		</li>
-		{% if pageoptions['allow_registration'] %}
-		<li>
-			<a href="{{url_for('do_add_user')}}" class="link adduser">
-				Create Account<span></span>
-			</a>
-		</li>
+		<li class="submenu-item">
+			<a href="javascript:void(0)" class="link menu-toggle">Tools</a>
+			<ul class="submenu">
+				<li>
+					<a href="{{url_for('show_import')}}" class="link import" title="Import bookmarks from file">
+						Import<span></span>
+					</a>
+				</li>
+				{% if pageoptions['allow_registration'] %}
+				<li>
+					<a href="{{url_for('do_add_user')}}" class="link adduser">
+						Create Account<span></span>
+					</a>
+				</li>
+				{% endif %}
+				<li class="bookmarklet">
+					<span>Bookmarklet:</span>
+					<a class="link jslink" href="{{["javascript:(function() {",
+					"var desc = '', i = 0, metas = document.getElementsByTagName('meta');",
+					"for (i in metas) {",
+					"if (metas[i].name == 'description') {",
+							"desc = metas[i].content",
+						"}",
+					"}",
+					"window.location='", url_for('do_add_link', _external = True), "'",
+					"+'?url='+encodeURIComponent(window.location)",
+					"+'&redirect_to_target=1'",
+					"+'&name='+encodeURIComponent(document.title)",
+					"+'&description='+encodeURIComponent(desc);",
+					"})()"]|join}}">
+						Add to lnto
+					</a>
+				</li>
+				<li>
+					Bookmark: <a class="link" href="{{url_for('do_add_from_url')}}">Add by URL</a>
+				</li>
+				<li>
+					<a href="{{url_for('do_logout')}}" class="link logout">
+						Log Out<span></span>
+					</a>
+				</li>
+			</ul>
 		{% endif %}
-		{% endif %}
+		{% if not pageoptions['user_logged_in'] %}
 		<li>
-			{% if pageoptions['user_logged_in'] %}
-			<a href="{{url_for('do_logout')}}" class="link logout">
-				Log Out<span></span>
-			</a>
-			{% else %}
 			<a href="{{url_for('do_login')}}" class="link login">
 				Login<span></span>
 			</a>
-			{% endif %}	
 		</li>
-		<li class="bookmarklet">
-			<span>Bookmarklets:</span>
-			<a class="link" href="{{["javascript:(function() {",
-			"var desc = '', i = 0, metas = document.getElementsByTagName('meta');",
-			"for (i in metas) {",
-			"if (metas[i].name == 'description') {",
-					"desc = metas[i].content",
-				"}",
-			"}",
-			"window.location='", url_for('do_add_link', _external = True), "'",
-			"+'?url='+encodeURIComponent(window.location)",
-			"+'&redirect_to_target=1'",
-			"+'&name='+encodeURIComponent(document.title)",
-			"+'&description='+encodeURIComponent(desc);",
-			"})()"]|join}}">
-				Add to lnto
-			</a> |
-			<a href="{{url_for('do_add_from_url')}}">Add by URL</a>
-		</li>
+		{% endif %}
 		{% block page_extension %}{% endblock %}
 	</ul>
 	{% endblock %}

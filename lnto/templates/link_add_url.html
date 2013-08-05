@@ -1,0 +1,11 @@
+{% extends "layout/main.html" %}
+{% block title %}Add link by URL{% endblock %}
+{% block content %}
+<div class="add-by-url">
+    <h3>Add link URL</h3>
+    <form method="post" action="{{url_for('do_add_from_url')}}">
+        <input type="text" class="fetch-by-url" name="fetch_url" value="{{url}}" />
+        <input type="submit" value="Add" />
+    </form>
+</div>
+{% endblock %}

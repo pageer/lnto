@@ -11,10 +11,14 @@ PageHeader = {
 				$this.text('[-]');
 				var $input = $('<textarea class="bookmarklet-text"></textarea>'),
 				    $panel = $('<div class="bookmarklet-panel"></div>').append($input);
-				$input.val($this.closest('.bookmarklet').find('.link').attr('href'));
+				$input.val($this.closest('.bookmarklet').find('.jslink').attr('href'));
 				$this.after($panel);
 				$input.select();
 			}
+		},
+		menu_toggle: function (e) {
+			$(this).closest('.submenu-item').toggleClass('showit');
+			e.stopPropagation();
 		},
 		notification_flash: function() {
 			var $notes = $('.notifications'),
@@ -31,7 +35,8 @@ PageHeader = {
 	init: function () {
 		var $bookmarklets = $('#header .bookmarklet'),
 		    $node = $('<a href="javascript:void(0)" class="link expand" title="Show bookmarklet code">[+]</a>').on('click.pageheader', this.handlers.bookmarklet_expand);
-		$bookmarklets.find('.link').after($node);
+		$bookmarklets.find('.jslink').after($node);
+		$('#header .menu-toggle').on('click.pageheader', this.handlers.menu_toggle);
 	
 		this.handlers.notification_flash();	
 	}
@@ -174,10 +179,32 @@ IndividualEditor = {
 				prefix = '';
 			}
 			$tags.val($tags.val() + prefix + val);
+		},
+		link_modified: function () {
+			var posturl = BASE_URL + 'api/links/fetch',
+			    url = $(this).val(),
+				$form = $('#add-link-form'),
+				$spinner = $('<span class="updating"></span>');
+			$form.find('#name, #description').after($spinner);
+			$.post(posturl, {url: url}, function (response, textStatus) {
+				console.log("Response is ", response.status);
+				if (response.status != 'success') {
+					console.log(response.data.message);
+					return;
+				}
+				if (response.data.name) {
+					$form.find('#name').val(response.data.name);
+				}
+				if (response.data.description) {
+					$form.find('#decsription').val(response.data.decsription);
+				}
+				$form.find('.updating').remove();
+			});
 		}
 	},
 	init: function () {
 		$('#add-link-form .tag-picker').on('change.editform', this.handlers.pick_tag);
+		$('#add-link-form #url').on('change.editform', this.handlers.link_modified);
 	}
 };
 

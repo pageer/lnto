@@ -1,27 +1,29 @@
 {% extends "layout/main.html" %}
-{% block title %}Add a link{% endblock %}
+{% block title %}Add link{% endblock %}
 {% block content %}
 <div>
 	<form id="add-link-form" action="{{options.post_view}}" method="post">
 		<div>
-			<label for="name">Title: </label>
-			<input type="text" id="name" name="name" value="{{link.name}}" autofocus />
-		</div>
-		<div>
 			<label for="url">Link: </label>
-			<input type="text" id="url" name="url" value="{{link.url}}" />
+			<input type="text" placeholder="Type of paste URL" id="url" name="url" value="{{link.url}}" autofocus />
 		</div>
 		<div>
-			<label for="shortname">Short name: </label>
-			<input type="text" id="shortname" name="shortname" value="{{link.shortname|default('', true)}}" />
+			<label for="name">Title: </label>
+			<input type="text" placeholder="Link title (auto-fetched)" id="name" name="name" value="{{link.name}}" />
 		</div>
 		<div>
 			<label for="description">Description:</label>
-			<textarea type="text" id="description" name="description"/>{{link.description}}</textarea>
+			<textarea placeholder="Link description (auto-fetched)" id="description" name="description" rows="4" cols="40"/>{{link.description}}</textarea>
+		</div>
+		<div>
+			<label for="shortname">Short name: </label>
+			<input type="text" placeholder="(Optional) A unique short name to access this URL"id="shortname" name="shortname" value="{{link.shortname|default('', true)}}" />
 		</div>
 		<div>
 			<label for="tags">Tags:</label>
-			<input type="text" id="tags" name="tags" value="{{link.get_taglist()|join(', ')}}" />
+			<input type="text" placeholder="Comma-separated list of tags" id="tags" name="tags" value="{{link.get_taglist()|join(', ')}}" />
+		</div>
+		<div class="tag-select">
 			<select class="tag-picker">
 				<option>Add tag:</option>
 				{% for tag in tags %}
@@ -29,9 +31,9 @@
 				{% endfor %}
 			</select>
 		</div>
-		<div>
-			<label for="is_public">Is public: </label>
+		<div class="checkbox">
 			<input type="checkbox" id="is_public" name="is_public" value="1" {% if link.is_public %}checked="checked"{% endif %} />
+			<label for="is_public">Is public: </label>
 		</div>
 		{% if errors %}
 		<div class="error">

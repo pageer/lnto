@@ -29,6 +29,33 @@ body {
 	display: inline-block;
 }
 
+#header .submenu-item {
+	position: relative;
+}
+
+#header .submenu-item .submenu {
+	display: none;
+	position: absolute;
+	background-color: #fff;
+	border: 1px solid #a5a5a5;
+	z-index: 20;
+	padding: 10px;
+	border-radius: 5px;
+	width: 250px;
+}
+
+#header .submenu-item.showit .submenu,
+#header .submenu-item:hover .submenu {
+	display: block;
+}
+
+#header .submenu-item .submenu li {
+	display: block;
+	list-style: none;
+	margin-left: 0;
+	margin-bottom: 4px;
+}
+
 #header h3 {
 	width: 50px;
 	margin-top: 0.3em;
@@ -38,7 +65,7 @@ body {
 
 #header ul li {
 	min-width: 25px;
-	font-size: 0.8em;
+	/*font-size: 0.8em;*/
 	margin-left: 5px;
 }
 
@@ -240,41 +267,46 @@ ul.link-list {
 	
 /* Add links */
 #add-link-form {
-	width: 365px;
-	margin: 20px auto 0 auto;
+	width: 80%;
+	max-width: 400px;
+	margin: 2em auto;
 }
 
-#add-link-form > div {
-	margin-bottom: 10px;
+#add-link-form div {
 	position: relative;
 }
 
-#add-link-form label {
-	display: inline-block;
-	width: 100px;
-	text-align: right;
-	vertical-align: top;
+#add-link-form div .updating {
+	background-image: url(../images/circle-ball-dark-antialiased.gif);
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: block;
+	width: 16px;
+	height: 16px;
+	right: -16px;
 }
 
+#add-link-form label,
 #add-link-form input,
 #add-link-form textarea {
-	display: inline-block;
-	margin-left: 5px;
-	width: 250px;
+	display: block;
+	width: 100%;
 }
 
-#add-link-form .tag-picker {
-	position: absolute;
-	right: 0;
-	z-index: 10;
-}
-
-#add-link-form input[type="checkbox"] {
+#add-link-form .checkbox input,
+#add-link-form .checkbox label {
+	display: inline;
 	width: auto;
 }
 
-#add-link-form .buttons {
+#add-link-form .buttons,
+#add-link-form .tag-select {
 	text-align: right;
+}
+
+#add-link-form .buttons button {
+	padding: 1em;
 }
 
 /* User dashboard */

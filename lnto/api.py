@@ -107,6 +107,19 @@ def api_add_tag():
 		return json_error('Error adding tags - ' + str(e))
 
 
+@app.route('/api/links/fetch', methods = ['POST'])
+@check_api_login
+def api_get_url_data():
+	if not request.form.get('url'):
+		return json_error('Missing url parameter')
+	
+	try:
+		link = Link.create_from_url(request.form.get('url'))
+		return json_success({'url': link.url, 'name': link.name, 'description': link.description})
+	except Exception as e:
+		return json_error('Error fetching link - ' + str(e))
+
+
 @app.route('/api/links/<linkid>')
 @check_api_login
 def get_link_metadata(linkid):
