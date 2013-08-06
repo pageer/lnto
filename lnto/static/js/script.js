@@ -1,3 +1,16 @@
+Menu = {
+	adjust_position: function ($elem) {
+		var win_width = $(window).outerWidth(),
+		    width = $elem.outerWidth(),
+			pos = $elem.offset(),
+			adjustment = win_width - (pos.left + width + 5);
+		if (adjustment < 0) {
+			$elem.css('left', adjustment);
+		} else if (Math.floor(adjustment) == parseInt($elem.css('left'), 10)) {
+			$elem.css('left', 'auto');
+		}
+	}
+};
 PageHeader = {
 	handlers: {
 		bookmarklet_expand: function () {
@@ -17,7 +30,9 @@ PageHeader = {
 			}
 		},
 		menu_toggle: function (e) {
-			$(this).closest('.submenu-item').toggleClass('showit');
+			var $item = $(this).closest('.submenu-item');
+			$item.toggleClass('showit');
+			Menu.adjust_position($item.find('.submenu'));
 			e.stopPropagation();
 		},
 		notification_flash: function() {
@@ -59,7 +74,9 @@ Dashboard = {
 		},
 		show_menu: function (e) {
 			LinkEditor.handlers.menu_off();
-			$(this).toggleClass('showit');
+			var $this = $(this);
+			$this.toggleClass('showit');
+			Menu.adjust_position($this.find('.menu'));
 			e.stopPropagation();
 		},
 		create_arrow: function (direction) {
@@ -148,7 +165,9 @@ LinkEditor = {
 		},
 		menu_on: function (e) {
 			LinkEditor.handlers.menu_off();
-			$(this).toggleClass('showit');
+			var $this = $(this);
+			$this.toggleClass('showit');
+			Menu.adjust_position($this.parent().find('.menu'));
 			e.stopPropagation();
 		},
 		menu_off: function () {

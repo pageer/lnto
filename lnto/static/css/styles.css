@@ -44,8 +44,7 @@ body {
 	width: 250px;
 }
 
-#header .submenu-item.showit .submenu,
-#header .submenu-item:hover .submenu {
+#header .submenu-item.showit .submenu {
 	display: block;
 }
 
