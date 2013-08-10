@@ -11,7 +11,11 @@
 		<script type="text/javascript" src="{{url_for('static', filename='js/jquery-2.0.0.min.js')}}"></script>
 	</head>
 	<body>
-		{% block body %}{% endblock %}
+		{% block body %}
+		<div id="content">
+			{% block content %}{% endblock %}
+		</div>
+		{% endblock %}
 		<script type="application/x-javascript" src="{{url_for('static', filename='js/jquery.form.min.js')}}"></script>
 		<script type="text/javascript" src="{{url_for('static', filename='js/script.js')}}"></script>
 	</body>

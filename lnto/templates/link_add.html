@@ -1,4 +1,8 @@
-{% extends "layout/main.html" %}
+{% if not pageoptions.standalone %}
+	{% extends "layout/main.html" %}
+{% else %}
+	{% extends "layout/base.html" %}
+{% endif %}
 {% block title %}Add link{% endblock %}
 {% block content %}
 <div>

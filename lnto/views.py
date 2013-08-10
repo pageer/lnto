@@ -21,7 +21,8 @@ def get_default_data():
 		'base_url': get_base_url(),
 		'referer': request.form.get('next') or request.args.get('next') or request.form.get('referer') or request.referrer or url_for('show_index'),
 		'user_logged_in': user_is_logged_in(),
-		'allow_registration': app.config['ALLOW_REGISTRATION']
+		'allow_registration': app.config['ALLOW_REGISTRATION'],
+		'standalone': request.args.get('framed')
 	}
 
 
