@@ -363,6 +363,28 @@ ul.link-list {
 	opacity: 1;
 }
 
+.mod-nav {
+	position: fixed;
+	bottom: 0;
+	opacity: 0.5;
+	padding: 0.8em;
+	background-color: #d5d5d5;
+}
+
+.mod-nav:hover {
+	opacity: 1;
+}
+
+.mod-nav.next {
+	right: 0;
+	border-top-left-radius: 5px;
+}
+
+.mod-nav.last {
+	left: 0;
+	border-top-right-radius: 5px;
+}
+
 .header .menu .config {
 	display: none;
 }
@@ -391,14 +413,7 @@ ul.link-list {
 	margin-right: 3em;
 }
 
-/* Header extensions */
-
-#header li.modules {
-	position: absolute;
-	top: 30%;
-	right: 1em;
-}
-
+/* Module config */
 .move-up,
 .move-down {
 	height: 16px;

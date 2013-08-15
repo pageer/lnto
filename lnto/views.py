@@ -26,6 +26,10 @@ def get_default_data():
 	}
 
 
+@app.route('/about')
+def show_about():
+	return render_template('about.html', pageoptions = get_default_data(), version = app.config['APP_VERSION'])
+
 @app.route('/login', methods = ['GET', 'POST'])
 def do_login():
 	curr_user = User.get_logged_in()
@@ -170,8 +174,14 @@ def do_remove_module(moduleid):
 		flash('Could not delete module', 'error')
 	return redirect(url_for('show_index'))
 
+
+@app.route('/public/<username>')
+def show_user():
+	pass
+
+
 @app.route('/links',  defaults = {'username': None})
-@app.route('/public/links/<username>')
+@app.route('/public/<username>/links')
 def show_user_index(username):
 	curr_user = User.get_logged_in()
 	if username is None:
@@ -401,14 +411,20 @@ def show_linkurl(linkid):
 	return redirect(link.url)
 
 @app.route('/tags',  defaults = {'username': None})
+@app.route('/public/<username>/tags')
 def show_user_tag_list(username):
+	curr_user = User.get_logged_in()
+	
 	if username is None:
-		user = User.get_logged_in()
-		username = user.username
+		username = curr_user.username
+		user = curr_user
+	elif curr_user and username == curr_user.username:
+		user = curr_user
 	else:
 		user = User.get_by_username(username)
 	
-	user_owned = user.username == username
+	user_owned = curr_user and curr_user.username == username
+	
 	if user_owned:
 		tags = Tag.get_cloud_by_user(user.userid)
 		title = "My Tags"

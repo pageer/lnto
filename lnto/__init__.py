@@ -12,6 +12,8 @@ ALLOW_REGISTRATION = True
 
 #### End config settings ####
 
+APP_VERSION = '0.1'
+
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_pyfile('../config.cfg', True)

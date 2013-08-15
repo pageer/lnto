@@ -2,7 +2,9 @@
 {% block body %}
 <div id="header">
 	{% block header %}
+	{% if not pageoptions['user_logged_in'] %}
 	<h3><a href="{{url_for('show_index')}}">lnto</a></h3>
+	{% endif %}
 	<ul class="headerlinks">
 		{% if pageoptions['user_logged_in'] %}
 		<li>
@@ -20,14 +22,14 @@
 				Tags<span></span>
 			</a>
 		</li>
-		<li>
-			<a href="{{url_for('do_add_link')}}" class="link addlink">
-				Add link<span></span>
-			</a>
-		</li>
 		<li class="submenu-item">
 			<a href="javascript:void(0)" class="link menu-toggle">Tools</a>
 			<ul class="submenu">
+				<li>
+					<a href="{{url_for('do_add_link')}}" class="link addlink">
+						Add link<span></span>
+					</a>
+				</li>
 				<li>
 					<a href="{{url_for('show_import')}}" class="link import" title="Import bookmarks from file">
 						Import<span></span>
@@ -39,7 +41,9 @@
 						Create Account<span></span>
 					</a>
 				</li>
-				{% endif %}
+			{% endif %}
+				{% block page_extension %}{% endblock %}
+				<li><hr></li>
 				<li class="bookmarklet">
 					<span>Bookmarklet:</span>
 					<a class="link jslink" href="{{["javascript:(function() {",
@@ -62,6 +66,10 @@
 					Bookmark: <a class="link" href="{{url_for('do_add_from_url')}}">Add by URL</a>
 				</li>
 				<li>
+					<a href="{{url_for('show_about')}}" class="link">About lnto</a>
+				</li>
+				<li><hr></li>
+				<li>
 					<a href="{{url_for('do_logout')}}" class="link logout">
 						Log Out<span></span>
 					</a>
@@ -75,7 +83,6 @@
 			</a>
 		</li>
 		{% endif %}
-		{% block page_extension %}{% endblock %}
 	</ul>
 	{% endblock %}
 </div>
@@ -94,6 +101,6 @@
 	{% block content %}{% endblock %}
 </div>
 <div id="footer">
-	Icons by <a href="http://www.famfamfam.com/lab/icons/silk/">Fam Fam Silk</a>.
+	
 </div>
 {% endblock %}

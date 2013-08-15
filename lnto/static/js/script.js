@@ -135,6 +135,21 @@ Dashboard = {
 		configure_module: function () {
 			var $mod = $(this).closest('.linkpanel');
 			window.location = BASE_URL + 'modules/config/' + $mod.data('moduleid');
+		},
+		last_module: function () {
+			var $first_visible = $('.linkpanel:in-viewport:first'),
+				$first_header = $first_visible.find('.header'),
+				$prev = $first_visible.prev();
+			if ($first_header.is(':in-viewport') && $prev.length > 0) {
+				$(document).scrollTop($prev.offset().top);
+			} else {
+				$(document).scrollTop($first_visible.offset().top);
+			}
+		},
+		next_module: function () {
+			var $last_visible = $('.linkpanel:in-viewport:last'),
+			    next_pos = $last_visible.next().offset().top;
+			$(document).scrollTop(next_pos);
 		}
 	},
 	init: function () {
@@ -143,6 +158,14 @@ Dashboard = {
 		$mods.prepend(this.handlers.create_arrow('up'));
 		$('#sort-form').ajaxForm();
 		$('.linkpanel .header').append(this.handlers.create_menu());
+		
+		if ($('.linkpanel').length > 0) {
+			var $last_arrow = $('<a class="mod-nav last" href="javascript:void(0)">&lt;-&nbsp;Last</a>'),
+			    $next_arrow = $('<a class="mod-nav next" href="javascript:void(0)">Next&nbsp;-&gt;</a>');
+			$last_arrow.on('click.dashboard', this.handlers.last_module);
+			$next_arrow.on('click.dashboard', this.handlers.next_module);
+			$('#content').append($last_arrow).append($next_arrow);
+		}
 	}
 };
 
