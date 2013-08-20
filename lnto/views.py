@@ -296,7 +296,10 @@ def do_edit_link(linkid):
 			link.save()
 			if request.form.get('referer'):
 				return redirect(request.form.get('referer'))
-	return render_template("link_add.html", pageoptions = get_default_data(), link=link, options=options, errors = errors)
+	
+	tags = Tag.get_by_user(usr.userid)
+	
+	return render_template("link_add.html", pageoptions = get_default_data(), link=link, options=options, tags = tags, errors = errors)
 
 
 @app.route('/links/manage/<tags>', methods = ['POST', 'GET'])
