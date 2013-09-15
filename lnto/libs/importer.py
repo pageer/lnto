@@ -39,7 +39,7 @@ class LinkImporter(object):
         return output
     
     def make_soup(self):
-        if self.import_type == 'firefox' or self.import_type == 'opera':
+        if self.import_type == 'htmlexport':
             fixed_markup = self.fix_firefox_html()
         else:
             fixed_markup = self.data

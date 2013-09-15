@@ -18,15 +18,21 @@
     {% endif %}
 </div>
 {% endif %}
-<form method="post" action="{{url_for('show_import')}}">
-    <div>
+<form id="import-form" method="post" enctype="multipart/form-data" action="{{url_for('show_import')}}">
+    <div class="format">
         Format: <label>Opera/Firefox<input type="radio" name="importtype" checked="checked" value="opera" /></label>
     </div>
-    <div>
-        <label for="importtext">Paste file to import here:</label>
+    <div class="upload">
+        <label>Upload file: <input type="file" name="bookmarkfile"/></label>
+        <br />
+        <input type="submit" value="Import File"/>
+    </div>
+    <div class="paste">
+        <label for="importtext">Or paste the file content here:</label>
         <br />
         <textarea rows="20" cols="80" id="importtext" name="importtext">{{import_file}}</textarea>
+        <br />
+        <input type="submit" value="Import" />
     </div>
-    <input type="submit" value="import" />
 </form>
 {% endblock %}

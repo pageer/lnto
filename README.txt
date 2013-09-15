@@ -17,6 +17,7 @@ REQUIREMENTS
 (Note: versions just indicate what lnto has been tested with.  Others may work.)
 Flask (>= 0.9)
 SQLAlchemy (>= 0.8)
+alembic
 Flask-SQLAlchemy
 beautifulsoup4
 

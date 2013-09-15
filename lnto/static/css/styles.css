@@ -413,6 +413,11 @@ ul.link-list {
 	margin-right: 3em;
 }
 
+/* Link import */
+#import-form .upload {
+	margin: 15px 0;
+}
+
 /* Module config */
 .move-up,
 .move-down {

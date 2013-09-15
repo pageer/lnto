@@ -385,7 +385,12 @@ def show_delete_link(linkid):
 @force_login
 def show_import():
 	if request.method == 'POST':
-		markup = request.form.get('importtext')
+		bookmarkfile = request.files.get('bookmarkfile')
+		if bookmarkfile:
+			markup = bookmarkfile.read()
+			bookmarkfile.close()
+		else:
+			markup = request.form.get('importtext')
 		import_type = request.form.get('importtype')
 		importer = LinkImporter(markup, import_type)
 		results = importer.convert()

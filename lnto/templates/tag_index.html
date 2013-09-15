@@ -4,7 +4,7 @@
 {% block content %}
 <div>
 	{% block content_title %}
-	<h3>{{section_title|default('Tag Listing')}}</h3>	{{user_owned}}
+	<h3>{{section_title|default('Tag Listing')}}</h3>
 	{% endblock %}
 	{{ macros.tag_listing(tags, True, user_owned) }}
 </div>
