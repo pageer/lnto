@@ -380,7 +380,7 @@ ul.link-list li {
 }
 
 .linkpanel li:nth-child(even) {
-	background-color: #dbdbdb;
+	background-color: #f3f3f3;
 }
 
 @media (min-width: 640px) and (max-width: 1100px) {
