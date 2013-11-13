@@ -9,21 +9,21 @@
 		{% if pageoptions['user_logged_in'] %}
 		<li>
 			<a href="{{url_for('show_index')}}" class="link dashboard">
-				Dashboard<span></span>
+				<span></span>Dashboard
 			</a>
 		</li>
 		<li>
 			<a href="{{url_for('do_bulk_edit')}}" class="link showlinks">
-				Links<span></span>
+				<span></span>Links
 			</a>
 		</li>
 				<li>
 			<a href="{{url_for('show_user_tag_list')}}" class="link showtags">
-				Tags<span></span>
+				<span></span>Tags
 			</a>
 		</li>
 		<li class="submenu-item">
-			<a href="javascript:void(0)" class="link menu-toggle">Tools</a>
+			<a href="javascript:void(0)" class="link menu-toggle menu-icon">Tools</a>
 			<ul class="submenu">
 				<li>
 					<a href="{{url_for('do_add_link')}}" class="link addlink">
@@ -57,7 +57,8 @@
 					"+'?url='+encodeURIComponent(window.location)",
 					"+'&redirect_to_target=1'",
 					"+'&name='+encodeURIComponent(document.title)",
-					"+'&description='+encodeURIComponent(desc);",
+					"+'&description='+encodeURIComponent(desc)",
+					"+'&is_public=1';",
 					"})()"]|join}}">
 						Add to lnto
 					</a>
@@ -99,8 +100,5 @@
 {% endwith %}
 <div id="content">
 	{% block content %}{% endblock %}
-</div>
-<div id="footer">
-	
 </div>
 {% endblock %}

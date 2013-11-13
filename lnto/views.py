@@ -343,7 +343,6 @@ def do_bulk_edit(tags):
 			flash('Deleted %s links' % len(edit_links), 'success')
 	
 	if tags == 'untagged':
-		taglist = tags.split(',')
 		title = 'Manage Untagged Links'
 		links = Link.get_untagged(user.userid)
 	elif tags:

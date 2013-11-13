@@ -81,7 +81,7 @@ PageHeader = {
 Dashboard = {
 	handlers: {
 		create_menu: function () {
-			var $menu_link = $('<a class="mod-config-link" href="javascript:void(0)"></a>'),
+			var $menu_link = $('<a class="mod-config-link menu-icon inline" href="javascript:void(0)"></a>'),
 				$menu = $('<div class="menu"></div>'),
 				$remove_link = $('<a class="button" href="javascript:void(0)">Remove</a>'),
 				$config_link = $('<a class="button config" href="javascript:void(0)">Configure</a>');
@@ -273,14 +273,17 @@ IndividualEditor = {
 
 BulkEditor = {
 	handlers: {
-		toggle_all: function () {
+		toggle_all: function (e) {
+			e.preventDefault();
 			var $boxes = $('.bulk-select'),
 				num_selected = $boxes.filter(':checked').length,
 				total_boxes = $boxes.length;
 			if (num_selected == total_boxes) {
 				$boxes.prop('checked', false);
+				$(this).prop('checked', false);
 			} else {
 				$boxes.prop('checked', true);
+				$(this).prop('checked', true);
 			}
 		},
 		change_tag: function () {
@@ -308,11 +311,11 @@ BulkEditor = {
 		}
 	},
 	init: function() {
-		var $toggle_box = $('<label><input type="checkbox" id="toggle-check"/>Toggle all</label>'),
+		var $toggle_box = $('<a href="javascript:void(0)" id="toggle-check">Toggle all</a>'),
 		    $js_controls = $('<div class="js-controls"></div>');
 		$js_controls.append($toggle_box);
 		$('.bulk-editor .controls').after($js_controls);
-		$toggle_box.on('change.bulkeditor', this.handlers.toggle_all);
+		$toggle_box.on('click.bulkeditor', this.handlers.toggle_all);
 		$('.bulk-editor li').on('click.bulkeditor', function() {
 			var $box = $(this).find('input.bulk-select');
 			$box.prop('checked', !$box.is(':checked'));

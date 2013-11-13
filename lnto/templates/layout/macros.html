@@ -1,6 +1,5 @@
 {% macro link_menu(link) %}
 	<span class="menulink">
-		<img src="{{url_for('static', filename="images/cog.png")}}" alt=""/>
 		<span class="menu" data-linkid="{{link.linkid}}">
 			<a href="{{ url_for('show_link', linkid=link.linkid) }}" class="button show">Show&nbsp;details</a>
 			<a href="{{url_for('do_edit_link', linkid=link.linkid)}}" class="button edit">Edit</a>

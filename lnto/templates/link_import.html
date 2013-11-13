@@ -20,7 +20,7 @@
 {% endif %}
 <form id="import-form" method="post" enctype="multipart/form-data" action="{{url_for('show_import')}}">
     <div class="format">
-        Format: <label>Opera/Firefox<input type="radio" name="importtype" checked="checked" value="opera" /></label>
+        Format: <label>HTML export (Opera/Firefox/Chrome)<input type="radio" name="importtype" checked="checked" value="htmlexport" /></label>
     </div>
     <div class="upload">
         <label>Upload file: <input type="file" name="bookmarkfile"/></label>

@@ -105,13 +105,27 @@ body {
 	height: 9em;
 }
 
-/* Footer */
+/* Three-line menu icon, from http://css-tricks.com/three-line-menu-navicon/ */
+.menu-icon {
+  position: relative;
+  padding-left: 1.25em;
+}
 
-#footer {
-	font-size: 70%;
-	text-align: center;
-	margin-top: 2em;
-	margin-bottom: 1em;
+.menu-icon.inline {
+	padding-left: 0;
+}
+
+.menu-icon:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.25em;
+  width: 1em;
+  height: 0.15em;
+  background: black;
+  box-shadow: 
+    0 0.25em 0 0 black,
+    0 0.5em 0 0 black;
 }
 
 /* link-images */
@@ -122,11 +136,13 @@ body {
 }
 
 #header .link.dashboard span {
-	background-image: url(../images/house.png);
+	background-image: url(../images/home.svg);
+	background-size: 100% 100%;
 }
 
 #header .link.showlinks span {
-	background-image: url(../images/link.png);
+	background-image: url(../images/link.svg);
+	background-size: 100% 100%;
 }
 
 #header .link.bulkedit span {
@@ -134,7 +150,8 @@ body {
 }
 
 #header .link.showtags span {
-	background-image: url(../images/tag_blue.png);
+	background-image: url(../images/tag_stroke.svg);
+	background-size: 100% 100%;
 }
 
 #header .link.addlink span {
@@ -158,22 +175,40 @@ body {
 }
 
 /* Login page */
+.login-header h1 {
+	text-align: center;
+	font-size: 1.2em;
+	font-family: Tahoma, Geneva, sans-serif;
+}
+
 .login-form {
-    padding: 15px;
+    padding: 1em;
     border: thin solid #c9c9c9;
     border-radius: 5px;
     margin: 0 auto;
+	margin-top: 2em;
     max-width: 300px;
 }
 
+.login-form h3 {
+	text-align: center;
+	font-size: 1em;
+	margin: 0 0 1em 0;
+}
+
 .login-form .row {
-    margin: 5px;
+    margin: 5px 0 5px 0;
+	width: 100%;
 }
 
 .login-form .row label {
-    display: inline-block;
-    width: 100px;
-    text-align: right;
+    display: block;
+}
+
+.login-form .row input {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .login-form .row.buttons {
@@ -204,10 +239,28 @@ ul.link-list {
 	padding-left: 0;
 }
 
+ul.link-list li {
+	padding: 2px 4px;
+	position: relative;
+}
+
 .link-list .menulink {
 	text-decoration: none;
-	position: relative;
 	opacity: 0.7;
+	background-image: url(../images/cog.svg);
+	min-height: 1em;
+	min-width: 1em;
+	display: inline-block;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+.linkpanel .menulink {
+	position: absolute;
+	right: 8px;
+}
+
+.menulink.showit {
+    background-image: none;
 }
 
 .link-list .menulink:hover {
@@ -245,6 +298,10 @@ ul.link-list {
 
 .showit .menu {
 	display: block;
+}
+
+.fullpage-list {
+	padding: 0;
 }
 
 .fullpage-list li {
@@ -312,7 +369,6 @@ ul.link-list {
 .linkpanel {
 	display: inline-block;
 	vertical-align: top;
-	padding: 10px;
 	min-width: 250px;
 	width: 29%;
 	margin: 10px;
@@ -321,6 +377,10 @@ ul.link-list {
 	min-height: 150px;
 	background-color: #fff;
 	box-shadow: 4px 4px 4px #d5d5d5;
+}
+
+.linkpanel li:nth-child(even) {
+	background-color: #dbdbdb;
 }
 
 @media (min-width: 640px) and (max-width: 1100px) {
@@ -336,12 +396,16 @@ ul.link-list {
 }
 
 .linkpanel .link-list {
-	margin: 4px;
+	margin: 4px 0;
+}
+
+.linkpanel .link-list li {
+	padding: 2px 8px;
 }
 
 .linkpanel .header {
 	position: relative;
-	margin: -10px -10px 0 -10px;
+	margin: 0;
 	padding: 6px;
 	background-color: #c5c5c5;
 	font-size: 1em;
@@ -353,9 +417,8 @@ ul.link-list {
 	position: absolute;
 	right: 0.5em;
 	top: 0.5em;
-	background-image: url(../images/wrench.png);
-	height: 16px;
-	width: 16px;
+	height: 1em;
+	width: 1em;
 	opacity: 0.5;
 }
 

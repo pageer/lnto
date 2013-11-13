@@ -220,7 +220,17 @@ class Link(appdb.Model):
 				link.description = meta.attrs.get('content')
 		
 		return link
-		
+	
+	@staticmethod
+	def search_by_user(userid, query):
+		pass
+	
+	
+	@staticmethod
+	def search_public_by_userid(userid, query):
+		pass
+	
+	
 
 class LinkHit(appdb.Model):
 	__tablename__ = "links_hits"
