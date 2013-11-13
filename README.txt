@@ -54,6 +54,9 @@ http://www.famfamfam.com/lab/icons/silk/
 Fam Fam Silk is licensed under a Creative Commons Attribution 2.5 License.
 http://creativecommons.org/licenses/by/2.5/
 
+SVG icons from Iconic by P.J. Onori
+http://somerandomdude.com/work/open-iconic/
+Licensed under a Creative Commons Share Alike 3.0 License.
 
 LICENSE INFORMATION
 ===================

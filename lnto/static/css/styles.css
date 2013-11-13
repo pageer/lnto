@@ -245,6 +245,7 @@ ul.link-list li {
 }
 
 .link-list .menulink {
+	position: relative;
 	text-decoration: none;
 	opacity: 0.7;
 	background-image: url(../images/cog.svg);
@@ -254,12 +255,12 @@ ul.link-list li {
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
 }
-.linkpanel .menulink {
+.linkpanel .link-list .menulink {
 	position: absolute;
 	right: 8px;
 }
 
-.menulink.showit {
+.linkpanel .menulink.showit {
     background-image: none;
 }
 
