@@ -257,7 +257,7 @@ ul.link-list li {
 }
 .linkpanel .link-list .menulink {
 	position: absolute;
-	right: 8px;
+	right: 5px;
 }
 
 .linkpanel .menulink.showit {
@@ -401,7 +401,7 @@ ul.link-list li {
 }
 
 .linkpanel .link-list li {
-	padding: 2px 8px;
+	padding: 2px 12px 2px 8px;
 }
 
 .linkpanel .header {
@@ -524,4 +524,35 @@ ul.link-list li {
 .fetch-by-url {
 	width: 80%;
 	max-width: 600px;
+}
+
+/* Link details page */
+.link-details .hits,
+.link-details .tags .tag-list {
+	list-style-type: none;
+	padding-left: 0;
+}
+
+.link-details .hits li,
+.link-details .tags .tag-list,
+.link-details .tags .tag-list li {
+	display: inline-block;
+}
+
+.link-details .hits li:after {
+	content: ' | ';
+}
+
+.link-details .hits li:last-child:after {
+	content: '';
+}
+
+.link-details .owner,
+.link-details .visibility,
+.link-details .shortlink {
+	margin-bottom: 0.5em;
+}
+
+.link-details .visibility {
+	font-size: 70%;
 }

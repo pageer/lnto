@@ -1,20 +1,43 @@
 {% extends "layout/main.html" %}
 {% block content %}
-<h3 class="title">
-	<a href="{{url_for('show_link', linkid = link.linkid)}}">{{link.name}}</a>
-</h3>
-<div class="hits">
-	You visited: {{link.get_hit(user).get_count()}}
-	Total visits: {{link.get_hit().get_count()}}
-	Your last visit: {{link.get_hit(user).get_last_hit()}}
-	
+<div class="link-details">
+	<h3 class="title">
+		<a href="{{url_for('show_link', linkid = link.linkid)}}">{{link.name}}</a>
+	</h3>
+	<div class="owner">
+		Added by {{link.owner.username}} on {{link.added.strftime('%Y-%m-%d %I:%m %p')}}.
+	</div>
+	<div class="visibility">
+		{% if link.public %}
+			This link is visible to everyone.
+		{% else %}
+			This link is only visible to you.
+		{% endif %}
+	</div>
+	{% if link.shortname %}
+	<div class="shortlink">
+		The friendly URL for this link:
+		<a href="{{url_for('show_shorturl', shorturl= link.shortname)}}">
+			{{url_for('show_shorturl', shorturl= link.shortname, _external = True)}}
+		</a>
+	</div>
+	{% endif %}
+	<ul class="hits">
+		<li>Your visits to this link: {{link.get_hit(user).get_count()}}</li>
+		<li>Total visits: {{link.get_hit().get_count()}}</li>
+		<li>Your last visit: {{link.get_hit(user).get_last_hit().strftime('%Y-%m-%d %I:%m %p')}}</li>
+	</ul>
+	<div class="description">
+		{{link.description}}
+	</div>
+	<div class="tags">
+		<span>Tags for this link:</span>
+		<ul class="tag-list">
+			{% for tag in link.get_taglist()%}
+			<li><a href="{{url_for('show_tag', name = tag)}}">{{tag}}</a></li>
+			{% endfor %}
+		</ul>
+	</div>
 </div>
-<div class="description">
-	{{link.description}}
-</div>
-<div class="tags">
-	{% for tag in link.get_taglist()%}
-	<a href="{{url_for('show_tag', name = tag)}}">{{tag}}</a> 
-	{% endfor %}
-</div>
+<iframe src="{{link.url}}"></iframe>
 {% endblock %}
