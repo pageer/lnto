@@ -404,7 +404,12 @@ def show_link(linkid):
 	if link is None:
 		abort(404)
 	usr = User.get_logged_in()
-	return render_template('link.html', pageoptions = get_default_data(), link = link, user = usr)
+	if link.is_owner(usr):
+		related = Link.get_recent_by_tag(link.get_taglist(), usr.userid)
+	else:
+		related = Link.get_recent_public_by_tag(link.get_taglist(), usr.userid)
+		
+	return render_template('link.html', pageoptions = get_default_data(), link = link, user = usr, related = related)
 
 @app.route('/to/<linkid>')
 def show_linkurl(linkid):

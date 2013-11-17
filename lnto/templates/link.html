@@ -16,7 +16,7 @@
 	</div>
 	{% if link.shortname %}
 	<div class="shortlink">
-		The friendly URL for this link:
+		The friendly URL for this link is:
 		<a href="{{url_for('show_shorturl', shorturl= link.shortname)}}">
 			{{url_for('show_shorturl', shorturl= link.shortname, _external = True)}}
 		</a>
@@ -25,19 +25,36 @@
 	<ul class="hits">
 		<li>Your visits to this link: {{link.get_hit(user).get_count()}}</li>
 		<li>Total visits: {{link.get_hit().get_count()}}</li>
-		<li>Your last visit: {{link.get_hit(user).get_last_hit().strftime('%Y-%m-%d %I:%m %p')}}</li>
+		{% if link.get_hit(user).get_last_hit() %}
+			<li>Your last visit: {{link.get_hit(user).get_last_hit().strftime('%Y-%m-%d %I:%m %p')}}</li>
+		{% endif %}
 	</ul>
 	<div class="description">
 		{{link.description}}
 	</div>
-	<div class="tags">
-		<span>Tags for this link:</span>
-		<ul class="tag-list">
-			{% for tag in link.get_taglist()%}
-			<li><a href="{{url_for('show_tag', name = tag)}}">{{tag}}</a></li>
-			{% endfor %}
-		</ul>
-	</div>
+	{% if link.tags %}
+		<div class="tags">
+			<span>Tags for this link:</span>
+			<ul class="tag-list">
+				{% for tag in link.get_taglist()%}
+				<li><a href="{{url_for('show_tag', name = tag)}}">{{tag}}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	{% endif %}
 </div>
-<iframe src="{{link.url}}"></iframe>
+{% if related %}
+<div class="related-links">
+	<h3>Related links</h3>
+	<ul>
+	{% for lnk in related %}
+		{% if lnk.linkid != link.linkid%}
+			<li>
+				<a href="{{url_for('show_linkurl', linkid = lnk.linkid)}}">{{lnk.name}}</a>
+			</li>
+		{% endif %}
+	{% endfor %}
+	</ul>
+</div>
+{% endif %}
 {% endblock %}

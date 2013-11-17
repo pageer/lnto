@@ -154,7 +154,21 @@ class Link(appdb.Model):
 			return appdb.session.query(Link).filter(Link.is_public == True, Link.tags.any(Tag.tag_name == tag)).all()
 		else:
 			return appdb.session.query(Link).filter(Link.userid == userid, Link.is_public == True, Link.tags.any(Tag.tag_name == tag)).all()
-	
+
+	@staticmethod
+	def get_recent_public_by_tag(tags, userid = None, limit = 10):
+		if userid is None:
+			return appdb.session.query(Link).filter(Link.is_public == True, Link.tags.any(Tag.tag_name.in_(tags))).limit(limit).all()
+		else:
+			return appdb.session.query(Link).filter(Link.userid == userid, Link.is_public == True).filter(Link.tags.any(Tag.tag_name.in_(tags))).limit(limit).all()
+
+	@staticmethod
+	def get_recent_by_tag(tags, userid = None, limit = 10):
+		if userid is None:
+			return appdb.session.query(Link).filter(Link.tags.any(Tag.tag_name.in_(tags))).limit(limit).all()
+		else:
+			return appdb.session.query(Link).filter_by(userid = userid).filter(Link.tags.any(Tag.tag_name.in_(tags))).limit(limit).all()
+
 	@staticmethod
 	def get_untagged(userid = None):
 		if userid is None:
