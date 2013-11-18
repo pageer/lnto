@@ -227,6 +227,11 @@ def do_add_link():
 	link = Link(data)
 	
 	if request.method == 'POST' or data.get('submit') == '1	':
+		
+		if link.already_exists():
+			flash('This link already exists.  Try editing it instead.', 'error')
+			return redirect(url_for('do_edit_link', linkid = link.linkid))
+		
 		if (data.get('tags').strip() == ''):
 			taglist = []
 		else:

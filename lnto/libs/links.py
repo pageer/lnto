@@ -120,7 +120,14 @@ class Link(appdb.Model):
 			'is_public': self.is_public,
 			'tags': self.get_taglist()
 		}
-
+	
+	def already_exists(self):
+		ret = appdb.session.query(Link).filter(Link.url == self.url, Link.userid == self.userid).first()
+		if ret:
+			self.linkid = ret.linkid
+			return True
+		else:
+			return False
 
 	@staticmethod
 	def get_by_id(id):
