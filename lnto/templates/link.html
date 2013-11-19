@@ -8,7 +8,7 @@
 		Added by {{link.owner.username}} on {{link.added.strftime('%Y-%m-%d %I:%m %p')}}.
 	</div>
 	<div class="visibility">
-		{% if link.public %}
+		{% if link.is_public %}
 			This link is visible to everyone.
 		{% else %}
 			This link is only visible to you.

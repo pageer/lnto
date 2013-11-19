@@ -165,16 +165,16 @@ class Link(appdb.Model):
 	@staticmethod
 	def get_recent_public_by_tag(tags, userid = None, limit = 10):
 		if userid is None:
-			return appdb.session.query(Link).filter(Link.is_public == True, Link.tags.any(Tag.tag_name.in_(tags))).limit(limit).all()
+			return appdb.session.query(Link).filter(Link.is_public == True, Link.tags.any(Tag.tag_name.in_(tags))).order_by(Link.added.desc()).limit(limit).all()
 		else:
-			return appdb.session.query(Link).filter(Link.userid == userid, Link.is_public == True).filter(Link.tags.any(Tag.tag_name.in_(tags))).limit(limit).all()
+			return appdb.session.query(Link).filter(Link.userid == userid, Link.is_public == True).filter(Link.tags.any(Tag.tag_name.in_(tags))).order_by(Link.added.desc()).limit(limit).all()
 
 	@staticmethod
 	def get_recent_by_tag(tags, userid = None, limit = 10):
 		if userid is None:
-			return appdb.session.query(Link).filter(Link.tags.any(Tag.tag_name.in_(tags))).limit(limit).all()
+			return appdb.session.query(Link).filter(Link.tags.any(Tag.tag_name.in_(tags))).order_by(Link.added.desc()).limit(limit).all()
 		else:
-			return appdb.session.query(Link).filter_by(userid = userid).filter(Link.tags.any(Tag.tag_name.in_(tags))).limit(limit).all()
+			return appdb.session.query(Link).filter_by(userid = userid).filter(Link.tags.any(Tag.tag_name.in_(tags))).order_by(Link.added.desc()).limit(limit).all()
 
 	@staticmethod
 	def get_untagged(userid = None):
@@ -219,6 +219,15 @@ class Link(appdb.Model):
 		query = appdb.session.query(Link)
 		if owner is not None:
 			query = query.filter(Link.userid == owner)
+		return query.order_by(Link.added.desc()).limit(limit).all()
+	
+	@staticmethod
+	def get_public_by_most_recent(owner = None, limit = 10):
+		query = appdb.session.query(Link)
+		if owner is not None:
+			query = query.filter(Link.userid == owner, Link.is_public == True)
+		else:
+			query = query.filter(Link.is_public == True)
 		return query.order_by(Link.added.desc()).limit(limit).all()
 	
 	@staticmethod

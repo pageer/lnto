@@ -12,17 +12,15 @@ from lnto.libs.decorators import force_login
 def get_base_url():
 	return request.url_root
 
-def user_is_logged_in():
-	u = User.get_logged_in()
-	return u is not None
-
 def get_default_data():
+	current_user = User.get_logged_in()
 	return {
 		'base_url': get_base_url(),
 		'referer': request.form.get('next') or request.args.get('next') or request.form.get('referer') or request.referrer or url_for('show_index'),
-		'user_logged_in': user_is_logged_in(),
+		'user_logged_in': current_user is not None,
 		'allow_registration': app.config['ALLOW_REGISTRATION'],
-		'standalone': request.args.get('framed')
+		'standalone': request.args.get('framed'),
+		'current_user': current_user
 	}
 
 
@@ -175,10 +173,13 @@ def do_remove_module(moduleid):
 	return redirect(url_for('show_index'))
 
 
-@app.route('/public/<username>')
-def show_user():
-	pass
-
+@app.route('/public/<username>/')
+def show_user(username):
+	curr_user = User.get_logged_in()
+	usr = User.get_by_username(username)
+	links = Link.get_public_by_most_recent(usr.userid, 30)
+	tags = Tag.get_public_by_user(usr.userid)
+	return render_template('public_dashboard.html', pageoptions = get_default_data(), tags = tags, links = links, user = usr, curr_user = curr_user)
 
 @app.route('/links',  defaults = {'username': None})
 @app.route('/public/<username>/links')
@@ -412,7 +413,7 @@ def show_link(linkid):
 	if link.is_owner(usr):
 		related = Link.get_recent_by_tag(link.get_taglist(), usr.userid)
 	else:
-		related = Link.get_recent_public_by_tag(link.get_taglist(), usr.userid)
+		related = Link.get_recent_public_by_tag(link.get_taglist(), link.userid)
 		
 	return render_template('link.html', pageoptions = get_default_data(), link = link, user = usr, related = related)
 
@@ -451,12 +452,21 @@ def show_user_tag_list(username):
 	
 	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags, page_title = title, section_title = title, user_owned = user_owned)
 	
-@app.route('/public/tag/<name>')
-def show_tag(name):
-	usr = User.get_logged_in()
-	links = Link.get_public_by_tag(name)
-	title = 'Links for Tag - "%s"' % name
-	return render_template('link_index.html',pageoptions = get_default_data(),  user = usr, links = links, section_title = title, page_title = title)
+@app.route('/public/tag/<name>', defaults = {'username': None})
+@app.route('/public/<username>/tag/<name>')
+def show_tag(name, username):
+	curr_user = User.get_logged_in()
+	if username:
+		user = User.get_by_username(username)
+	else:
+		user = None
+	if user:
+		links = Link.get_public_by_tag(name, user.userid)
+		title = 'Links for tag "%s" by %s' % (name, user.username)
+	else:
+		links = Link.get_public_by_tag(name)
+		title = 'Links for Tag - "%s"' % name
+	return render_template('link_index.html',pageoptions = get_default_data(),  user = user, curr_user = curr_user, links = links, section_title = title, page_title = title)
 	
 @app.route('/tag/<name>')
 @force_login

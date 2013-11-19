@@ -556,3 +556,17 @@ ul.link-list li {
 .link-details .visibility {
 	font-size: 70%;
 }
+
+/* Public profile page */
+.public-dashboard .link-panel,
+.public-dashboard .tag-panel {
+	width: 48%;
+}
+
+.public-dashboard .link-panel {
+	float: left;
+}
+
+.public-dashboard .tag-panel {
+	float: right;
+}

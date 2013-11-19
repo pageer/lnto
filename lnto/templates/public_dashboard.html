@@ -1,0 +1,16 @@
+{% extends "layout/main.html" %}
+{% import 'layout/macros.html' as macros %}
+{% block title %}Lnto Dashboard for {{user.username}}{% endblock %}
+{% block content %}
+<div class="public-dashboard">
+	<h3>Profile for {{user.username}}</h3>
+	<div class="link-panel">
+		<h4>Recently Added Links</h4>
+		{{macros.link_listing(links, curr_user)}}
+	</div>
+	<div class="tag-panel">
+		<h4>Tags Added</h4>
+		{{macros.tag_listing(tags, user = user)}}
+	</div>
+</div>
+{% endblock %}

@@ -44,6 +44,10 @@
 			{% endif %}
 				{% block page_extension %}{% endblock %}
 				<li><hr></li>
+				<li>
+					<a href="{{url_for('show_user', username = pageoptions['current_user'].username)}}" class="link">Public profile</a>
+				</li>
+				<li><hr></li>
 				<li class="bookmarklet">
 					<span>Bookmarklet:</span>
 					<a class="link jslink" href="{{["javascript:(function() {",

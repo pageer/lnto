@@ -33,13 +33,15 @@
 	</ul>
 {% endmacro %}
 
-{% macro tag_listing(tags, show_counts = None, user_owned = False) %}
+{% macro tag_listing(tags, show_counts = None, user_owned = False, user = None) %}
 	<ul class="link-list">
 		{% for tag in tags %}
 		{% if user_owned %}
 		{% set tag_url = url_for('do_bulk_edit', tags = tag.tag_name) %}
+		{% elif user %}
+		{% set tag_url = url_for('show_tag', name = tag.tag_name, username = user.username) %}
 		{% else %}
-		{% set tag_url = url_for('show_tag', name = tag.tag_name) %}
+		{% set tag_url = url_for('show_tag', name = tag.tag_name, username = user.username) %}
 		{% endif %}
 		<li>
 			<a href="{{tag_url}}" class="name">{{tag.tag_name}}</a>
