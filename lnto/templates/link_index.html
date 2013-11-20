@@ -6,6 +6,6 @@
 	{% block content_title %}
 	<h3>{{section_title|default('Links')}}</h3>	
 	{% endblock %}
-	{{ macros.link_listing(links, user) }}
+	{{ macros.link_listing(links, curr_user) }}
 </div>
 {% endblock %}

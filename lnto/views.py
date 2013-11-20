@@ -428,8 +428,8 @@ def show_linkurl(linkid):
 	link.get_hit(usr).add_hit()
 	return redirect(link.url)
 
-@app.route('/tags',  defaults = {'username': None})
-@app.route('/public/<username>/tags')
+@app.route('/tags/',  defaults = {'username': None})
+@app.route('/public/<username>/tags/')
 def show_user_tag_list(username):
 	curr_user = User.get_logged_in()
 	
@@ -450,10 +450,11 @@ def show_user_tag_list(username):
 		tags = Tag.get_public_by_user(user.userid)
 		title = 'Tags for %s' % username
 	
-	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags, page_title = title, section_title = title, user_owned = user_owned)
+	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags,
+						   page_title = title, section_title = title, user_owned = user_owned, user = user)
 	
-@app.route('/public/tag/<name>', defaults = {'username': None})
-@app.route('/public/<username>/tag/<name>')
+@app.route('/public/tags/<name>', defaults = {'username': None})
+@app.route('/public/<username>/tags/<name>')
 def show_tag(name, username):
 	curr_user = User.get_logged_in()
 	if username:
@@ -468,7 +469,7 @@ def show_tag(name, username):
 		title = 'Links for Tag - "%s"' % name
 	return render_template('link_index.html',pageoptions = get_default_data(),  user = user, curr_user = curr_user, links = links, section_title = title, page_title = title)
 	
-@app.route('/tag/<name>')
+@app.route('/tags/<name>')
 @force_login
 def show_user_tag(name):
 	usr = User.get_logged_in()
