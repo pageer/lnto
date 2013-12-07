@@ -23,8 +23,9 @@
     <form method="post" action="{{url_for('do_bulk_edit', tags = url_tags)}}">
 		<div class="controls">
 			<div class="edit-panel add-tag">
-				<label>Add tag: <input name="tag_text" type="text"/></label>
+				<label>Add/remove tag: <input name="tag_text" type="text"/></label>
 				<input type="submit" name="tag_submit" value="Add"/>
+				<input type="submit" name="tag_remove" value="Remove"/>
 			</div>
 			<div class="edit-panel edit-privacy">
 				<label>Privacy: 

@@ -331,11 +331,17 @@ def do_bulk_edit(tags):
 				valid = False
 				flash("You do not have permission to edit all of the selected links.", 'error')
 		
-		if valid and request.form.get('tag_text') and request.form.get('tag_submit'):
-			for l in edit_links:
-				l.add_tag(request.form.get('tag_text'))
-				l.save()
-			flash('Tagged %d links as "%s"' % (len(edit_links), request.form.get('tag_text')), 'success')
+		if valid and request.form.get('tag_text'):
+			if request.form.get('tag_submit'):
+				for l in edit_links:
+					l.add_tag(request.form.get('tag_text'))
+					l.save()
+				flash('Tagged %d links as "%s"' % (len(edit_links), request.form.get('tag_text')), 'success')
+			elif request.form.get('tag_remove'):
+				for l in edit_links:
+					l.remove_tag(request.form.get('tag_text'))
+					l.save()
+				flash('Removed tag "%s" from %d links' % (request.form.get('tag_text'), len(edit_links)), 'success')
 		
 		if valid and request.form.get('set_privacy') and request.form.get('privacy_submit'):
 			for l in edit_links:

@@ -72,6 +72,14 @@ class Link(appdb.Model):
 		self.tags.append(t)
 	
 	
+	def remove_tag(self, tagname):
+		tagname = tagname.strip()
+		for tag in self.tags:
+			if str(tag) == tagname:
+				self.tags.remove(tag)
+				return
+	
+	
 	def save(self):
 		if self.shortname == '':
 			self.shortname = None
