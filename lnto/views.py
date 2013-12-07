@@ -450,7 +450,7 @@ def show_user_tag_list(username):
 		tags = Tag.get_public_by_user(user.userid)
 		title = 'Tags for %s' % username
 	
-	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags,
+	return render_template('tag_index.html', pageoptions = get_default_data(), tags = tags, curr_user = curr_user,
 						   page_title = title, section_title = title, user_owned = user_owned, user = user)
 	
 @app.route('/public/tags/<name>', defaults = {'username': None})
@@ -467,7 +467,8 @@ def show_tag(name, username):
 	else:
 		links = Link.get_public_by_tag(name)
 		title = 'Links for Tag - "%s"' % name
-	return render_template('link_index.html',pageoptions = get_default_data(),  user = user, curr_user = curr_user, links = links, section_title = title, page_title = title)
+	return render_template('link_index.html', pageoptions = get_default_data(),  user = user, curr_user = curr_user,
+						   links = links, section_title = title, page_title = title)
 	
 @app.route('/tags/<name>')
 @force_login
