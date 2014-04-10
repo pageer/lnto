@@ -49,14 +49,17 @@ SETUP
 
 CREDITS
 =======
-Icons taken from Fam Fam Silk 1.3 by Mark James
+Icons taken from Fam Fam Silk 1.3. by Mark James
 http://www.famfamfam.com/lab/icons/silk/
 Fam Fam Silk is licensed under a Creative Commons Attribution 2.5 License.
 http://creativecommons.org/licenses/by/2.5/
 
 SVG icons from Iconic by P.J. Onori
 http://somerandomdude.com/work/open-iconic/
-Licensed under a Creative Commons Share Alike 3.0 License.
+Additional contributions by Philip Shaw (www.codestyle.org), Yann Hourdel (www.github.com/yhourdel),
+and Ian Storm Taylor (www.github.com/ianstormtaylor)
+Iconic is licensed under a Creative Commons Share Alike 3.0 License.
+http://creativecommons.org/licenses/by-sa/3.0/us/
 
 LICENSE INFORMATION
 ===================
