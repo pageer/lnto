@@ -1,3 +1,6 @@
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
 import unittest
 import lnto
 import tests.db
@@ -235,4 +238,5 @@ class TestLinks(unittest.TestCase):
         self.assertEqual(link.name, 'This is a test')
         self.assertEqual(link.description, "Describe this page")
     
-        
+if __name__ == '__main__':
+    unittest.main()

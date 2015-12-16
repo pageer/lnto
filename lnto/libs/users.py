@@ -33,7 +33,10 @@ class User(appdb.Model):
 		return request.cookies['uinf'] == self.get_userkey()
 	
 	def login(self, password):
-		if werkzeug.security.check_password_hash(self.password, password):
+		# HACK: Convert both of the parameters to strings so that Werkzeug doesn't
+		# throw "'unicode' does not have the buffer interface" exceptions.
+		# There is almost certainly a better way to do this.
+		if werkzeug.security.check_password_hash(str(self.password), str(password)):
 			return self.get_userkey()
 		else:
 			return None

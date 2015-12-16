@@ -1,3 +1,6 @@
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
 import unittest
 import lnto
 import tests.db
@@ -45,8 +48,6 @@ class TestLinks(unittest.TestCase):
                 self.assertEqual(t.link_count, 1)
             else:
                 self.assertTrue(False, 'Got unexpected tags')
-        
-    
-    
-    
-    
+
+if __name__ == '__main__':
+    unittest.main()
