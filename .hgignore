@@ -1,3 +1,8 @@
 syntax: glob
 
 *.pyc
+tags
+bower_components
+node_modules
+venv
+vendor
