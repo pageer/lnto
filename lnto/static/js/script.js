@@ -222,7 +222,7 @@ LinkEditor = {
 		$('.link-list .button.delete').on('click.linkeditor', this.handlers.delete_link);
 		$('.link-list .box.tag').on('keypress.linkeditor', this.handlers.add_tag);
 		$('.link-list .menulink').on('click.linkeditor', this.handlers.menu_on);
-		$(document).on('click.linkeditor', this.handlers.menu_off)
+		$(document).on('click.linkeditor', this.handlers.menu_off);
 	}
 };
 
@@ -295,7 +295,7 @@ BulkEditor = {
 				if ($('.controls').is(':visible')) {
 					localStorage.removeItem('hide_bulk_edit_control');
 				} else {
-					localStorage['hide_bulk_edit_control'] = true;
+					localStorage.hide_bulk_edit_control = true;
 				}
 			} catch (e) {
 				console.log("Error writing to local storage");
@@ -337,7 +337,7 @@ BulkEditor = {
 		$show_controls_link.on('click.bulkeditor', this.handlers.toggle_edit_controls);
 		
 		try {
-			if (localStorage['hide_bulk_edit_control']) {
+			if (localStorage.hide_bulk_edit_control) {
 				this.handlers.toggle_edit_controls();
 			}
 		} catch(e) {
