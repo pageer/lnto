@@ -540,20 +540,27 @@ def show_user_tag_list(username):
         user=user
     )
 
-@app.route('/public/tags/<name>', defaults={'username': None})
-@app.route('/public/<username>/tags/<name>')
-def show_tag(name, username):
+@app.route('/public/tags/<name>')
+def show_tag(name):
     curr_user = User.get_logged_in()
-    if username:
-        user = User.get_by_username(username)
-    else:
-        user = None
-    if user:
-        links = Link.get_public_by_tag(name, user.userid)
-        title = 'Links for tag "%s" by %s' % (name, user.username)
-    else:
-        links = Link.get_public_by_tag(name)
-        title = 'Links for Tag - "%s"' % name
+    links = Link.get_public_by_tag(name)
+    title = 'Links for Tag - "%s"' % name
+    return render_template(
+        'link_index.html',
+        pageoptions=get_default_data(),
+        user=None,
+        curr_user=curr_user,
+        links=links,
+        section_title=title,
+        page_title=title
+    )
+
+@app.route('/public/<username>/tags/<name>')
+def show_all_user_tagged(name, username):
+    curr_user = User.get_logged_in()
+    user = User.get_by_username(username)
+    links = Link.get_public_by_tag(name, user.userid)
+    title = 'Links for tag "%s" by %s' % (name, user.username)
     return render_template(
         'link_index.html',
         pageoptions=get_default_data(),
@@ -590,3 +597,7 @@ def show_shorturl(shorturl):
     #if usr is not None:
     #    link.get_count(usr).add_hit()
     return redirect(link.url)
+
+@app.route('/test')
+def show_test():
+    return "This is a test"

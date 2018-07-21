@@ -1,5 +1,5 @@
 from flask import Flask, request, session, g
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 #### Default configuration settings ####
 
@@ -10,11 +10,13 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///../linkto.db'
 # Set to true to allow new user accounts to be registerd.
 ALLOW_REGISTRATION = True
 
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 #### End config settings ####
 
-APP_VERSION = '0.1'
+APP_VERSION = '0.2'
 
-app = Flask(__name__)
+app = Flask(__name__) #pylint: disable=invalid-name
 app.config.from_object(__name__)
 app.config.from_pyfile('../config.py', True)
 
@@ -24,9 +26,16 @@ app.config.from_pyfile('../config.py', True)
 #file_handler.setLevel(logging.ERROR)
 #app.logger.addHandler(file_handler)
 
-appdb = SQLAlchemy(app)
+appdb = SQLAlchemy(app) #pylint: disable=invalid-name
 
-import views, api
+import lnto.views
+import lnto.api
+
+def get_db():
+    return appdb
+
+def get_app():
+    return app
 
 @app.after_request
 def after_request(req):
