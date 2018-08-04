@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from lnto import app, appdb
+from lnto.app import app, appdb
 from lnto.libs.dashboard import Dashboard
 from lnto.libs.decorators import check_api_login
 from lnto.libs.links import Link

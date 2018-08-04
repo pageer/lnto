@@ -39,9 +39,9 @@
 		{% if user_owned %}
 		{% set tag_url = url_for('do_bulk_edit', tags = tag.tag_name) %}
 		{% elif user %}
-		{% set tag_url = url_for('show_tag', name = tag.tag_name, username = user.username) %}
+		{% set tag_url = url_for('show_all_user_tagged', name = tag.tag_name, username = user.username) %}
 		{% else %}
-		{% set tag_url = url_for('show_tag', name = tag.tag_name, username = user.username) %}
+		{% set tag_url = url_for('show_tag', name = tag.tag_name) %}
 		{% endif %}
 		<li>
 			<a href="{{tag_url}}" class="name">{{tag.tag_name}}</a>

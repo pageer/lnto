@@ -4,7 +4,7 @@ import werkzeug.security # pylint: disable=import-error
 from flask import request
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, DateTime
-from lnto import appdb
+from lnto.app import appdb
 
 class User(appdb.Model):
 

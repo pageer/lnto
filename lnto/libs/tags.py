@@ -2,7 +2,7 @@ import re
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey, Table, Column, Integer, String
 import lnto.libs.links
-from lnto import appdb
+from lnto.app import appdb
 
 link_tags = Table( # pylint: disable=invalid-name
     'link_tags',

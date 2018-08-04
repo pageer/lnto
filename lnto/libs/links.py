@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup # pylint: disable=import-error
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql.expression import or_
 from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, Boolean, Text
-from lnto import appdb
+from lnto.app import appdb
 from lnto.libs.tags import Tag, link_tags
 
 def search(terms):
@@ -269,7 +269,7 @@ class Link(appdb.Model): # pylint: disable=too-many-public-methods,too-many-inst
 
     @staticmethod
     def create_from_webpage(url, pagedata):
-        soup = BeautifulSoup(pagedata)
+        soup = BeautifulSoup(pagedata, "html.parser")
         link = Link()
         link.url = url
         link.name = soup.head.title.string

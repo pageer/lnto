@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey, Table, Column, Integer, String, DateTime, Boolean, Text
-from lnto import appdb
+from lnto.app import appdb
 
 folder_links = Table( # pylint: disable=invalid-name
     'folder_links',

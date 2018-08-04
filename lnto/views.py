@@ -1,7 +1,7 @@
 import datetime
 from datetime import datetime, timedelta
 from flask import render_template, make_response, redirect, abort, url_for, flash, request
-from lnto import app
+from lnto.app import app
 from lnto.libs.dashboard import Dashboard, module_type_map
 from lnto.libs.decorators import force_login
 from lnto.libs.importer import LinkImporter

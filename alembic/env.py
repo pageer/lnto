@@ -15,7 +15,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from lnto import appdb
+from lnto.app import appdb
 target_metadata = appdb.metadata
 # target_metadata = None
 

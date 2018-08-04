@@ -1,6 +1,6 @@
 import re
 from bs4 import BeautifulSoup # pylint: disable=import-error
-from lnto import appdb
+from lnto.app import appdb
 from lnto.libs.links import Link
 from lnto.libs.users import User
 from lnto.libs.folders import Folder
@@ -42,7 +42,7 @@ class LinkImporter(object):
             fixed_markup = self.fix_firefox_html()
         else:
             fixed_markup = self.data
-        self.soup = BeautifulSoup(fixed_markup)
+        self.soup = BeautifulSoup(fixed_markup, "html.parser")
 
     def convert(self):
         anchors = self.soup.find_all('a')
