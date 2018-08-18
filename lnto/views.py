@@ -1,6 +1,7 @@
 import datetime
 from datetime import datetime, timedelta
 from flask import render_template, make_response, redirect, abort, url_for, flash, request
+import lnto.forms as forms
 from lnto.app import app
 from lnto.libs.dashboard import Dashboard, module_type_map
 from lnto.libs.decorators import force_login
@@ -57,10 +58,8 @@ def do_login():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def do_logout():
-    usr = User.get_logged_in()
-    if usr:
-        response = make_response(redirect(url_for('do_login')))
-        response.set_cookie('uinf', '', 60*60*24*7, datetime.today() + timedelta(days=20))
+    response = make_response(redirect(url_for('do_login')))
+    response.set_cookie('uinf', '', 60*60*24*7, datetime.today() + timedelta(days=20))
     return response
 
 @app.route('/users/new', methods=['GET', 'POST'])
@@ -76,7 +75,7 @@ def do_add_user():
             errors.append('You must give a password')
         if request.form['password'] != request.form['confirm']:
             errors.append('Your password does not match the confirmation')
-        if errors:
+        if not errors:
             usr = User()
             usr.username = request.form['username']
             usr.set_password(request.form['password'])
@@ -86,6 +85,21 @@ def do_add_user():
         return render_template("new_user.html", pageoptions=get_default_data(), errors=errors)
     else:
         return render_template("new_user.html", pageoptions=get_default_data())
+
+@app.route('/user/password/change', methods=['GET', 'POST'])
+@force_login
+def change_password():
+    user = User.get_logged_in()
+    form = forms.ChangePassword(request.form)
+    if request.method == 'POST' and form.validate():
+        user.set_password(form.new_password.data)
+        user.save()
+        redirect(url_for('do_login'))
+    return render_template(
+        'change_password.html',
+        form=form,
+        pageoptions=get_default_data()
+    )
 
 @app.route('/')
 @force_login
@@ -400,6 +414,7 @@ def do_bulk_edit(tags):
             for link in edit_links:
                 link.is_public = True if request.form.get('set_privacy') == 'public' else False
                 link.save()
+
             flash('Marked %d links %s' % (
                 len(edit_links),
                 'public' if request.form.get('set_privacy') == 'public' else 'private'

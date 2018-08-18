@@ -41,7 +41,12 @@
 						Create Account<span></span>
 					</a>
 				</li>
-			{% endif %}
+			    {% endif %}
+				<li>
+					<a href="{{url_for('change_password')}}" class="link">
+						Change Password<span></span>
+					</a>
+				</li>
 				{% block page_extension %}{% endblock %}
 				<li><hr></li>
 				<li>
