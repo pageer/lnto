@@ -1,4 +1,5 @@
 {% extends "layout/main.html" %}
+{% import 'layout/macros.html' as macros %} 
 {% block title %}Create a new user{% endblock %}
 {% block content %}
 <form method="post" action="{{ url_for('do_add_user') }}">
@@ -6,14 +7,17 @@
 		<label for="username">Username</label>
 		<input type="text" id="username" name="username" />
 	</div>
+    {{ macros.show_field_error(form.username) }}
 	<div>
 		<label for="password">Password</label>
 		<input type="password" id="password" name="password" />
 	</div>
+    {{ macros.show_field_error(form.password) }}
 	<div>
 		<label for="confirm">Confirm</label>
 		<input type="password" id="confirm" name="confirm" />
 	</div>
+    {{ macros.show_field_error(form.confirm) }}
 	<div>
 		<button>Create Account</button>
 	</div>

@@ -1,13 +1,12 @@
+# pylint: disable=invalid-name, wrong-import-position
 import sys
 
 from os.path import abspath, dirname
-from flask import Flask
-#from flask_testing import TestCase
 from unittest import TestCase
 
 try:
     import unittest.mock as mock
-except:
+except Exception:
     import mock
 
 from mock import Mock
@@ -16,7 +15,6 @@ sys.path.insert(0, dirname(dirname(abspath(__file__))))
 
 import lnto
 import lnto.views
-from lnto.libs.users import User
 
 class ViewTest(TestCase):
 
@@ -32,6 +30,37 @@ class ViewTest(TestCase):
         response = self.client.get('/users/new')
 
         assert "403 Forbidden" in response.data
+
+
+    def test_new_user_when_username_empty_display_error(self):
+        lnto.app.config['ALLOW_REGISTRATION'] = True
+
+        post_data = dict(username='  ', password='asdf', confirm='asdf')
+        response = self.client.post('/users/new', data=post_data)
+
+        assert "You must give a username" in response.data
+
+
+    def test_new_user_when_password_empty_display_error(self):
+        lnto.app.config['ALLOW_REGISTRATION'] = True
+
+        post_data = dict(username='bob', password='  ', confirm='test')
+        response = self.client.post('/users/new', data=post_data)
+
+        assert "You must give a password" in response.data
+        assert "Passwords do not match" in response.data
+
+
+    @mock.patch('lnto.views.User.save')
+    @mock.patch('lnto.views.User.set_password')
+    def test_new_user_when_form_valid_creates_new_user(self, mock_set_password, mock_save):
+        lnto.app.config['ALLOW_REGISTRATION'] = True
+
+        post_data = dict(username='bob', password='test', confirm='test')
+        response = self.client.post('/users/new', data=post_data)
+
+        mock_save.assert_called()
+        mock_set_password.assert_called_with('test')
 
 
     @mock.patch('lnto.views.User.get_logged_in')
@@ -55,3 +84,104 @@ class ViewTest(TestCase):
 
         mock_user_instance.set_password.assert_called_with('testpassword')
         assert mock_user_instance.save.called
+
+    @mock.patch('lnto.views.User.get_logged_in')
+    @mock.patch('lnto.views.Link')
+    def test_add_link_when_form_valid_saves_link(self, mock_link, mock_logged_in):
+        lnto.app.config['WTF_CSRF_ENABLED'] = False
+        mock_user = Mock()
+        mock_user.userid = 1
+        mock_logged_in.return_value = mock_user
+        mock_link_instance = Mock()
+        mock_link_instance.already_exists.return_value = False
+        mock_link.return_value = mock_link_instance
+
+        post_data = dict(
+            name=u'Example',
+            shortname=u'',
+            url=u'http://example.com/',
+            description=u'',
+            tags=u'foo,bar',
+            is_public=u'1'
+        )
+        self.client.post('/link/add', data=post_data)
+
+        mock_link.assert_called_with(dict(
+            userid=1,
+            name=u'Example',
+            shortname=u'',
+            url=u'http://example.com/',
+            description=u'',
+            tags=u'foo,bar',
+            is_public=True,
+            referer='/',
+            redirect_to_target='0'
+        ))
+        mock_link_instance.set_tags.assert_called_with([u'foo', u'bar'])
+        mock_link_instance.save.assert_called()
+
+
+    @mock.patch('lnto.views.User.get_logged_in')
+    @mock.patch('lnto.views.Link')
+    @mock.patch('lnto.views.Tag.get_by_user')
+    def test_add_link_when_missing_name_and_link_shows_errors(
+            self,
+            mock_get_by_user,
+            mock_link,
+            mock_logged_in):
+        lnto.app.config['WTF_CSRF_ENABLED'] = False
+        mock_user = Mock()
+        mock_user.userid = 1
+        mock_logged_in.return_value = mock_user
+        mock_get_by_user.return_value = []
+        mock_link_instance = Mock()
+        mock_link_instance.already_exists.return_value = False
+        mock_link_instance.get_taglist.return_value = ['foo', 'bar']
+        mock_link.return_value = mock_link_instance
+
+        post_data = dict(
+            userid=u'1',
+            name=u'',
+            shortname=u'',
+            url=u'',
+            description=u'Test',
+            tags=u'foo,bar',
+            is_public=u'1'
+        )
+        response = self.client.post('/link/add', data=post_data)
+
+        assert "Title is required" in response.data
+        assert "URL is required" in response.data
+
+
+    @mock.patch('lnto.views.User.get_logged_in')
+    @mock.patch('lnto.views.Link')
+    @mock.patch('lnto.views.flash')
+    def test_add_link_when_link_exists_shows_message(
+            self,
+            mock_flash,
+            mock_link,
+            mock_logged_in):
+        lnto.app.config['WTF_CSRF_ENABLED'] = False
+        mock_user = Mock()
+        mock_user.userid = 1
+        mock_logged_in.return_value = mock_user
+        mock_link_instance = Mock()
+        mock_link_instance.already_exists.return_value = True
+        mock_link.return_value = mock_link_instance
+
+        post_data = dict(
+            userid=u'1',
+            name=u'',
+            shortname=u'',
+            url=u'',
+            description=u'Test',
+            tags=u'',
+            is_public=u'1'
+        )
+        self.client.post('/link/add', data=post_data)
+
+        mock_flash.assert_called_with(
+            'This link already exists.  Try editing it instead.',
+            'error'
+        )

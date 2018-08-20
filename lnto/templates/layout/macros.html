@@ -58,3 +58,13 @@
 		<a class="link-tag" href="{{url_for('show_tag', name = tag)}}">{{tag}}</a>
 	{% endfor %}
 {% endmacro %}
+
+{% macro show_field_error(form_field) %}
+    {% if form_field.errors %}
+        <ul class="errors">
+            {% for error in form_field.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}

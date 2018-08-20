@@ -13,18 +13,22 @@ from lnto.libs.users import User
 def get_base_url():
     return request.url_root
 
-def get_default_data():
-    current_user = User.get_logged_in()
-    referer = (
+
+def get_referer():
+    return (
         request.form.get('next')
         or request.args.get('next')
         or request.form.get('referer')
         or request.referrer
         or url_for('show_index')
     )
+
+
+def get_default_data():
+    current_user = User.get_logged_in()
     return {
         'base_url': get_base_url(),
-        'referer': referer,
+        'referer': get_referer(),
         'user_logged_in': current_user is not None,
         'allow_registration': app.config['ALLOW_REGISTRATION'],
         'standalone': request.args.get('framed'),
@@ -39,6 +43,7 @@ def show_about():
         pageoptions=get_default_data(),
         version=app.config['APP_VERSION']
     )
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def do_login():
@@ -56,35 +61,32 @@ def do_login():
         return render_template('login.html', pageoptions=get_default_data(), error=error)
     return render_template('login.html', pageoptions=get_default_data())
 
+
 @app.route('/logout', methods=['GET', 'POST'])
 def do_logout():
     response = make_response(redirect(url_for('do_login')))
     response.set_cookie('uinf', '', 60*60*24*7, datetime.today() + timedelta(days=20))
     return response
 
+
 @app.route('/users/new', methods=['GET', 'POST'])
 def do_add_user():
     if not app.config['ALLOW_REGISTRATION']:
         abort(403)
 
-    if request.method == 'POST':
-        errors = []
-        if request.form['username'].strip() == '':
-            errors.append('You must give a username')
-        if request.form['password'].strip() == '':
-            errors.append('You must give a password')
-        if request.form['password'] != request.form['confirm']:
-            errors.append('Your password does not match the confirmation')
-        if not errors:
-            usr = User()
-            usr.username = request.form['username']
-            usr.set_password(request.form['password'])
-            usr.signup_ip = request.remote_addr
-            usr.save()
-            return redirect(url_for('show_index'))
-        return render_template("new_user.html", pageoptions=get_default_data(), errors=errors)
-    else:
-        return render_template("new_user.html", pageoptions=get_default_data())
+    form = forms.AddUser(request.form)
+    if request.method == 'POST' and form.validate():
+        usr = User()
+        usr.username = request.form['username']
+        usr.set_password(request.form['password'])
+        usr.signup_ip = request.remote_addr
+        usr.save()
+        return redirect(url_for('show_index'))
+    return render_template(
+        "new_user.html",
+        form=form,
+        pageoptions=get_default_data()
+    )
 
 @app.route('/user/password/change', methods=['GET', 'POST'])
 @force_login
@@ -101,6 +103,7 @@ def change_password():
         pageoptions=get_default_data()
     )
 
+
 @app.route('/')
 @force_login
 def show_index():
@@ -113,6 +116,7 @@ def show_index():
         user=usr,
         dashboard=data
     )
+
 
 @app.route('/modules/add', methods=['GET', 'POST'])
 @force_login
@@ -218,6 +222,7 @@ def show_user(username):
         curr_user=curr_user
     )
 
+
 @app.route('/links', defaults={'username': None})
 @app.route('/public/<username>/links')
 def show_user_index(username):
@@ -246,49 +251,31 @@ def show_user_index(username):
 @force_login
 def do_add_link():
     usr = User.get_logged_in()
+    req = request.form if request.method == 'POST' else request.args
+    form = forms.AddLink(req, referer=get_referer())
 
-    if request.method == 'POST':
-        req = request.form
-    else:
-        req = request.args
+    data = form.data
+    data['userid'] = usr.userid
 
-    data = {
-        'userid': usr.userid,
-        'name': req.get('name', ''),
-        'shortname': req.get('shortname', ''),
-        'url': req.get('url', ''),
-        'description': req.get('description', ''),
-        'tags': req.get('tags', ''),
-        'is_public': True if req.get('is_public', 1) == '1' else False,
-    }
     options = {
         'button_label': 'Add Link',
         'post_view': req.get('post_view') if req.get('post_view') else url_for('do_add_link'),
-        'redirect_to_target': 1 if req.get('redirect_to_target', 0) == '1' else 0
     }
 
     link = Link(data)
 
-    if request.method == 'POST' or data.get('submit') == '1 ':
+    if request.method == 'POST' or request.args.get('submit') == '1 ':
 
         if link.already_exists():
             flash('This link already exists.  Try editing it instead.', 'error')
             return redirect(url_for('do_edit_link', linkid=link.linkid))
 
-        if data.get('tags').strip() == '':
-            taglist = []
-        else:
-            taglist = data.get('tags').split(',')
-
+        taglist = form.tags.data.split(',') if form.tags.data else []
         link.set_tags(taglist)
 
-        if data['name'] == '' or data['url'] == '':
-            flash("Name and URL are required", 'error')
-        else:
+        if form.validate():
             link.save()
-            redir_target = link.url if options['redirect_to_target'] else (
-                req.get('next') or req.get('referer') or url_for('show_index')
-            )
+            redir_target = link.url if form.redirect_to_target else get_referer()
             return redirect(redir_target)
 
     tags = Tag.get_by_user(usr.userid)
@@ -296,6 +283,7 @@ def do_add_link():
     return render_template(
         "link_add.html",
         pageoptions=get_default_data(),
+        form=form,
         link=link,
         tags=tags,
         options=options
@@ -469,6 +457,7 @@ def show_delete_link(linkid):
             return redirect(request.form.get('referer'))
     return render_template("link_delete.html", pageoptions=get_default_data(), link=link)
 
+
 @app.route('/links/import', methods=['GET', 'POST'])
 @force_login
 def show_import():
@@ -492,6 +481,7 @@ def show_import():
         results=results
     )
 
+
 @app.route('/link/show/<linkid>')
 def show_link(linkid):
     link = Link.get_by_id(linkid)
@@ -511,6 +501,7 @@ def show_link(linkid):
         related=related
     )
 
+
 @app.route('/to/<linkid>')
 def show_linkurl(linkid):
     link = Link.get_by_id(linkid)
@@ -521,6 +512,7 @@ def show_linkurl(linkid):
     #    link.get_count(usr).add_hit()
     link.get_hit(usr).add_hit()
     return redirect(link.url)
+
 
 @app.route('/tags/', defaults={'username': None})
 @app.route('/public/<username>/tags/')
@@ -555,6 +547,7 @@ def show_user_tag_list(username):
         user=user
     )
 
+
 @app.route('/public/tags/<name>')
 def show_tag(name):
     curr_user = User.get_logged_in()
@@ -569,6 +562,7 @@ def show_tag(name):
         section_title=title,
         page_title=title
     )
+
 
 @app.route('/public/<username>/tags/<name>')
 def show_all_user_tagged(name, username):
@@ -586,6 +580,7 @@ def show_all_user_tagged(name, username):
         page_title=title
     )
 
+
 @app.route('/tags/<name>')
 @force_login
 def show_user_tag(name):
@@ -601,6 +596,7 @@ def show_user_tag(name):
         page_title=title
     )
 
+
 # Wildcard route - THIS MUST BE PROCESSED LAST
 @app.route('/<shorturl>')
 def show_shorturl(shorturl):
@@ -612,7 +608,3 @@ def show_shorturl(shorturl):
     #if usr is not None:
     #    link.get_count(usr).add_hit()
     return redirect(link.url)
-
-@app.route('/test')
-def show_test():
-    return "This is a test"
