@@ -198,7 +198,7 @@ class TestLinks(unittest.TestCase):
     def test_get_public_untagged(self):
         result = Link.get_public_untagged()
         for r in result:
-            print str(r.linkid) + ' ' + str(r.is_public)
+            print(str(r.linkid) + ' ' + str(r.is_public))
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].linkid, 7)
 

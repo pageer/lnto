@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_login import LoginManager #pylint: disable=import-error
 from flask_sqlalchemy import SQLAlchemy
 
 #### Default configuration settings ####
@@ -27,6 +28,13 @@ app.config.from_pyfile('../config.py', True)
 #app.logger.addHandler(file_handler)
 
 appdb = SQLAlchemy(app) #pylint: disable=invalid-name
+
+login_manager = LoginManager() #pylint: disable=invalid-name
+# Accomodate old versions of flask-login
+try:
+    login_manager.init_app(app)
+except Exception as ex:
+    login_manager.setup_app(app)
 
 def get_db():
     return appdb

@@ -1,0 +1,8 @@
+*.pyc
+venv
+vendor
+tags
+bower_components
+tags
+*.log
+node_modules

@@ -1,9 +1,9 @@
 from sqlalchemy import ForeignKey, Column, Integer, String, func
-from lnto.app import appdb
+from lnto import appdb #from lnto.app import appdb
 from lnto.libs.links import Link
 from lnto.libs.tags import Tag
 
-class AbstractModule(object):
+class AbstractModule:
 
     typeid = 0
     classes = ''
@@ -199,7 +199,7 @@ module_type_map = { # pylint: disable=invalid-name
 }
 
 
-class Dashboard(object):
+class Dashboard:
 
     userid = 0
 

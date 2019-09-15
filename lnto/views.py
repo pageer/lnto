@@ -1,10 +1,8 @@
-import datetime
-from datetime import datetime, timedelta
 from flask import render_template, make_response, redirect, abort, url_for, flash, request
+from flask_login import login_required, login_user, logout_user, current_user #pylint: disable=import-error
 import lnto.forms as forms
-from lnto.app import app
+from lnto import app
 from lnto.libs.dashboard import Dashboard, module_type_map
-from lnto.libs.decorators import force_login
 from lnto.libs.importer import LinkImporter
 from lnto.libs.links import Link
 from lnto.libs.tags import Tag
@@ -25,7 +23,6 @@ def get_referer():
 
 
 def get_default_data():
-    current_user = User.get_logged_in()
     return {
         'base_url': get_base_url(),
         'referer': get_referer(),
@@ -47,16 +44,16 @@ def show_about():
 
 @app.route('/login', methods=['GET', 'POST'])
 def do_login():
-    curr_user = User.get_logged_in()
-    if curr_user:
-        return redirect(url_for('show_index'))
+    #if current_user:
+        #return redirect(url_for('show_index'))
     if request.method == 'POST':
+        valid = False
         curr_user = User.get_by_username(request.form.get('username'))
-        userkey = curr_user.login(request.form.get('password')) if curr_user else None
-        if curr_user and userkey:
-            response = make_response(redirect(request.form.get('referer') or url_for('show_index')))
-            response.set_cookie('uinf', userkey, 60*60*24*7, datetime.today() + timedelta(days=20))
-            return response
+        if curr_user:
+            valid = curr_user.check_password(request.form.get('password'))
+        if valid:
+            login_user(curr_user)
+            return make_response(redirect(request.form.get('referer') or url_for('show_index')))
         error = 'Either your username or password is wrong'
         return render_template('login.html', pageoptions=get_default_data(), error=error)
     return render_template('login.html', pageoptions=get_default_data())
@@ -64,9 +61,8 @@ def do_login():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def do_logout():
-    response = make_response(redirect(url_for('do_login')))
-    response.set_cookie('uinf', '', 60*60*24*7, datetime.today() + timedelta(days=20))
-    return response
+    logout_user()
+    return make_response(redirect(url_for('do_login')))
 
 
 @app.route('/users/new', methods=['GET', 'POST'])
@@ -75,7 +71,7 @@ def do_add_user():
         abort(403)
 
     form = forms.AddUser(request.form)
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         usr = User()
         usr.username = request.form['username']
         usr.set_password(request.form['password'])
@@ -89,13 +85,12 @@ def do_add_user():
     )
 
 @app.route('/user/password/change', methods=['GET', 'POST'])
-@force_login
+@login_required
 def change_password():
-    user = User.get_logged_in()
     form = forms.ChangePassword(request.form)
-    if request.method == 'POST' and form.validate():
-        user.set_password(form.new_password.data)
-        user.save()
+    if form.validate_on_submit():
+        current_user.set_password(form.new_password.data)
+        current_user.save()
         redirect(url_for('do_login'))
     return render_template(
         'change_password.html',
@@ -105,38 +100,36 @@ def change_password():
 
 
 @app.route('/')
-@force_login
+@login_required
 def show_index():
-    usr = User.get_logged_in()
-    dashboard = Dashboard(usr.userid)
+    dashboard = Dashboard(current_user.userid)
     data = dashboard.render()
     return render_template(
         'homepage.html',
         pageoptions=get_default_data(),
-        user=usr,
+        user=current_user,
         dashboard=data
     )
 
 
 @app.route('/modules/add', methods=['GET', 'POST'])
-@force_login
+@login_required
 def show_add_module():
-    usr = User.get_logged_in()
-    dash = Dashboard(usr.userid)
+    dash = Dashboard(current_user.userid)
     mods = dash.get_modules()
     modtype = request.form.get('mod_type')
     if request.method == 'POST' and modtype and module_type_map.get(int(modtype)):
         mod = module_type_map[int(modtype)]
         if mod.config_required:
             return redirect(url_for('do_add_module', modtype=request.form.get('mod_type')))
-        else:
-            pos = dash.get_next_position()
-            try:
-                dash.add_module(int(modtype), int(pos))
-                flash('Module added.', 'success')
-                return redirect(url_for('show_index'))
-            except Exception as ex:
-                flash(str(ex), 'error')
+
+        pos = dash.get_next_position()
+        try:
+            dash.add_module(int(modtype), int(pos))
+            flash('Module added.', 'success')
+            return redirect(url_for('show_index'))
+        except Exception as ex:
+            flash(str(ex), 'error')
 
     return render_template(
         'module_available.html',
@@ -147,11 +140,10 @@ def show_add_module():
 
 
 @app.route('/modules/add/<modtype>', methods=['GET', 'POST'])
-@force_login
+@login_required
 def do_add_module(modtype):
-    usr = User.get_logged_in()
-    dash = Dashboard(usr.userid)
-    mod = module_type_map[int(modtype)](usr.userid)
+    dash = Dashboard(current_user.userid)
+    mod = module_type_map[int(modtype)](current_user.userid)
 
     if request.method == 'POST':
         mod_type = request.form.get('module_type')
@@ -167,15 +159,14 @@ def do_add_module(modtype):
             flash('You must supply a module type.', 'error')
 
     return render_template('module_add.html', pageoptions=get_default_data(),
-                           user=usr, dashboard=dash, module=mod,
+                           user=current_user, dashboard=dash, module=mod,
                            post_view=url_for('do_add_module', modtype=mod.typeid))
 
 
 @app.route('/modules/config/<moduleid>', methods=['GET', 'POST'])
-@force_login
+@login_required
 def do_module_config(moduleid):
-    usr = User.get_logged_in()
-    dash = Dashboard(usr.userid)
+    dash = Dashboard(current_user.userid)
     mod = dash.get_single_module(moduleid)
 
     if not mod:
@@ -190,16 +181,15 @@ def do_module_config(moduleid):
             flash(str(ex), 'error')
 
     return render_template('module_add.html', pageoptions=get_default_data(),
-                           user=usr, dashboard=dash, module=mod.module,
+                           user=current_user, dashboard=dash, module=mod.module,
                            post_view=url_for('do_module_config', moduleid=moduleid),
                            title='Configure Module')
 
 
 @app.route('/modules/remove/<moduleid>')
-@force_login
+@login_required
 def do_remove_module(moduleid):
-    usr = User.get_logged_in()
-    dash = Dashboard(usr.userid)
+    dash = Dashboard(current_user.userid)
     if dash.remove_module(moduleid):
         flash('Module deleted', 'success')
     else:
@@ -209,7 +199,6 @@ def do_remove_module(moduleid):
 
 @app.route('/public/<username>/')
 def show_user(username):
-    curr_user = User.get_logged_in()
     usr = User.get_by_username(username)
     links = Link.get_public_by_most_recent(usr.userid, 30)
     tags = Tag.get_public_by_user(usr.userid)
@@ -219,43 +208,41 @@ def show_user(username):
         tags=tags,
         links=links,
         user=usr,
-        curr_user=curr_user
+        curr_user=current_user
     )
 
 
 @app.route('/links', defaults={'username': None})
 @app.route('/public/<username>/links')
 def show_user_index(username):
-    curr_user = User.get_logged_in()
     if username is None:
-        usr = curr_user
+        usr = current_user
     else:
         usr = User.get_by_username(username)
 
     if not usr:
         abort(404)
 
-    if usr is curr_user:
-        links = Link.get_by_user(curr_user.userid)
+    if usr is current_user:
+        links = Link.get_by_user(current_user.userid)
     else:
         links = Link.get_public_by_user(usr.userid)
     return render_template(
         'link_index.html',
         pageoptions=get_default_data(),
         links=links,
-        user=curr_user
+        user=current_user
     )
 
 
 @app.route('/link/add', methods=['GET', 'POST'])
-@force_login
+@login_required
 def do_add_link():
-    usr = User.get_logged_in()
     req = request.form if request.method == 'POST' else request.args
     form = forms.AddLink(req, referer=get_referer())
 
     data = form.data
-    data['userid'] = usr.userid
+    data['userid'] = current_user.userid
 
     options = {
         'button_label': 'Add Link',
@@ -277,8 +264,10 @@ def do_add_link():
             link.save()
             redir_target = link.url if form.redirect_to_target else get_referer()
             return redirect(redir_target)
+        flash('Invalid link submission', 'error')
+        return str(form.errors)
 
-    tags = Tag.get_by_user(usr.userid)
+    tags = Tag.get_by_user(current_user.userid)
 
     return render_template(
         "link_add.html",
@@ -291,11 +280,11 @@ def do_add_link():
 
 @app.route('/link/add/fetch', defaults={'url': None}, methods=['GET', 'POST'])
 @app.route('/link/add/fetch/<url>', methods=['GET', 'POST'])
-@force_login
+@login_required
 def do_add_from_url(url):
     fetch_url = url or request.form.get('fetch_url')
     if fetch_url:
-        try:
+#        try:
             link = Link.create_from_url(fetch_url)
             redir_url = url_for(
                 'do_add_link',
@@ -305,16 +294,15 @@ def do_add_from_url(url):
                 redirect_to_target=1
             )
             return redirect(redir_url)
-        except Exception as ex:
+#        except Exception as ex:
             flash('Error getting link - ' + str(ex), 'error')
     return render_template('link_add_url.html', pageoptions=get_default_data(), url=fetch_url or '')
 
 
 @app.route('/link/edit/<linkid>', methods=['GET', 'POST'])
-@force_login
+@login_required
 def do_edit_link(linkid):
     errors = []
-    usr = User.get_logged_in()
 
     link = Link.get_by_id(linkid)
     if not link:
@@ -330,7 +318,7 @@ def do_edit_link(linkid):
         link.description = request.form.get('description')
         link.shortname = request.form.get('shortname')
         link.url = request.form.get('url')
-        link.is_public = True if request.form.get('is_public') == '1' else False
+        link.is_public = request.form.get('is_public') == '1'
 
         if request.form.get('tags').strip() == '':
             taglist = []
@@ -347,7 +335,7 @@ def do_edit_link(linkid):
             if request.form.get('referer'):
                 return redirect(request.form.get('referer'))
 
-    tags = Tag.get_by_user(usr.userid)
+    tags = Tag.get_by_user(current_user.userid)
 
     return render_template(
         "link_add.html",
@@ -361,52 +349,39 @@ def do_edit_link(linkid):
 
 @app.route('/links/manage/<tags>', methods=['POST', 'GET'])
 @app.route('/links/manage/', methods=['POST', 'GET'], defaults={'tags': None})
-@force_login
+@login_required
 def do_bulk_edit(tags):
-    user = User.get_logged_in()
-
     # Redirect filters immediately
     if request.args.get('tag_select'):
         return redirect(url_for('do_bulk_edit', tags=request.args.get('tag_select')))
 
-    available_tags = Tag.get_by_user(user.userid)
+    available_tags = Tag.get_by_user(current_user.userid)
 
     if request.method == 'POST':
 
         linkids = request.form.getlist('linkids')
         edit_links = Link.get_by_id(linkids)
 
-        valid = True
-        for link in edit_links:
-            if not link.is_owner(user):
-                valid = False
-                flash("You do not have permission to edit all of the selected links.", 'error')
+        valid = _links_are_valid(edit_links)
+        tag_text = request.form.get('tag_text')
 
-        if valid and request.form.get('tag_text'):
-            if request.form.get('tag_submit'):
-                for link in edit_links:
-                    link.add_tag(request.form.get('tag_text'))
-                    link.save()
-                flash('Tagged %d links as "%s"' % (
-                    len(edit_links), request.form.get('tag_text')
-                ), 'success')
-            elif request.form.get('tag_remove'):
-                for link in edit_links:
-                    link.remove_tag(request.form.get('tag_text'))
-                    link.save()
-                flash('Removed tag "%s" from %d links' % (
-                    request.form.get('tag_text'), len(edit_links)
-                ), 'success')
+        if valid and tag_text and request.form.get('tag_submit'):
+            for link in edit_links:
+                link.add_tag(tag_text)
+                link.save()
+            flash('Tagged %d links as "%s"' % (
+                len(edit_links), tag_text
+            ), 'success')
+        elif valid and tag_text and request.form.get('tag_remove'):
+            for link in edit_links:
+                link.remove_tag(tag_text)
+                link.save()
+            flash('Removed tag "%s" from %d links' % (
+                tag_text, len(edit_links)
+            ), 'success')
 
         if valid and request.form.get('set_privacy') and request.form.get('privacy_submit'):
-            for link in edit_links:
-                link.is_public = True if request.form.get('set_privacy') == 'public' else False
-                link.save()
-
-            flash('Marked %d links %s' % (
-                len(edit_links),
-                'public' if request.form.get('set_privacy') == 'public' else 'private'
-            ), 'success')
+            _set_link_privacy(edit_links, request.form.get('set_privacy'))
 
         if valid and request.form.get('delete_selected_submit'):
             for link in edit_links:
@@ -415,14 +390,14 @@ def do_bulk_edit(tags):
 
     if tags == 'untagged':
         title = 'Manage Untagged Links'
-        links = Link.get_untagged(user.userid)
+        links = Link.get_untagged(current_user.userid)
     elif tags:
         taglist = tags.split(',')
         title = 'Manage Links in ' + tags
-        links = Link.get_by_tag(taglist[0], user.userid)
+        links = Link.get_by_tag(taglist[0], current_user.userid)
     else:
         title = "Manage Links"
-        links = Link.get_by_user(user.userid)
+        links = Link.get_by_user(current_user.userid)
 
     return render_template(
         "link_edit_bulk.html",
@@ -434,6 +409,22 @@ def do_bulk_edit(tags):
     )
 
 
+def _links_are_valid(edit_links):
+    for link in edit_links:
+        if not link.is_owner(current_user):
+            flash("You do not have permission to edit all of the selected links.", 'error')
+            return False
+    return True
+
+def _set_link_privacy(edit_links, access):
+    for link in edit_links:
+        link.is_public = access == 'public'
+        link.save()
+    flash('Marked %d links %s' % (
+        len(edit_links),
+        'public' if access == 'public' else 'private'
+    ), 'success')
+
 #@app.route('/link/search', methods=['POST'])
 #def do_link_search():
     #usr = User.get_logged_in()
@@ -441,25 +432,22 @@ def do_bulk_edit(tags):
 
 
 @app.route('/link/delete/<linkid>', methods=['POST', 'GET'])
-@force_login
+@login_required
 def show_delete_link(linkid):
-    usr = User.get_logged_in()
     link = Link.get_by_id(linkid)
-
-    if not link.is_owner(usr):
+    if not link.is_owner(current_user):
         flash('You do not have permission to delete this link.', 'error')
-    else:
-        if request.form.get('confirm'):
-            link.delete()
-            flash('Deleted link', 'success')
-            return redirect(url_for('show_index'))
-        elif request.form.get('cancel'):
-            return redirect(request.form.get('referer'))
+    elif request.form.get('confirm'):
+        link.delete()
+        flash('Deleted link', 'success')
+        return redirect(url_for('show_index'))
+    elif request.form.get('cancel'):
+        return redirect(request.form.get('referer'))
     return render_template("link_delete.html", pageoptions=get_default_data(), link=link)
 
 
 @app.route('/links/import', methods=['GET', 'POST'])
-@force_login
+@login_required
 def show_import():
     if request.method == 'POST':
         bookmarkfile = request.files.get('bookmarkfile')
@@ -487,9 +475,8 @@ def show_link(linkid):
     link = Link.get_by_id(linkid)
     if link is None:
         abort(404)
-    usr = User.get_logged_in()
-    if link.is_owner(usr):
-        related = Link.get_recent_by_tag(link.get_taglist(), usr.userid)
+    if link.is_owner(current_user):
+        related = Link.get_recent_by_tag(link.get_taglist(), current_user.userid)
     else:
         related = Link.get_recent_public_by_tag(link.get_taglist(), link.userid)
 
@@ -497,7 +484,7 @@ def show_link(linkid):
         'link.html',
         pageoptions=get_default_data(),
         link=link,
-        user=usr,
+        user=current_user,
         related=related
     )
 
@@ -507,27 +494,22 @@ def show_linkurl(linkid):
     link = Link.get_by_id(linkid)
     if link is None:
         abort(404)
-    usr = User.get_logged_in()
-    #if usr is not None:
-    #    link.get_count(usr).add_hit()
-    link.get_hit(usr).add_hit()
+    link.get_hit(current_user).add_hit()
     return redirect(link.url)
 
 
 @app.route('/tags/', defaults={'username': None})
 @app.route('/public/<username>/tags/')
 def show_user_tag_list(username):
-    curr_user = User.get_logged_in()
-
     if username is None:
-        username = curr_user.username
-        user = curr_user
-    elif curr_user and username == curr_user.username:
-        user = curr_user
+        username = current_user.username
+        user = current_user
+    elif current_user and username == current_user.username:
+        user = current_user
     else:
         user = User.get_by_username(username)
 
-    user_owned = curr_user and curr_user.username == username
+    user_owned = current_user and current_user.username == username
 
     if user_owned:
         tags = Tag.get_cloud_by_user(user.userid)
@@ -540,7 +522,7 @@ def show_user_tag_list(username):
         'tag_index.html',
         pageoptions=get_default_data(),
         tags=tags,
-        curr_user=curr_user,
+        curr_user=current_user,
         page_title=title,
         section_title=title,
         user_owned=user_owned,
@@ -550,14 +532,13 @@ def show_user_tag_list(username):
 
 @app.route('/public/tags/<name>')
 def show_tag(name):
-    curr_user = User.get_logged_in()
     links = Link.get_public_by_tag(name)
     title = 'Links for Tag - "%s"' % name
     return render_template(
         'link_index.html',
         pageoptions=get_default_data(),
         user=None,
-        curr_user=curr_user,
+        curr_user=current_user,
         links=links,
         section_title=title,
         page_title=title
@@ -566,7 +547,6 @@ def show_tag(name):
 
 @app.route('/public/<username>/tags/<name>')
 def show_all_user_tagged(name, username):
-    curr_user = User.get_logged_in()
     user = User.get_by_username(username)
     links = Link.get_public_by_tag(name, user.userid)
     title = 'Links for tag "%s" by %s' % (name, user.username)
@@ -574,7 +554,7 @@ def show_all_user_tagged(name, username):
         'link_index.html',
         pageoptions=get_default_data(),
         user=user,
-        curr_user=curr_user,
+        curr_user=current_user,
         links=links,
         section_title=title,
         page_title=title
@@ -582,15 +562,14 @@ def show_all_user_tagged(name, username):
 
 
 @app.route('/tags/<name>')
-@force_login
+@login_required
 def show_user_tag(name):
-    usr = User.get_logged_in()
-    links = Link.get_by_tag(name, usr.userid)
+    links = Link.get_by_tag(name, current_user.userid)
     title = 'My Tagged Links - "%s"' % name
     return render_template(
         'link_index.html',
         pageoptions=get_default_data(),
-        user=usr,
+        user=current_user,
         links=links,
         section_title=title,
         page_title=title
@@ -603,8 +582,5 @@ def show_shorturl(shorturl):
     link = Link.get_by_shortname(shorturl)
     if link is None:
         abort(404)
-    usr = User.get_logged_in()
-    link.get_hit(usr).add_hit()
-    #if usr is not None:
-    #    link.get_count(usr).add_hit()
+    link.get_hit(current_user).add_hit()
     return redirect(link.url)

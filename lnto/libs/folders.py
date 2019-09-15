@@ -1,18 +1,18 @@
 from datetime import datetime
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey, Table, Column, Integer, String, DateTime, Boolean, Text
-from lnto.app import appdb
+from lnto import appdb #from lnto.app import appdb
 
 folder_links = Table( # pylint: disable=invalid-name
     'folder_links',
-    appdb.Model.metadata,
+    appdb.Model.metadata, #pylint: disable=no-member
     Column('folderid', Integer, ForeignKey('folders.folderid')),
     Column('linkid', Integer, ForeignKey('links.linkid'))
 )
 
 folder_children = Table( # pylint: disable=invalid-name
     'folder_children',
-    appdb.Model.metadata,
+    appdb.Model.metadata, #pylint: disable=no-member
     Column('parentid', Integer, ForeignKey('folders.folderid')),
     Column('childid', Integer, ForeignKey('folders.folderid'))
 )

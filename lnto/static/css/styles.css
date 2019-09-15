@@ -41,6 +41,7 @@ body {
 	z-index: 20;
 	padding: 10px;
 	border-radius: 5px;
+    box-shadow: 2px 2px 5px #808080;
 	width: 250px;
 }
 

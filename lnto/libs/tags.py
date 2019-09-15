@@ -1,19 +1,19 @@
 import re
 from sqlalchemy.orm import relationship
-from sqlalchemy import ForeignKey, Table, Column, Integer, String
+from sqlalchemy import ForeignKey, Table, Column, Integer, String, text
 import lnto.libs.links
 from lnto.app import appdb
 
-link_tags = Table( # pylint: disable=invalid-name
+link_tags = Table( #pylint: disable=invalid-name
     'link_tags',
-    appdb.Model.metadata,
+    appdb.Model.metadata, #pylint: disable=no-member
     Column('linkid', Integer, ForeignKey('links.linkid')),
     Column('tagid', Integer, ForeignKey('tags.tagid'))
 )
 
-link_display_tags = Table( # pylint: disable=invalid-name
+link_display_tags = Table( #pylint: disable=invalid-name
     'link_display_tags',
-    appdb.Model.metadata,
+    appdb.Model.metadata, #pylint: disable=no-member
     Column('linkid', Integer, ForeignKey('links.linkid')),
     Column('tagid', Integer, ForeignKey('display_tags.tagid'))
 )
@@ -62,7 +62,7 @@ class Tag(appdb.Model):
                 .join(link_tags, lnto.libs.links.Link) \
                 .filter_by(userid=userid) \
                 .group_by(Tag) \
-                .order_by('num_links DESC') \
+                .order_by(text('num_links DESC')) \
                 .all()
         ret = []
         for tag in tags:

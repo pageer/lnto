@@ -80,4 +80,3 @@ class AddLink(FlaskForm):
     is_public = BooleanField("Is public")
     referer = HiddenField()
     redirect_to_target = HiddenField(default="0")
-

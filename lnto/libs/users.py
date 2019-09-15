@@ -2,11 +2,19 @@ from datetime import datetime
 import hashlib
 import werkzeug.security # pylint: disable=import-error
 from flask import request
+from flask_login import UserMixin
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, DateTime
-from lnto.app import appdb
+from lnto import appdb, login_manager
+#from lnto.app import appdb, login_manager
 
-class User(appdb.Model):
+login_manager.login_view = 'do_login'
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.get_by_userid(userid)
+
+class User(appdb.Model, UserMixin):
 
     __tablename__ = 'users'
     userid = Column(Integer, primary_key=True)
@@ -39,6 +47,12 @@ class User(appdb.Model):
             return self.get_userkey()
         return None
 
+    def get_id(self):
+        return self.userid
+
+    def check_password(self, password):
+        return werkzeug.security.check_password_hash(str(self.password), str(password))
+
     def get_userkey(self):
         userkey = request.headers.get('User-Agent', '') + request.headers.get('Remote-Addr', '')
         userkey += hashlib.sha512(self.password).hexdigest()
@@ -68,3 +82,7 @@ class User(appdb.Model):
     @classmethod
     def get_by_username(cls, username):
         return appdb.session.query(User).filter_by(username=username).first()
+
+    @classmethod
+    def get_by_userid(cls, userid):
+        return appdb.session.query(User).filter_by(userid=userid).first()

@@ -1,11 +1,11 @@
 import re
 from bs4 import BeautifulSoup # pylint: disable=import-error
-from lnto.app import appdb
+from lnto import appdb #from lnto.app import appdb
 from lnto.libs.links import Link
 from lnto.libs.users import User
 from lnto.libs.folders import Folder
 
-class LinkImporter(object):
+class LinkImporter:
 
     data = ''
     import_type = None
@@ -57,10 +57,10 @@ class LinkImporter(object):
             if anchor.contents:
                 data['name'] = data['url'][:250]
             else:
-                data['name'] = unicode(anchor.contents[0])
+                data['name'] = anchor.contents[0]
             desc_node = self.get_description(anchor)
             if desc_node:
-                data['description'] = unicode(desc_node.contents[0])
+                data['description'] = desc_node.contents[0]
             try:
                 link = Link(data)
 

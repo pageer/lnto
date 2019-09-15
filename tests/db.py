@@ -1,13 +1,12 @@
+from datetime import datetime
+
 import lnto
 from lnto.libs.links import Link
 from lnto.libs.links import LinkHit
 from lnto.libs.users import User
-from lnto.libs.tags import Tag
-
-from datetime import datetime
 
 def init_test_db():
-    
+
     lnto.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tmp.db'
     lnto.appdb.init_app(lnto.app)
     lnto.appdb.create_all()
@@ -139,18 +138,17 @@ def create_test_data():
             'ts': datetime(2013, 2, 3, 16, 17, 18)
         }
     ]
-    
+
     for user in user_data:
-        u = User(user)
-        u.set_password(user['password'])
-        u.save()
-    
+        user_obj = User(user)
+        user_obj.set_password(user['password'])
+        user_obj.save()
+
     for link in link_data:
-        l = Link(link)
-        l.save()
-    
+        link_obj = Link(link)
+        link_obj.save()
+
     for hit in hit_data:
-        h = LinkHit(hit)
-        lnto.appdb.session.add(h)
+        hit_obj = LinkHit(hit)
+        lnto.appdb.session.add(hit_obj)
         lnto.appdb.session.commit()
-    

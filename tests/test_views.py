@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name, wrong-import-position
+#i pylint: disable=invalid-name, wrong-import-position
 import sys
 
 from os.path import abspath, dirname
@@ -21,15 +21,18 @@ class ViewTest(TestCase):
     render_templates = False
 
     def setUp(self):
+        lnto.app.config['TESTING'] = True
         lnto.app.testing = True
+        #lnto.app.login_manager.init_app(lnto.app)
         self.client = lnto.app.test_client()
+
 
     def test_new_user_when_registration_disabled_returns_403(self):
         lnto.app.config['ALLOW_REGISTRATION'] = False
 
         response = self.client.get('/users/new')
 
-        assert "403 Forbidden" in response.data
+        assert "403 Forbidden" in str(response.data)
 
 
     def test_new_user_when_username_empty_display_error(self):
@@ -38,7 +41,7 @@ class ViewTest(TestCase):
         post_data = dict(username='  ', password='asdf', confirm='asdf')
         response = self.client.post('/users/new', data=post_data)
 
-        assert "You must give a username" in response.data
+        assert "You must give a username" in str(response.data)
 
 
     def test_new_user_when_password_empty_display_error(self):
@@ -47,8 +50,8 @@ class ViewTest(TestCase):
         post_data = dict(username='bob', password='  ', confirm='test')
         response = self.client.post('/users/new', data=post_data)
 
-        assert "You must give a password" in response.data
-        assert "Passwords do not match" in response.data
+        assert "You must give a password" in str(response.data)
+        assert "Passwords do not match" in str(response.data)
 
 
     @mock.patch('lnto.views.User.save')
@@ -57,27 +60,31 @@ class ViewTest(TestCase):
         lnto.app.config['ALLOW_REGISTRATION'] = True
 
         post_data = dict(username='bob', password='test', confirm='test')
-        response = self.client.post('/users/new', data=post_data)
+        self.client.post('/users/new', data=post_data)
 
         mock_save.assert_called()
         mock_set_password.assert_called_with('test')
 
 
     @mock.patch('lnto.views.User.get_logged_in')
-    def test_change_password_passwords_do_not_match(self, mock_user):
+    @mock.patch('flask_login.utils._get_user')
+    def test_change_password_passwords_do_not_match(self, user, mock_user):
         mock_user.return_value = Mock()
+        user.return_value = Mock()
 
         post_data = dict(new_password='test1', confirm='test2')
         response = self.client.post('/user/password/change', data=post_data)
 
-        assert "Passwords do not match" in response.data
+        assert "Passwords do not match" in str(response.data)
 
 
     @mock.patch('lnto.views.User.get_logged_in')
-    def test_change_password_when_password_valid_user_is_saved(self, mock_user):
+    @mock.patch('flask_login.utils._get_user')
+    def test_change_password_when_password_valid_user_is_saved(self, user, mock_user):
         lnto.app.config['WTF_CSRF_ENABLED'] = False
         mock_user_instance = Mock()
         mock_user.return_value = mock_user_instance
+        user.return_value = mock_user_instance
 
         post_data = dict(new_password='testpassword', confirm='testpassword')
         self.client.post('/user/password/change', data=post_data)
@@ -87,10 +94,12 @@ class ViewTest(TestCase):
 
     @mock.patch('lnto.views.User.get_logged_in')
     @mock.patch('lnto.views.Link')
-    def test_add_link_when_form_valid_saves_link(self, mock_link, mock_logged_in):
+    @mock.patch('flask_login.utils._get_user')
+    def test_add_link_when_form_valid_saves_link(self, user, mock_link, mock_logged_in):
         lnto.app.config['WTF_CSRF_ENABLED'] = False
         mock_user = Mock()
         mock_user.userid = 1
+        user.return_value = mock_user
         mock_logged_in.return_value = mock_user
         mock_link_instance = Mock()
         mock_link_instance.already_exists.return_value = False
@@ -124,14 +133,17 @@ class ViewTest(TestCase):
     @mock.patch('lnto.views.User.get_logged_in')
     @mock.patch('lnto.views.Link')
     @mock.patch('lnto.views.Tag.get_by_user')
+    @mock.patch('flask_login.utils._get_user')
     def test_add_link_when_missing_name_and_link_shows_errors(
             self,
+            user,
             mock_get_by_user,
             mock_link,
             mock_logged_in):
         lnto.app.config['WTF_CSRF_ENABLED'] = False
         mock_user = Mock()
         mock_user.userid = 1
+        user.return_value = mock_user
         mock_logged_in.return_value = mock_user
         mock_get_by_user.return_value = []
         mock_link_instance = Mock()
@@ -150,21 +162,24 @@ class ViewTest(TestCase):
         )
         response = self.client.post('/link/add', data=post_data)
 
-        assert "Title is required" in response.data
-        assert "URL is required" in response.data
+        assert "Title is required" in str(response.data)
+        assert "URL is required" in str(response.data)
 
 
     @mock.patch('lnto.views.User.get_logged_in')
     @mock.patch('lnto.views.Link')
     @mock.patch('lnto.views.flash')
+    @mock.patch('flask_login.utils._get_user')
     def test_add_link_when_link_exists_shows_message(
             self,
+            user,
             mock_flash,
             mock_link,
             mock_logged_in):
         lnto.app.config['WTF_CSRF_ENABLED'] = False
         mock_user = Mock()
         mock_user.userid = 1
+        user.return_value = mock_user
         mock_logged_in.return_value = mock_user
         mock_link_instance = Mock()
         mock_link_instance.already_exists.return_value = True
