@@ -1,8 +1,8 @@
 module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-pylint');
-    grunt.loadNpmTasks('grunt-bower');
     grunt.loadNpmTasks('grunt-nose');
 
     grunt.initConfig({
@@ -26,22 +26,12 @@ module.exports = function(grunt) {
                 src: 'tests/'
             }
         },
-        bower: {
-            dev: {
-                dest: 'lnto/static/vendor/',
-                js_dest: 'lnto/static/vendor/js/',
-                css_dest: 'lnto/static/vendor/css/',
-                options: {
-                    keepExpandedHierarchy: false,
-                    packageSpecific: {
-                        jquery: {
-                            files: ['dist/jquery.min.js']
-                        },
-                        'jquery-form': {
-                            files: ['dist/jquery.form.min.js']
-                        }
-                    }
-                }
+        copy: {
+            main: {
+                files: [
+                    {src: 'node_modules/jquery/dist/jquery.min.js', dest: 'lnto/static/vendor/js/jquery.min.js'},
+                    {src: 'node_modules/jquery-form/dist/jquery.form.min.js', dest: 'lnto/static/vendor/js/jquery.form.min.js'}
+                ]
             }
         }
     });
@@ -49,6 +39,6 @@ module.exports = function(grunt) {
     grunt.registerTask('lint', ['jshint', 'pylint']);
     grunt.registerTask('test', ['nose']);
     grunt.registerTask('validate', ['jshint', 'pylint', 'nose']);
-    grunt.registerTask('deploy', ['bower']);
-    grunt.registerTask('default', ['jshint', 'pylint', 'nose', 'bower']);
+    grunt.registerTask('deploy', ['copy']);
+    grunt.registerTask('default', ['jshint', 'pylint', 'nose', 'copy']);
 };
