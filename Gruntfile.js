@@ -29,8 +29,13 @@ module.exports = function(grunt) {
         copy: {
             main: {
                 files: [
-                    {src: 'node_modules/jquery/dist/jquery.min.js', dest: 'lnto/static/vendor/js/jquery.min.js'},
-                    {src: 'node_modules/jquery-form/dist/jquery.form.min.js', dest: 'lnto/static/vendor/js/jquery.form.min.js'}
+                    {
+                        src: 'node_modules/jquery/dist/jquery.min.js',
+                        dest: 'lnto/static/vendor/js/jquery.min.js'
+                    }, {
+                        src: 'node_modules/jquery-form/dist/jquery.form.min.js',
+                        dest: 'lnto/static/vendor/js/jquery.form.min.js'
+                    }
                 ]
             }
         }
