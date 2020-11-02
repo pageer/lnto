@@ -2,7 +2,7 @@
 venv
 vendor
 tags
-bower_components
-tags
+tags.temp
+tags.lock
 *.log
 node_modules

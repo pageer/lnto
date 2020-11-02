@@ -284,7 +284,7 @@ def do_add_link():
 def do_add_from_url(url):
     fetch_url = url or request.form.get('fetch_url')
     if fetch_url:
-#        try:
+        try:
             link = Link.create_from_url(fetch_url)
             redir_url = url_for(
                 'do_add_link',
@@ -294,7 +294,7 @@ def do_add_from_url(url):
                 redirect_to_target=1
             )
             return redirect(redir_url)
-#        except Exception as ex:
+        except Exception as ex:
             flash('Error getting link - ' + str(ex), 'error')
     return render_template('link_add_url.html', pageoptions=get_default_data(), url=fetch_url or '')
 
