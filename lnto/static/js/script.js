@@ -218,10 +218,26 @@ LinkEditor = {
 			$('.showit').removeClass('showit');
 		}
 	},
+    tags_init: function() {
+        var availableTags = $('.tag-select option').map(function (idx, value) {
+            var val = $(value).attr('value');
+            return val ? val : null;
+        });
+
+        $('#tags').tagit({
+            singleField: true,
+            allowSpaces: true,
+            availableTags: availableTags,
+            placeholderText: 'Comma-separated list of tags',
+            showAutocompleteOnFocus: true
+        });
+        $('.tag-select').hide();
+    },
 	init: function() {
 		$('.link-list .button.delete').on('click.linkeditor', this.handlers.delete_link);
 		$('.link-list .box.tag').on('keypress.linkeditor', this.handlers.add_tag);
 		$('.link-list .menulink').on('click.linkeditor', this.handlers.menu_on);
+        this.tags_init();
 		$(document).on('click.linkeditor', this.handlers.menu_off);
 	}
 };

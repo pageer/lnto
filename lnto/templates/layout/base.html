@@ -4,11 +4,17 @@
 		<base href="{{url_for('show_index')}}" />
 		<title>{% block title %}{% endblock %}</title>
 		<link rel="stylesheet" href="{{url_for('static', filename = 'css/styles.css')}}" />
+		<link rel="stylesheet" href="{{url_for('static', filename = 'vendor/css/jquery-ui.min.css')}}" />
+		<link rel="stylesheet" href="{{url_for('static', filename = 'vendor/css/jquery-ui.structure.min.css')}}" />
+		<link rel="stylesheet" href="{{url_for('static', filename = 'vendor/css/jquery-ui.theme.min.css')}}" />
+		<link rel="stylesheet" href="{{url_for('static', filename = 'vendor/css/jquery.tagit.css')}}" />
+		<link rel="stylesheet" href="{{url_for('static', filename = 'vendor/css/tagit.ui-zendesk.css')}}" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 		<script type=text/javascript>
 			BASE_URL = {{ pageoptions.base_url|tojson|safe }};
 		</script>
 		<script type="text/javascript" src="{{url_for('static', filename='vendor/js/jquery.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='vendor/js/jquery-ui.min.js')}}"></script>
 	</head>
 	<body>
 		{% block body %}
@@ -17,6 +23,7 @@
 		</div>
 		{% endblock %}
 		<script type="application/x-javascript" src="{{url_for('static', filename='vendor/js/jquery.form.min.js')}}"></script>
-		<script type="text/javascript" src="{{url_for('static', filename='js/script.js')}}"></script>
+        <script type="application/x-javascript" src="{{url_for('static', filename='vendor/js/tag-it.min.js')}}"></script>
+		<script type="application/x-javascript" src="{{url_for('static', filename='js/script.js')}}"></script>
 	</body>
 </html>

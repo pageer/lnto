@@ -352,6 +352,16 @@ ul.link-list li {
 	width: 100%;
 }
 
+/* TODO: Fix the rule specificity so this isn't needed. */
+#add-link-form input.tagit-hidden-field {
+    display: none;
+}
+
+/* TODO: Not sure why I need this... */
+#add-link-form ul.tagit li.tagit-new {
+    //float: none;
+}
+
 #add-link-form .checkbox input,
 #add-link-form .checkbox label {
 	display: inline;
