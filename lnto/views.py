@@ -257,7 +257,7 @@ def do_add_link():
             flash('This link already exists.  Try editing it instead.', 'error')
             return redirect(url_for('do_edit_link', linkid=link.linkid))
 
-        taglist = form.tags.data.split(',') if form.tags.data else []
+        taglist = form.tags_string.data.split(',') if form.tags_string.data else []
         link.set_tags(taglist)
 
         if form.validate():
@@ -301,36 +301,40 @@ def do_add_from_url(url):
 
 @app.route('/link/edit/<linkid>', methods=['GET', 'POST'])
 @login_required
-def do_edit_link(linkid):
+def do_edit_link(linkid): 
     errors = []
 
     link = Link.get_by_id(linkid)
     if not link:
         abort(404)
+    link.tags_string = ', '.join(link.get_taglist())
 
     options = {
         'button_label': 'Save',
         'post_view': url_for('do_edit_link', linkid=linkid)
     }
 
+    form: forms.AddLink = forms.AddLink(formdata=request.form, data=link.__dict__, referer=get_referer())
+    form.is_public.data = link.is_public
+
     if request.method == 'POST':
         link.name = request.form.get('name')
         link.description = request.form.get('description')
         link.shortname = request.form.get('shortname')
         link.url = request.form.get('url')
-        link.is_public = request.form.get('is_public') == '1'
+        link.is_public = request.form.get('is_public', '') == 'y'
 
-        if request.form.get('tags').strip() == '':
+        if request.form.get('tags_string', '').strip() == '':
             taglist = []
         else:
-            taglist = request.form.get('tags').split(',')
+            taglist = request.form.get('tags_string').split(',')
 
         link.set_tags(taglist)
 
         if not (request.form.get('name') and request.form.get('url')):
             errors.append("Name and URL are required")
 
-        if errors:
+        if not errors:
             link.save()
             if request.form.get('referer'):
                 return redirect(request.form.get('referer'))
@@ -340,6 +344,7 @@ def do_edit_link(linkid):
     return render_template(
         "link_add.html",
         pageoptions=get_default_data(),
+        form=form,
         link=link,
         options=options,
         tags=tags,

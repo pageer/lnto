@@ -224,7 +224,7 @@ LinkEditor = {
             return val ? val : null;
         });
 
-        $('#tags').tagit({
+        $('#tags_string').tagit({
             singleField: true,
             allowSpaces: true,
             availableTags: availableTags,

@@ -72,7 +72,7 @@ class AddLink(FlaskForm):
             'cols': 40
         }
     )
-    tags = StringField(
+    tags_string: StringField = StringField(
         "Tags",
         filters=[lambda x: x.strip()],
         render_kw={'placeholder': "Comma-separated list of tags"}
