@@ -2,6 +2,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, BooleanField, \
                     HiddenField, validators
+from wtforms.fields.html5 import URLField
 
 class AddUser(FlaskForm):
     username = StringField(
@@ -56,7 +57,7 @@ class AddLink(FlaskForm):
             'placeholder': "(Optional) A unique short name to access the URL",
         }
     )
-    url = StringField(
+    url: URLField = URLField (
         "Link",
         [validators.DataRequired("URL is required")],
         render_kw={

@@ -5,7 +5,7 @@
     <h3>Add link by URL</h3>
     <p>Type or paste the link to bookmark here to fetch the page metadata.</p>
     <form method="post" action="{{url_for('do_add_from_url')}}">
-        <input type="text" placeholder="URL to bookmark" class="fetch-by-url" name="fetch_url" value="{{url}}" />
+        <input type="url" placeholder="URL to bookmark" class="fetch-by-url" name="fetch_url" value="{{url}}" />
         <input type="submit" value="Add" />
     </form>
 </div>

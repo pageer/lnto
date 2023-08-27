@@ -268,14 +268,15 @@ IndividualEditor = {
 			$.post(posturl, {url: url}, function (response, textStatus) {
 				console.log("Response is ", response.status);
 				if (response.status != 'success') {
-					console.log(response.data.message);
+                    $form.find('.updating').remove();
+					console.log(response.message);
 					return;
 				}
 				if (response.data.name) {
 					$form.find('#name').val(response.data.name);
 				}
 				if (response.data.description) {
-					$form.find('#decsription').val(response.data.decsription);
+					$form.find('#description').val(response.data.decsription);
 				}
 				$form.find('.updating').remove();
 			});
