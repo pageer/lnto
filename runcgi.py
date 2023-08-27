@@ -1,8 +1,6 @@
 #!./venv/bin/python
 
-
 import os
-import sys
 os.putenv('VIRTUAL_ENVIRONMENT', os.path.join(os.getcwd(), 'venv'))
 
 from wsgiref.handlers import CGIHandler

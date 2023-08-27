@@ -5,6 +5,11 @@ RewriteRule ^(.*)$ runcgi.py/$1 [L]
 <Files "config.cfg">
 	Deny from all
 </Files>
+
 <Files "config.py">
+	Deny from all
+</Files>
+
+<Files "error.log">
 	Deny from all
 </Files>

@@ -12,16 +12,6 @@ suitable for use as your browser homepage.  Oh, and you can also use it to
 share your links with others if you want.
 
 
-REQUIREMENTS
-============
-(Note: versions just indicate what lnto has been tested with.  Others may work.)
-Flask (>= 0.9)
-SQLAlchemy (>= 0.8)
-alembic
-Flask-SQLAlchemy
-beautifulsoup4
-
-
 SETUP
 =====
 1) Extract the archive and copy the files to your host.
@@ -35,7 +25,7 @@ SETUP
    should also work, but you're on your own.
 4) Import the initial database schema using the appropriate file in the schema
    directory.
-5) Create a config.cfg file in your lnto directory.  Add the following lines:
+5) Create a config.py file in your lnto directory.  Add the following lines:
    SECRET_KEY = '<secret_key_value_here'
    SQLALCHEMY_DATABASE_URI = '<database_uri_here>'
    a) To generate a secret key, you can use the gen-secret-key.py CGI script.
