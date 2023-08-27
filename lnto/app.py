@@ -21,11 +21,11 @@ app = Flask(__name__) #pylint: disable=invalid-name
 app.config.from_object(__name__)
 app.config.from_pyfile('../config.py', True)
 
-#import logging
-#from logging import FileHandler
-#file_handler = FileHandler('error.log')
-#file_handler.setLevel(logging.ERROR)
-#app.logger.addHandler(file_handler)
+import logging
+from logging import FileHandler
+file_handler = FileHandler('error.log')
+file_handler.setLevel(logging.ERROR)
+app.logger.addHandler(file_handler)
 
 appdb = SQLAlchemy(app) #pylint: disable=invalid-name
 
