@@ -276,7 +276,7 @@ IndividualEditor = {
 					$form.find('#name').val(response.data.name);
 				}
 				if (response.data.description) {
-					$form.find('#description').val(response.data.decsription);
+					$form.find('#description').val(response.data.description);
 				}
 				$form.find('.updating').remove();
 			});
