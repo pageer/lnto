@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-activate_this = '/home/skepticats/www/www/lnto/venv/bin/activate_this.py'
-execfile(activate_this, dict(__file__=activate_this))
+# Old virtualenv stuff for Python 27
+#activate_this = '/home/skepticats/www/www/lnto/venv/bin/activate_this.py'
+#execfile(activate_this, dict(__file__=activate_this))
+import os
+os.putenv('VIRTUAL_ENVIRONMENT', os.path.join(os.getcwd(), 'venv'))
 
 from wsgiref.handlers import CGIHandler
 import lnto
