@@ -1,40 +1,49 @@
 # Runtime requirements — shared by local dev and production host.
 #
-# History: the original pins (see git) were Flask 2.0.1-era and worked on the
-# host's old Python 3.9. When the host moved to Python 3.11 and the local
-# machine to 3.14/3.15, those pins became unbuildable (Werkzeug 2.0.1 uses
-# ast.Str, removed in Python 3.12; Flask-Login 0.5 imports a Werkzeug API
-# removed in 2.1). The set below is the closest modern combination that runs
-# unchanged on both Python 3.11 and 3.15.
+# History: the original pins were Flask 2.0.1-era (see git history). When the
+# host moved to Python 3.11 and the local machine to 3.14/3.15, those pins
+# became unbuildable; the 2026-11 security pass then pushed the set to the
+# current versions, chosen to clear all open Dependabot pip alerts while
+# keeping the app's model/view code working unchanged.
 #
 # Notes:
+# - Flask 3.1.x required by the Flask session CVE alert (Vary: Cookie).
+#   Needed the matching major bumps: Flask-SQLAlchemy 3.1.x and
+#   SQLAlchemy 2.1.x. The models keep the legacy Query API, which 2.x still
+#   supports; changes required were: drop convert_unicode Column kwarg
+#   (lnto/libs/links.py), fix a two-target .join() call (lnto/libs/tags.py),
+#   and rework tests/db.py for the per-app engine/metadata model.
+# - Werkzeug 3.1.9 clears all Werkzeug alerts (debugger RCE, multipart DoS,
+#   Windows safe_join family). Flask 2.2.x is NOT compatible with Werkzeug
+#   3.1 (removed werkzeug.__version__).
+# - Mako 1.4.x, python-dotenv 1.2.x, soupsieve 4.x clear their respective
+#   alerts (TemplateLookup path traversal, set_key symlink overwrite, CSS
+#   parser ReDoS family).
+# - WTForms 3.1.x pairs with Flask-WTF 1.2.x. forms.py imports URLField from
+#   wtforms directly (wtforms.fields.html5 was removed in 3.0) and the
+#   strip-filter lambdas guard against None (3.x runs filters on None).
 # - PyMySQL is the DB driver. Locally the app uses SQLite (default
 #   SQLALCHEMY_DATABASE_URI), so PyMySQL is simply unused; on the host,
 #   config.py uses the mysql+pymysql:// scheme. Pure Python, installs
 #   everywhere — no MySQL headers needed.
-# - SQLAlchemy stays on 1.4.x: the models use the 1.4 Query API.
-# - Jinja2 3.1.x pairs with MarkupSafe 3.x. Do NOT bump Flask/Werkzeug/SQLAlchemy
-#   requirements-dev.txt and the old requirements files in git history.
-# - Dev tools (pylint etc.) live in requirements-dev.txt; greenlet is not
-#   needed (no asyncio).
-alembic==1.6.5
+# - Dev tools live in requirements-dev.txt; greenlet is not needed
+#   (no asyncio).
+alembic==1.20.1
 beautifulsoup4==4.9.3
+blinker==1.9.0
 click==8.1.8
 colorama==0.4.6
-Flask==2.2.5
+Flask==3.1.3
 Flask-Login==0.6.3
-Flask-SQLAlchemy==2.5.1
-Flask-WTF==0.15.1
-itsdangerous==2.1.2
+Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.2
+itsdangerous==2.2.0
 Jinja2==3.1.6
-Mako==1.3.10
+Mako==1.4.3
 MarkupSafe==3.0.4
 PyMySQL==1.1.2
-python-dateutil==2.8.2
-python-dotenv==0.19.0
-python-editor==1.0.4
-six==1.16.0
-soupsieve==2.2.1
-SQLAlchemy==1.4.54
-Werkzeug==2.3.8
-WTForms==2.3.3
+python-dotenv==1.2.4
+soupsieve==4.1.3
+SQLAlchemy==2.1.9
+Werkzeug==3.1.9
+WTForms==3.1.2

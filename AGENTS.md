@@ -64,19 +64,23 @@ commit `linkto.db`, `lnto/tmp.db`, or `error.log` (gitignored).
 
 ## Dependency constraints (important)
 
-The pinned versions are chosen to work on both Python 3.11 and
-3.14/3.15. Do not bump majors without testing in both environments:
+The pinned versions are the 2026-11 security-pass set. Do not downgrade
+or bump majors without testing in both environments:
 
-- **SQLAlchemy stays 1.4.x** — the models (`lnto/libs/*.py`) use the
-  1.4 `Query` API (`appdb.session.query(...)`, `.filter_by()`,
-  lazy loading configured via relationship strings).
-- **Werkzeug must be >= 2.1** — 2.0.x uses `ast.Str`, removed in
-  Python 3.12, but older app code assumes the 2.x routing behavior;
-  2.3.8 is the tested pin.
-- **Flask stays 2.2.x** — Flask-SQLAlchemy 2.5.1 imports
-  `flask._app_ctx_stack`, removed in Flask 2.3.
-- **WTForms stays 2.3.x** — `lnto/forms.py` imports
-  `wtforms.fields.html5`, removed in WTForms 3.0.
+- **Flask 3.1.x / Werkzeug 3.1.x** — required by the Dependabot alert
+  set (Flask session `Vary: Cookie`, Werkzeug debugger RCE and Windows
+  `safe_join` family). Flask 2.2.x cannot run on Werkzeug 3.1.
+- **SQLAlchemy 2.1.x with Flask-SQLAlchemy 3.1.x** — the models keep
+  the legacy `Query` API (`appdb.session.query(...)`), which 2.x still
+  supports. Known constraints: no `convert_unicode` Column kwarg,
+  `.join()` takes one target per call, and engines/metadata are
+  per-app (see `tests/db.py` for the pattern).
+- **WTForms 3.1.x with Flask-WTF 1.2.x** — `lnto/forms.py` imports
+  `URLField` from `wtforms` directly (3.0 removed
+  `wtforms.fields.html5`) and its strip-filter lambdas guard against
+  `None` (3.x runs filters on `None`).
+- **Mako 1.4.x, python-dotenv 1.2.x, soupsieve 4.x, alembic 1.20.x** —
+  security-driven pins; alembic 1.20 is required for SQLAlchemy 2.x.
 - **PyMySQL** is the only DB driver; never add mysqlclient (no MySQL
   headers on the shared host, and its wheels don't match the host
   glibc).

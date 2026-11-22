@@ -1,19 +1,38 @@
 from datetime import datetime
+import os
+
+import sqlalchemy
 
 import lnto
 from lnto.libs.links import Link
 from lnto.libs.links import LinkHit
 from lnto.libs.users import User
 
+_test_ctx = None
+_test_db_path = os.path.join(os.path.dirname(lnto.__file__), 'tmp.db')
+
 def init_test_db():
 
-    lnto.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tmp.db'
-    lnto.appdb.init_app(lnto.app)
+    uri = 'sqlite:///' + _test_db_path.replace('\\', '/')
+    lnto.app.config['SQLALCHEMY_DATABASE_URI'] = uri
+    # Flask-SQLAlchemy 3.x creates the engine once at init_app time and
+    # refuses a second init_app, so install a fresh engine for the test
+    # database directly. Also push an app context, which is required for
+    # create_all and any session use during the test.
+    with lnto.app.app_context():
+        lnto.appdb.engines.pop(None, None)
+        lnto.appdb.engines[None] = sqlalchemy.create_engine(uri)
+    global _test_ctx
+    _test_ctx = lnto.app.app_context()
+    _test_ctx.push()
     lnto.appdb.create_all()
     create_test_data()
 
 def delete_test_db():
     lnto.appdb.drop_all()
+    _test_ctx.pop()
+
+_test_ctx = None
 
 def create_test_data():
     link_data = [

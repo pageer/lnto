@@ -59,7 +59,8 @@ class Tag(appdb.Model):
     def get_cloud_by_user(userid):
         tags = appdb.session \
                 .query(Tag, appdb.func.count('*').label('num_links')) \
-                .join(link_tags, lnto.libs.links.Link) \
+                .join(link_tags) \
+                .join(lnto.libs.links.Link) \
                 .filter_by(userid=userid) \
                 .group_by(Tag) \
                 .order_by(text('num_links DESC')) \

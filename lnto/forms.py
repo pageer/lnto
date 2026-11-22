@@ -1,14 +1,13 @@
 # pylint: disable=too-few-public-methods, import-error
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, BooleanField, \
-                    HiddenField, validators
-from wtforms.fields.html5 import URLField
+                    HiddenField, URLField, validators
 
 class AddUser(FlaskForm):
     username = StringField(
         "Username",
         [validators.DataRequired("You must give a username")],
-        filters=[lambda x: x.strip()]
+        filters=[lambda x: x.strip() if x is not None else x]
     )
     password = PasswordField(
         "Password",
@@ -16,7 +15,7 @@ class AddUser(FlaskForm):
             validators.DataRequired("You must give a password"),
             validators.Length(min=3)
         ],
-        filters=[lambda x: x.strip()]
+        filters=[lambda x: x.strip() if x is not None else x]
     )
     confirm = PasswordField("Confirm", [
         validators.DataRequired(),
@@ -75,7 +74,7 @@ class AddLink(FlaskForm):
     )
     tags_string: StringField = StringField(
         "Tags",
-        filters=[lambda x: x.strip()],
+        filters=[lambda x: x.strip() if x is not None else x],
         render_kw={'placeholder': "Comma-separated list of tags"}
     )
     is_public = BooleanField("Is public")
