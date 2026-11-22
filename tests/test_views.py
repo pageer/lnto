@@ -9,7 +9,7 @@ try:
 except Exception:
     import mock
 
-from mock import Mock
+from unittest.mock import Mock
 
 sys.path.insert(0, dirname(dirname(abspath(__file__))))
 
@@ -110,7 +110,7 @@ class ViewTest(TestCase):
             shortname=u'',
             url=u'http://example.com/',
             description=u'',
-            tags=u'foo,bar',
+            tags_string=u'foo,bar',
             is_public=u'1'
         )
         self.client.post('/link/add', data=post_data)
@@ -121,7 +121,7 @@ class ViewTest(TestCase):
             shortname=u'',
             url=u'http://example.com/',
             description=u'',
-            tags=u'foo,bar',
+            tags_string=u'foo,bar',
             is_public=True,
             referer='/',
             redirect_to_target='0'
