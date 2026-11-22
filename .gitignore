@@ -13,3 +13,6 @@ lnto/tmp.db
 .vibediff.pid
 review-comments.txt
 vibediff.log
+
+# host connection settings (push-assets.ps1)
+.env
