@@ -1,0 +1,14 @@
+# Development-only tools. Not needed in production (the host's venv
+# should only ever install requirements.txt).
+#
+# The test suite is plain unittest with an optional fallback to the old
+# standalone `mock` package (not needed on Python 3.3+, unittest.mock
+# covers it). `nose` was listed in the old requirements file but was never
+# imported by the tests — dropped as dead weight.
+#
+# pylint was pinned at 2.10.2 in the old requirements, but its dependency
+# lazy-object-proxy 1.6.0 no longer builds on modern Pythons; modern pylint
+# is pure-Python and installs everywhere.
+-r requirements.txt
+pytest
+pylint
