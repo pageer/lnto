@@ -8,3 +8,8 @@ tags.lock
 node_modules
 config.py
 lnto/tmp.db
+
+# vibediff review state
+.vibediff.pid
+review-comments.txt
+vibediff.log
